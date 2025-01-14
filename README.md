@@ -1,5 +1,5 @@
 # Zipsoon (집순)
-네이버 부동산 데이터 기반 맞춤형 주거지 추천 서비스
+맞춤형 주거지 추천 서비스
 
 ## 1. 프로젝트 소개
 
@@ -14,20 +14,18 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
   </tr>
   <tr>
     <td style="text-align: center;">
-      <img src="/images/main.png" alt="Main Screen" style="display: block; margin: 0 auto;">
+      <img src="/assets/images/guest-screen.png" alt="메인 화면(게스트)" style="display: block; margin: 0 auto;">
       <br>
-      • 라이프스타일별 맞춤 필터링<br>
-      • 개인화된 가중치 설정<br>
-      • 실시간 인기 매물 노출<br>
-      • 교통, 교육, 편의시설 등 카테고리별 필터
+      • <i>인기 매물</i> 순위별 노출<br>
+      • 디폴트 옵션 3개로 매물 점수 계산<br>
+      • 매물 가격 노출
     </td>
     <td style="text-align: center;">
-      <img src="/images/search.png" alt="Search Result" style="display: block; margin: 0 auto;">
+      <img src="/assets/images/user-screen.png" alt="메인 화면(회원)" style="display: block; margin: 0 auto;">
       <br>
-      • 사용자 설정 기반 매물 점수 (10점 만점)<br>
-      • 카테고리별 세부 점수 분석<br>
-      • 선호도에 따른 매물 정렬<br>
-      • 매물 기본 정보 요약 제공
+      • <i>사용자 지정 매물</i> 순위별 노출<br>
+      • 사용자가 설정한 옵션들로 매물 점수 계산<br>
+      • 매물 가격, 상위 3개옵션 점수 노출
     </td>
   </tr>
   <tr>
@@ -36,20 +34,16 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
   </tr>
   <tr>
     <td style="text-align: center;">
-      <img src="/images/detail.png" alt="Detail Screen" style="display: block; margin: 0 auto;">
+      <img src="/assets/images/detail-screen.png" alt="매물 상세보기 화면" style="display: block; margin: 0 auto;">
       <br>
-      • 종합 점수 상세 분석 차트<br>
-      • 점수 산정 근거 설명<br>
-      • 매물 및 중개사무소 정보<br>
-      • 반경 내 주요 시설 및 교통 정보
+      • 매물 종합 평점과 세부 정보 제공<br>
+      • 사용자가 선택한 옵션별 점수 노출
     </td>
     <td style="text-align: center;">
-      <img src="/images/settings.png" alt="Settings Screen" style="display: block; margin: 0 auto;">
+      <img src="/assets/images/settings-screen.png" alt="유저 정보 화면" style="display: block; margin: 0 auto;">
       <br>
-      • 카테고리별 중요도 설정<br>
-      • 불필요 항목 제외 기능<br>
-      • 관심 지역 등록<br>
-      • 실시간 매물 알림 설정
+      • 사전 제공되는 옵션 목록 제공<br>
+      • 사용자 옵션 추가, 제거, 순위 변경 기능 제공
     </td>
   </tr>
 </table>
@@ -75,10 +69,12 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
 - 네이버 부동산 매물 데이터 크롤링 및 동기화
 - 지역별 매물 정보 업데이트 관리
 
-### ii) 맞춤형 추천 시스템
-- 사용자 우선순위 기반 점수화 알고리즘
-- 다중 요소 가중치 계산 시스템
-- 선호도 기반 매물 필터링
+### ii) 맞춤형 필터 시스템
+- 매물 점수 계산 시스템
+- 옵션에 따른 매물 필터링
 
-### iii) 성능 최적화
-- TBD
+### iii) 추천 시스템
+- (TBD) 사용자의 성별, 나이, 지역에 따른 추천 시스템
+
+### iv) 성능 최적화
+- (TBD)
