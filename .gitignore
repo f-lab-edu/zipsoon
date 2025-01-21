@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Environment Variables
+.env
+
+# Gradle
+.gradle
+build/

@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://db.wdnnpbyamdkwwzwxskak.supabase.co:5432/postgres
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  profiles:
+    active: local
+
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+logging:
+  level:
+    org.springframework.batch: DEBUG
+    com.zipsoon.zipsoonbatch: DEBUG
+
+naver:
+  land:
+    base-url: https://new.land.naver.com/api
+    auth-token: ${NAVER_AUTH_TOKEN}
