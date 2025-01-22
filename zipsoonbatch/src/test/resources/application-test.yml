@@ -1,0 +1,10 @@
+spring:
+  batch:
+    job:
+      enabled: false
+
+logging:
+  level:
+    org.springframework.batch: INFO
+    com.zipsoon.zipsoonbatch: DEBUG
+

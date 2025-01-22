@@ -47,7 +47,7 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testImplementation 'me.paulschwarz:spring-dotenv:4.0.0'
     testAnnotationProcessor 'org.projectlombok:lombok'
-	
+
 }
 
 tasks.named('test') {
