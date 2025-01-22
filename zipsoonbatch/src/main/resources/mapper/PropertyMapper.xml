@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zipsoon.zipsoonbatch.repository.mapper.PropertyMapper">
+    <select id="findByPlatformTypeAndPlatformId" resultType="com.zipsoon.zipsoonbatch.domain.Property">
+        SELECT *
+        FROM property
+        WHERE platform_type = #{platformType}
+        AND platform_id = #{platformId}
+    </select>
+
+    <insert id="save" parameterType="com.zipsoon.zipsoonbatch.domain.Property">
+        INSERT INTO property (
+            platform_type, platform_id, name, type, trade_type, trade_type_code,
+            price, area, area_p, location, address, floor_info, direction,
+            building_name, age_type, price_change_state, verification_type,
+            realtor_name, feature_description, tags, image_url, same_addr_count,
+            same_addr_max_price, same_addr_min_price, status, last_checked,
+            created_at, updated_at
+        ) VALUES (
+            #{platformType}, #{platformId}, #{name}, #{type}, #{tradeType}, #{tradeTypeCode},
+            #{price}, #{area}, #{areaP}, ST_SetSRID(ST_MakePoint(#{location.x}, #{location.y}), 4326),
+            #{address}, #{floorInfo}, #{direction}, #{buildingName}, #{ageType},
+            #{priceChangeState}, #{verificationType}, #{realtorName}, #{featureDescription},
+            #{tags,typeHandler=com.zipsoon.zipsoonbatch.config.typehandler.StringArrayTypeHandler}, #{imageUrl}, #{sameAddrCount}, #{sameAddrMaxPrice}, #{sameAddrMinPrice},
+            #{status}, #{lastChecked}, #{createdAt}, #{updatedAt}
+        )
+    </insert>
+</mapper>
