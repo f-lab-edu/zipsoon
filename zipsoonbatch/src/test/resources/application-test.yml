@@ -1,10 +1,24 @@
 spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgis:15-3.4:///test_db?TC_REUSABLE=true
+
   batch:
-    job:
-      enabled: false
+    jdbc:
+      initialize-schema: always
+
+  sql:
+    init:
+      mode: always
+      schema-locations:
+        - classpath:org/springframework/batch/core/schema-postgresql.sql
+        - classpath:schema.sql
+
+testcontainers:
+  reuse:
+    enable: true
 
 logging:
   level:
     org.springframework.batch: INFO
     com.zipsoon.zipsoonbatch: DEBUG
-
