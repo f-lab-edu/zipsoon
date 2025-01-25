@@ -47,7 +47,7 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testImplementation 'me.paulschwarz:spring-dotenv:4.0.0'
     testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
+    testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql:1.20.4'
     testImplementation 'org.testcontainers:testcontainers:1.20.4'
 }

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db.wdnnpbyamdkwzwxskak.supabase.co:5432/postgres
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  batch:
+    job:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.batch: INFO
+    com.zipsoon.zipsoonbatch: INFO
