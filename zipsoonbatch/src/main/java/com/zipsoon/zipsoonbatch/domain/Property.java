@@ -2,11 +2,13 @@ package com.zipsoon.zipsoonbatch.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 public class Property {
     private Long id;

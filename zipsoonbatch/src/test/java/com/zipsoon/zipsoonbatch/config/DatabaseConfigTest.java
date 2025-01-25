@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -33,6 +35,17 @@ public class DatabaseConfigTest {
         assertThat(version)
             .isNotNull()
             .contains("PostgreSQL");
+    }
+
+    @Test
+    @DisplayName("Spring Batch 메타데이터 테이블이 생성되어야 한다")
+    void batchTablesExist(@Autowired JdbcTemplate jdbcTemplate) {
+        Integer result = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name LIKE 'batch_%'",
+            Integer.class
+        );
+
+        assertThat(result).isGreaterThan(0);
     }
 
     @Test

@@ -9,10 +9,11 @@ spring:
     active: local
 
   batch:
+    jdbc:
+      initialize-schema: never
     job:
       enabled: false
-    jdbc:
-      initialize-schema: always
+
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml

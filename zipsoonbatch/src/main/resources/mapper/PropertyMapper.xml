@@ -10,7 +10,8 @@
         AND platform_id = #{platformId}
     </select>
 
-    <insert id="save" parameterType="com.zipsoon.zipsoonbatch.domain.Property">
+    <insert id="save" parameterType="com.zipsoon.zipsoonbatch.domain.Property"
+            useGeneratedKeys="true" keyProperty="id">
         INSERT INTO property (
             platform_type, platform_id, name, type, trade_type, trade_type_code,
             price, area, area_p, location, address, floor_info, direction,
@@ -23,8 +24,14 @@
             #{price}, #{area}, #{areaP}, ST_SetSRID(ST_MakePoint(#{location.x}, #{location.y}), 4326),
             #{address}, #{floorInfo}, #{direction}, #{buildingName}, #{ageType},
             #{priceChangeState}, #{verificationType}, #{realtorName}, #{featureDescription},
-            #{tags,typeHandler=com.zipsoon.zipsoonbatch.config.typehandler.StringArrayTypeHandler}, #{imageUrl}, #{sameAddrCount}, #{sameAddrMaxPrice}, #{sameAddrMinPrice},
+            #{tags}, #{imageUrl}, #{sameAddrCount}, #{sameAddrMaxPrice}, #{sameAddrMinPrice},
             #{status}, #{lastChecked}, #{createdAt}, #{updatedAt}
         )
+        ON CONFLICT (platform_type, platform_id) DO UPDATE
+        SET
+            price = #{price},
+            status = #{status},
+            last_checked = #{lastChecked},
+            updated_at = #{updatedAt}
     </insert>
 </mapper>
