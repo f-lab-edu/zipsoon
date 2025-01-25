@@ -1,31 +1,14 @@
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
-
-  profiles:
-    active: local
+    url: jdbc:postgresql://db.wdnnpbyamdkwzwxskak.supabase.co:5432/postgres
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 
   batch:
-    jdbc:
-      initialize-schema: never
     job:
-      enabled: false
-
-mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
-  type-handlers-package: com.zipsoon.zipsoonbatch.config.typehandler
+      enabled: true
 
 logging:
   level:
-    org.springframework.batch: DEBUG
-    com.zipsoon.zipsoonbatch: DEBUG
-
-naver:
-  land:
-    base-url: https://new.land.naver.com/api
-    auth-token: ${NAVER_AUTH_TOKEN}
+    org.springframework.batch: INFO
+    com.zipsoon.zipsoonbatch: INFO
