@@ -3,7 +3,7 @@ package com.zipsoon.zipsoonbatch.job;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.zipsoonbatch.job.reader.NaverResponseDto;
-import com.zipsoon.zipsoonbatch.job.reader.NaverLandClient;
+import com.zipsoon.zipsoonbatch.job.reader.NaverClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
-class NaverLandClientTest {
+class NaverClientTest {
 
     @Autowired
-    private NaverLandClient naverLandClient;
+    private NaverClient naverClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -32,7 +32,7 @@ class NaverLandClientTest {
         int page = 1;
 
         // when
-        NaverResponseDto response = naverLandClient.getArticles(cortarNo, page);
+        NaverResponseDto response = naverClient.get(cortarNo, page);
 
         // then
         assertThat(response).isNotNull();

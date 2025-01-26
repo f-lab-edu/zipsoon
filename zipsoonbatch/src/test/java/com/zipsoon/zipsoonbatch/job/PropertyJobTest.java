@@ -12,13 +12,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBatchTest
 @SpringBootTest
-@ActiveProfiles("test")
-class PropertyJobConfigTest {
+@ActiveProfiles("local")
+class PropertyJobTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -38,7 +40,7 @@ class PropertyJobConfigTest {
     void jobExecutes() throws Exception {
         // given
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("datetime", "2025-01-22T10:00:00")
+                .addString("datetime", LocalDateTime.now().toString())
                 .toJobParameters();
 
         // when
