@@ -13,7 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NaverLandClient {
+public class NaverClient {
     private final RestTemplate restTemplate;
 
     @Value("${naver.land.base-url}")
@@ -27,7 +27,7 @@ public class NaverLandClient {
         maxAttempts = 3,
         backoff = @Backoff(delay = 2000)
     )
-    public NaverArticleResponseDto getArticles(String cortarNo, int page) {
+    public NaverResponseDto get(String cortarNo, int page) {
         HttpHeaders headers = createHeaders();
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -39,11 +39,11 @@ public class NaverLandClient {
             .build()
             .toUriString();
 
-        ResponseEntity<NaverArticleResponseDto> response = restTemplate.exchange(
+        ResponseEntity<NaverResponseDto> response = restTemplate.exchange(
             url,
             HttpMethod.GET,
             requestEntity,
-            NaverArticleResponseDto.class
+            NaverResponseDto.class
         );
 
         if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {

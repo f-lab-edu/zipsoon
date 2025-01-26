@@ -5,15 +5,22 @@ import com.zipsoon.zipsoonbatch.repository.mapper.PropertyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
 public class PropertyRepository {
     private final PropertyMapper propertyMapper;
 
-    public Optional<Property> findByPlatformTypeAndPlatformId(String platformType, String platformId) {
-        return propertyMapper.findByPlatformTypeAndPlatformId(platformType, platformId);
+    public Optional<Property> findByPlatformAndId(String platformType, String id) {
+        return propertyMapper.findByPlatformAndId(platformType, id);
+    }
+
+    public void updateLastCheckedById(Long id, LocalDateTime lastChecked) {
+        propertyMapper.updateLastCheckedById(id, lastChecked);
     }
 
     public void save(Property property) {

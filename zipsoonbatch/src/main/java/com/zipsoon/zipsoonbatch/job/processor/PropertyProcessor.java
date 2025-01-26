@@ -3,8 +3,7 @@ package com.zipsoon.zipsoonbatch.job.processor;
 import com.zipsoon.zipsoonbatch.domain.PlatformType;
 import com.zipsoon.zipsoonbatch.domain.Property;
 import com.zipsoon.zipsoonbatch.domain.PropertyStatusType;
-import com.zipsoon.zipsoonbatch.job.reader.NaverArticleResponseDto;
-import com.zipsoon.zipsoonbatch.repository.PropertyRepository;
+import com.zipsoon.zipsoonbatch.job.reader.NaverResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -15,62 +14,85 @@ import org.springframework.batch.item.ItemProcessor;
 
 import java.time.LocalDateTime;
 
+
 @Slf4j
 @RequiredArgsConstructor
-public class PropertyProcessor implements ItemProcessor<NaverArticleResponseDto.ArticleDto, Property> {
+public class PropertyProcessor implements ItemProcessor<NaverResponseDto.ArticleDto, Property> {
     private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-    private final PropertyRepository propertyRepository;
-
     @Override
-    public Property process(NaverArticleResponseDto.ArticleDto item) {
-        log.debug("Processing article: {}", item.getArticleNo());
+    public Property process(NaverResponseDto.ArticleDto item) {
+        LocalDateTime now = LocalDateTime.now();
 
-        Point location = createPoint(item.getLongitude(), item.getLatitude());
+        return Property.builder()
+                .id(null)   // autoincrement
+                .platformType(PlatformType.NAVER)
+                .platformId(item.getArticleNo())
+                .articleName(item.getArticleName())
+                .articleStatus(item.getArticleStatus())
+                .realEstateTypeCode(item.getRealEstateTypeCode())
+                .realEstateTypeName(item.getRealEstateTypeName())
+                .articleRealEstateTypeCode(item.getArticleRealEstateTypeCode())
+                .articleRealEstateTypeName(item.getArticleRealEstateTypeName())
+                .tradeTypeCode(item.getTradeTypeCode())
+                .tradeTypeName(item.getTradeTypeName())
+                .verificationTypeCode(item.getVerificationTypeCode())
+                .floorInfo(item.getFloorInfo())
+                .priceChangeState(item.getPriceChangeState())
+                .isPriceModification(item.isPriceModification())
+                .price(item.getDealOrWarrantPrc())
+                .rentPrc(item.getRentPrc())
+                .dealOrWarrantPrc(item.getDealOrWarrantPrc())
+                .areaName(item.getAreaName())
+                .area1(item.getArea1())
+                .area2(item.getArea2())
+                .direction(item.getDirection())
+                .articleConfirmYmd(item.getArticleConfirmYmd())
+                .representativeImgUrl(item.getRepresentativeImgUrl())
+                .articleFeatureDesc(item.getArticleFeatureDesc())
+                .tags(item.getTagList())
+                .buildingName(item.getBuildingName())
+                .sameAddrCnt(item.getSameAddrCnt())
+                .sameAddrDirectCnt(item.getSameAddrDirectCnt())
+                .sameAddrMaxPrc(item.getSameAddrMaxPrc())
+                .sameAddrMinPrc(item.getSameAddrMinPrc())
+                .cpid(item.getCpid())
+                .cpName(item.getCpName())
+                .cpPcArticleUrl(item.getCpPcArticleUrl())
+                .cpPcArticleBridgeUrl(item.getCpPcArticleBridgeUrl())
+                .cpPcArticleLinkUseAtArticleTitleYn(item.getCpPcArticleLinkUseAtArticleTitleYn())
+                .cpPcArticleLinkUseAtCpNameYn(item.getCpPcArticleLinkUseAtCpNameYn())
+                .cpMobileArticleUrl(item.getCpMobileArticleUrl())
+                .cpMobileArticleLinkUseAtArticleTitleYn(item.getCpMobileArticleLinkUseAtArticleTitleYn())
+                .cpMobileArticleLinkUseAtCpNameYn(item.getCpMobileArticleLinkUseAtCpNameYn())
+                .isLocationShow(item.getIsLocationShow())
+                .realtorName(item.getRealtorName())
+                .realtorId(item.getRealtorId())
+                .tradeCheckedByOwner(item.getTradeCheckedByOwner())
+                .isDirectTrade(item.getIsDirectTrade())
+                .isInterest(item.getIsInterest())
+                .isComplex(item.getIsComplex())
+                .detailAddress(item.getDetailAddress())
+                .detailAddressYn(item.getDetailAddressYn())
+                .virtualAddressYn(item.getVirtualAddressYn())
+                .isVrExposed(item.getIsVrExposed())
+                .location(createPoint(item.getLongitude(), item.getLatitude()))
+                .status(PropertyStatusType.ACTIVE)
+                .lastChecked(now)
+                .createdAt(now)
+                .updatedAt(now)
+                .deletedAt(null)    // set when deleted
+                .build();
 
-        Property property = Property.builder()
-            .platformType(PlatformType.NAVER)
-            .platformId(item.getArticleNo())
-            .name(item.getArticleName())
-            .type(item.getRealEstateTypeName())
-            .tradeType(item.getTradeTypeName())
-            .tradeTypeCode(item.getTradeTypeCode())
-            .price(item.getDealOrWarrantPrc())
-            .area(item.getArea1())
-            .areaP(item.getArea2())
-            .location(location)
-            .floorInfo(item.getFloorInfo())
-            .direction(item.getDirection())
-            .buildingName(item.getBuildingName())
-            .priceChangeState(item.getPriceChangeState())
-            .verificationType(item.getVerificationTypeCode())
-            .realtorName(item.getRealtorName())
-            .featureDescription(item.getArticleFeatureDesc())
-            .tags(item.getTagList())
-            .imageUrl(item.getRepresentativeImgUrl())
-            .sameAddrCount(item.getSameAddrCnt())
-            .sameAddrMaxPrice(item.getSameAddrMaxPrc())
-            .sameAddrMinPrice(item.getSameAddrMinPrc())
-            .status(PropertyStatusType.ACTIVE)
-            .lastChecked(LocalDateTime.now())
-            .build();
-
-        // 기존 매물이 있는지 확인
-        propertyRepository.findByPlatformTypeAndPlatformId(
-                PlatformType.NAVER.name(),
-                item.getArticleNo()
-            )
-            .ifPresent(existingProperty -> {
-                property.setId(existingProperty.getId());
-                property.setCreatedAt(existingProperty.getCreatedAt());
-            });
-
-        return property;
     }
 
     private Point createPoint(String longitude, String latitude) {
-        double lon = Double.parseDouble(longitude);
-        double lat = Double.parseDouble(latitude);
-        return geometryFactory.createPoint(new Coordinate(lon, lat));
+        if (longitude == null || latitude == null) {
+            throw new IllegalArgumentException("Coordinates must not be null");
+        }
+        return geometryFactory.createPoint(new Coordinate(
+                Double.parseDouble(longitude),
+                Double.parseDouble(latitude)
+        ));
     }
 }
