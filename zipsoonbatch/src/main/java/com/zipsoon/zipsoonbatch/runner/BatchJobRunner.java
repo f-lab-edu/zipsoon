@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class BatchJobRunner implements CommandLineRunner {
     private final JobLauncher jobLauncher;
-    private final Job propertyCollectionJob;  // Job 이름과 동일한 빈을 주입받음
+    private final Job propertyCollectionJob;
 
     @Override
     public void run(String... args) throws Exception {
