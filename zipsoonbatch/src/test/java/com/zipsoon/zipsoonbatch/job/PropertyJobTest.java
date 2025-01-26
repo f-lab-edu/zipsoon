@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBatchTest
 @SpringBootTest
 @ActiveProfiles("test")
-class PropertyCollectionJobConfigTest {
+class PropertyJobConfigTest {
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
