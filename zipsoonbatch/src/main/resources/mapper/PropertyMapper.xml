@@ -3,35 +3,72 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.zipsoon.zipsoonbatch.repository.mapper.PropertyMapper">
-    <select id="findByPlatformTypeAndPlatformId" resultType="com.zipsoon.zipsoonbatch.domain.Property">
+    <select id="findByPlatformAndId" resultType="com.zipsoon.zipsoonbatch.domain.Property">
         SELECT *
         FROM property
         WHERE platform_type = #{platformType}
         AND platform_id = #{platformId}
     </select>
 
-    <insert id="save" parameterType="com.zipsoon.zipsoonbatch.domain.Property"
-            useGeneratedKeys="true" keyProperty="id">
+    <update id="updateLastCheckedById">
+        UPDATE property
+        SET last_checked = #{lastChecked}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="save" parameterType="com.zipsoon.zipsoonbatch.domain.Property" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO property (
-            platform_type, platform_id, name, type, trade_type, trade_type_code,
-            price, area, area_p, location, address, floor_info, direction,
-            building_name, age_type, price_change_state, verification_type,
-            realtor_name, feature_description, tags, image_url, same_addr_count,
-            same_addr_max_price, same_addr_min_price, status, last_checked,
-            created_at, updated_at
+            platform_type, platform_id, article_name, article_status,
+            real_estate_type_code, real_estate_type_name,
+            article_real_estate_type_code, article_real_estate_type_name,
+            trade_type_code, trade_type_name, verification_type_code,
+            floor_info, price_change_state, is_price_modification,
+            price, rent_prc, deal_or_warrant_prc,
+            area_name, area1, area2, direction,
+            article_confirm_ymd, representative_img_url,
+            article_feature_desc, tags, building_name,
+            same_addr_cnt, same_addr_direct_cnt,
+            same_addr_max_prc, same_addr_min_prc,
+            cpid, cp_name, cp_pc_article_url,
+            cp_pc_article_bridge_url,
+            cp_pc_article_link_use_at_article_title_yn,
+            cp_pc_article_link_use_at_cp_name_yn,
+            cp_mobile_article_url,
+            cp_mobile_article_link_use_at_article_title_yn,
+            cp_mobile_article_link_use_at_cp_name_yn,
+            is_location_show, realtor_name, realtor_id,
+            trade_checked_by_owner, is_direct_trade, is_interest,
+            is_complex, detail_address, detail_address_yn,
+            virtual_address_yn, is_vr_exposed,
+            location, status, last_checked,
+            created_at, updated_at, deleted_at
         ) VALUES (
-            #{platformType}, #{platformId}, #{name}, #{type}, #{tradeType}, #{tradeTypeCode},
-            #{price}, #{area}, #{areaP}, ST_SetSRID(ST_MakePoint(#{location.x}, #{location.y}), 4326),
-            #{address}, #{floorInfo}, #{direction}, #{buildingName}, #{ageType},
-            #{priceChangeState}, #{verificationType}, #{realtorName}, #{featureDescription},
-            #{tags}, #{imageUrl}, #{sameAddrCount}, #{sameAddrMaxPrice}, #{sameAddrMinPrice},
-            #{status}, #{lastChecked}, #{createdAt}, #{updatedAt}
+            #{platformType}, #{platformId}, #{articleName}, #{articleStatus},
+            #{realEstateTypeCode}, #{realEstateTypeName},
+            #{articleRealEstateTypeCode}, #{articleRealEstateTypeName},
+            #{tradeTypeCode}, #{tradeTypeName}, #{verificationTypeCode},
+            #{floorInfo}, #{priceChangeState}, #{isPriceModification},
+            #{price}, #{rentPrc}, #{dealOrWarrantPrc},
+            #{areaName}, #{area1}, #{area2}, #{direction},
+            #{articleConfirmYmd}, #{representativeImgUrl},
+            #{articleFeatureDesc}, #{tags}, #{buildingName},
+            #{sameAddrCnt}, #{sameAddrDirectCnt},
+            #{sameAddrMaxPrc}, #{sameAddrMinPrc},
+            #{cpid}, #{cpName}, #{cpPcArticleUrl},
+            #{cpPcArticleBridgeUrl},
+            #{cpPcArticleLinkUseAtArticleTitleYn},
+            #{cpPcArticleLinkUseAtCpNameYn},
+            #{cpMobileArticleUrl},
+            #{cpMobileArticleLinkUseAtArticleTitleYn},
+            #{cpMobileArticleLinkUseAtCpNameYn},
+            #{isLocationShow}, #{realtorName}, #{realtorId},
+            #{tradeCheckedByOwner}, #{isDirectTrade}, #{isInterest},
+            #{isComplex}, #{detailAddress}, #{detailAddressYn},
+            #{virtualAddressYn}, #{isVrExposed},
+            ST_SetSRID(ST_MakePoint(#{location.x}, #{location.y}), 4326),
+            #{status}, #{lastChecked},
+            #{createdAt}, #{updatedAt}, #{deletedAt}
         )
-        ON CONFLICT (platform_type, platform_id) DO UPDATE
-        SET
-            price = #{price},
-            status = #{status},
-            last_checked = #{lastChecked},
-            updated_at = #{updatedAt}
     </insert>
+
 </mapper>
