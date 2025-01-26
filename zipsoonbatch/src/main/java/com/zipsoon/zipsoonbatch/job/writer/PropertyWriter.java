@@ -6,77 +6,63 @@ import com.zipsoon.zipsoonbatch.repository.PropertyHistoryRepository;
 import com.zipsoon.zipsoonbatch.repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 public class PropertyWriter implements ItemWriter<Property> {
     private final PropertyRepository propertyRepository;
     private final PropertyHistoryRepository propertyHistoryRepository;
+    private final Javers javers = JaversBuilder.javers().build();
 
     @Override
     public void write(Chunk<? extends Property> items) {
         log.info("Writing {} properties", items.size());
 
-        for (Property property : items) {
-            Optional<Property> existingPropertyOpt = propertyRepository.findByPlatformTypeAndPlatformId(
-                property.getPlatformType().name(),
-                property.getPlatformId()
-            );
-
-            if (existingPropertyOpt.isPresent()) {
-                // 기존 매물
-                Property existingProperty = existingPropertyOpt.get();
-                if (hasChanges(existingProperty, property)) {
-                    property.setId(existingProperty.getId());
-                    property.setCreatedAt(existingProperty.getCreatedAt());
-                    property.setUpdatedAt(LocalDateTime.now());
-                    propertyRepository.save(property);
-
-                    recordHistory(property.getId(),
-                        "UPDATE",
-                        propertyToString(existingProperty),
-                        propertyToString(property));
-                }
-            } else {
-                // 신규 매물
-                property.setCreatedAt(LocalDateTime.now());
-                property.setUpdatedAt(LocalDateTime.now());
-                propertyRepository.save(property);
+        for (Property newProp : items) {
+            try {
+                newProp.setCreatedAt(LocalDateTime.now());
+                propertyRepository.save(newProp);
+            } catch (DuplicateKeyException e) {
+                Property oldProp = propertyRepository.findByPlatformAndId(
+                    newProp.getPlatformType().name(),
+                    newProp.getPlatformId()
+                ).get(); // 반드시 존재
+                Property updatedProp = compareAndUpdateProperty(oldProp, newProp);
+                propertyRepository.updateLastCheckedById(updatedProp.getId(), LocalDateTime.now());
             }
         }
+
     }
 
-    private void recordHistory(Long propertyId, String changeType,
-                             String beforeValue, String afterValue) {
-        PropertyHistory history = PropertyHistory.builder()
-            .propertyId(propertyId)
-            .changeType(changeType)
-            .beforeValue(beforeValue)
-            .afterValue(afterValue)
-            .createdAt(LocalDateTime.now())
-            .build();
+    private Property compareAndUpdateProperty(Property oldProp, Property newProp) {
+        newProp.setLastChecked(LocalDateTime.now());
 
-        propertyHistoryRepository.save(history);
-    }
+        Diff diff = javers.compare(oldProp, newProp);
+        if (!diff.hasChanges()) return newProp;
 
-    private boolean hasChanges(Property existingProperty, Property newProperty) {
-        return !propertyToString(existingProperty).equals(propertyToString(newProperty));
-    }
+        diff.getChanges().stream()
+            .filter(ValueChange.class::isInstance)
+            .map(ValueChange.class::cast)
+            .map(valueChange -> PropertyHistory.builder()
+                    .propertyId(oldProp.getId())
+                    .changeType(valueChange.getPropertyName())
+                    .beforeValue(valueChange.getLeft() != null ? valueChange.getLeft().toString() : null)
+                    .afterValue(valueChange.getRight() != null ? valueChange.getRight().toString() : null)
+                    .createdAt(LocalDateTime.now())
+                    .build())
+            .forEach(propertyHistoryRepository::save);
 
-    private String propertyToString(Property property) {
-        return String.format("%s|%s|%s|%s|%s|%s",
-            property.getPrice(),
-            property.getStatus(),
-            property.getTradeType(),
-            property.getArea(),
-            property.getFeatureDescription(),
-            property.getPriceChangeState()
-        );
+        newProp.setUpdatedAt(LocalDateTime.now());
+        return newProp;
     }
 
 }

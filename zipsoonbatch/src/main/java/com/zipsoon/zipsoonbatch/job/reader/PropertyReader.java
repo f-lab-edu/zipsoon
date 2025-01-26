@@ -4,24 +4,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 
 @Slf4j
-public class PropertyReader implements ItemReader<NaverArticleResponseDto.ArticleDto> {
+public class PropertyReader implements ItemReader<NaverResponseDto.ArticleDto> {
     private static final String HARD_CODED_DONG_CODE = "1111018000";
 
-    private final NaverLandClient naverLandClient;
-    private NaverArticleResponseDto.ArticleDto[] currentArticles;
+    private final NaverClient naverClient;
+    private NaverResponseDto.ArticleDto[] currentArticles;
     private int currentArticleIndex;
     private int currentPage;
     private boolean hasMore;
 
-    public PropertyReader(NaverLandClient naverLandClient) {
-        this.naverLandClient = naverLandClient;
+    public PropertyReader(NaverClient naverClient) {
+        this.naverClient = naverClient;
         this.currentPage = 0;
         this.currentArticleIndex = 0;
         this.hasMore = true;
     }
 
     @Override
-    public NaverArticleResponseDto.ArticleDto read() {
+    public NaverResponseDto.ArticleDto read() {
         if (currentArticles == null || currentArticleIndex >= currentArticles.length) {
             if (!hasMore) {
                 return null;
@@ -40,7 +40,7 @@ public class PropertyReader implements ItemReader<NaverArticleResponseDto.Articl
     private void fetchNextPage() {
         log.info("Fetching page {} for dongCode: {}", currentPage, HARD_CODED_DONG_CODE);
 
-        NaverArticleResponseDto response = naverLandClient.getArticles(HARD_CODED_DONG_CODE, currentPage);
+        NaverResponseDto response = naverClient.get(HARD_CODED_DONG_CODE, currentPage);
         currentArticles = response.getArticleList();
         currentArticleIndex = 0;
         hasMore = response.isMoreData();
