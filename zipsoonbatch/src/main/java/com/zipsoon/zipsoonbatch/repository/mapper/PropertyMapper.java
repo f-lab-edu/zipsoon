@@ -1,6 +1,7 @@
 package com.zipsoon.zipsoonbatch.repository.mapper;
 
 import com.zipsoon.zipsoonbatch.domain.Property;
+import com.zipsoon.zipsoonbatch.domain.UpsertResult;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,15 +12,11 @@ import java.util.Set;
 
 @Mapper
 public interface PropertyMapper {
+    Optional<Property> findById(@Param("id") Long id);
     Optional<Property> findByPlatformAndId(
         @Param("platformType") String platformType,
         @Param("platformId") String platformId
     );
-
-    void updateLastCheckedById(
-        @Param("id") Long id,
-        @Param("lastChecked") LocalDateTime lastChecked
-    );
-
-    void save(Property property);
+    int insert(Property property);
+    void update(Property property);
 }
