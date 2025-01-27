@@ -3,20 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.zipsoon.zipsoonbatch.repository.mapper.PropertyMapper">
-    <select id="findByPlatformAndId" resultType="com.zipsoon.zipsoonbatch.domain.Property">
+    <select id="findById" resultType="com.zipsoon.zipsoonbatch.domain.Property">
         SELECT *
         FROM property
-        WHERE platform_type = #{platformType}
-        AND platform_id = #{platformId}
+        WHERE id = #{id}
     </select>
 
-    <update id="updateLastCheckedById">
-        UPDATE property
-        SET last_checked = #{lastChecked}
-        WHERE id = #{id}
-    </update>
-
-    <insert id="save" parameterType="com.zipsoon.zipsoonbatch.domain.Property" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.zipsoon.zipsoonbatch.domain.Property">
         INSERT INTO property (
             platform_type, platform_id, article_name, article_status,
             real_estate_type_code, real_estate_type_name,
@@ -69,6 +62,22 @@
             #{status}, #{lastChecked},
             #{createdAt}, #{updatedAt}, #{deletedAt}
         )
+        ON CONFLICT (platform_type, platform_id)
+        DO UPDATE SET
+            last_checked = EXCLUDED.last_checked
     </insert>
+
+    <select id="findByPlatformAndId" resultType="com.zipsoon.zipsoonbatch.domain.Property">
+        SELECT *
+        FROM property
+        WHERE platform_type = #{platformType}
+        AND platform_id = #{platformId}
+    </select>
+
+    <update id="update" parameterType="com.zipsoon.zipsoonbatch.domain.Property">
+        UPDATE property
+        SET updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
 
 </mapper>
