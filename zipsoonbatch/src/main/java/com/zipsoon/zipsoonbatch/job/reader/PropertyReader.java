@@ -46,5 +46,10 @@ public class PropertyReader implements ItemReader<NaverResponseDto.ArticleDto> {
         hasMore = response.isMoreData();
 
         log.info("Fetched {} articles. More data available: {}", currentArticles.length, hasMore);
+
+        if (currentPage > 50) {
+            hasMore = false;
+            log.warn("Reached maximum page limit");
+        }
     }
 }

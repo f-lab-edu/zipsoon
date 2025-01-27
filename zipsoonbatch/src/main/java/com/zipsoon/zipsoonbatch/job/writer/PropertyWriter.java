@@ -2,6 +2,7 @@ package com.zipsoon.zipsoonbatch.job.writer;
 
 import com.zipsoon.zipsoonbatch.domain.Property;
 import com.zipsoon.zipsoonbatch.domain.PropertyHistory;
+import com.zipsoon.zipsoonbatch.domain.UpsertResult;
 import com.zipsoon.zipsoonbatch.repository.PropertyHistoryRepository;
 import com.zipsoon.zipsoonbatch.repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,10 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,27 +29,24 @@ public class PropertyWriter implements ItemWriter<Property> {
     public void write(Chunk<? extends Property> items) {
         log.info("Writing {} properties", items.size());
 
-        for (Property newProp : items) {
-            try {
-                newProp.setCreatedAt(LocalDateTime.now());
-                propertyRepository.save(newProp);
-            } catch (DuplicateKeyException e) {
-                Property oldProp = propertyRepository.findByPlatformAndId(
-                    newProp.getPlatformType().name(),
-                    newProp.getPlatformId()
-                ).get(); // 반드시 존재
-                Property updatedProp = compareAndUpdateProperty(oldProp, newProp);
-                propertyRepository.updateLastCheckedById(updatedProp.getId(), LocalDateTime.now());
+        List<? extends Property> properties = items.getItems();
+        for (Property newProp : properties) {
+            UpsertResult result = propertyRepository.upsert(newProp);
+
+            if ("UPDATE".equals(result.getOperation())) {
+                Property oldProp = propertyRepository.findById(result.getId()).get();
+                recordChanges(oldProp, newProp);
             }
         }
-
     }
 
-    private Property compareAndUpdateProperty(Property oldProp, Property newProp) {
-        newProp.setLastChecked(LocalDateTime.now());
-
+    private void recordChanges(Property oldProp, Property newProp) {
         Diff diff = javers.compare(oldProp, newProp);
-        if (!diff.hasChanges()) return newProp;
+        if (!diff.hasChanges()) return;
+
+        LocalDateTime now = LocalDateTime.now();
+        newProp.setUpdatedAt(now);
+        propertyRepository.update(newProp);
 
         diff.getChanges().stream()
             .filter(ValueChange.class::isInstance)
@@ -55,14 +54,11 @@ public class PropertyWriter implements ItemWriter<Property> {
             .map(valueChange -> PropertyHistory.builder()
                     .propertyId(oldProp.getId())
                     .changeType(valueChange.getPropertyName())
-                    .beforeValue(valueChange.getLeft() != null ? valueChange.getLeft().toString() : null)
-                    .afterValue(valueChange.getRight() != null ? valueChange.getRight().toString() : null)
-                    .createdAt(LocalDateTime.now())
+                    .beforeValue(Optional.ofNullable(valueChange.getLeft()).map(Object::toString).orElse(null))
+                    .afterValue(Optional.ofNullable(valueChange.getRight()).map(Object::toString).orElse(null))
+                    .createdAt(now)
                     .build())
             .forEach(propertyHistoryRepository::save);
-
-        newProp.setUpdatedAt(LocalDateTime.now());
-        return newProp;
     }
 
 }
