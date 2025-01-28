@@ -49,9 +49,6 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
 </table>
 
 ## 3. Tech Stack
-Looking at what we've specifically discussed so far, here's a more focused and accurate Tech Stack section:
-
-### 3. Tech Stack
 
 **Core**
 - Java 17
