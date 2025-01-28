@@ -49,10 +49,32 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
 </table>
 
 ## 3. Tech Stack
-- Java 11
-- Spring Boot 2.7.x
-- Mybatis
-- MySQL 8.0
+Looking at what we've specifically discussed so far, here's a more focused and accurate Tech Stack section:
+
+### 3. Tech Stack
+
+**Core**
+- Java 17
+- Spring Boot 3.2.x
+- Spring Security with JWT Authentication
+- MyBatis
+
+**Database**
+- PostgreSQL 15 with PostGIS extension
+- Supabase
+
+**Testing**
+- JUnit 5
+- Testcontainers for integration testing
+- Mockito for unit testing
+
+**Build & Development**
+- Gradle 8.x
+- Docker
+- Docker Compose
+
+**API Documentation**
+- Swagger/OpenAPI
 
 ## 4. System Architecture
 [시스템 아키텍처 다이어그램]
