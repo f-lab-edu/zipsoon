@@ -74,13 +74,150 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
 - Swagger/OpenAPI
 
 ## 4. System Architecture
-[시스템 아키텍처 다이어그램]
+```mermaid
+flowchart TD
+    NaverLand[부동산 중개 사이트] -->|batch| ZipsoonBatch
+    PublicData[공공데이터] -->|batch| ZipsoonBatch
+    ZipsoonBatch -->|Insert/Update| DB[(PostgreSQL + PostGIS)]
+    DB -->|Read| ZipsoonApp
+    ZipsoonApp <-->|REST API| 유저
+    
+    subgraph " "
+        ZipsoonBatch
+    end
+    
+    subgraph " "
+        ZipsoonApp
+    end
+```
 
 ## 5. ERD
-[ERD 다이어그램]
+```mermaid
+erDiagram
+    Property ||--o{ PropertyHistory : "changes"
+    Property ||--o{ PropertyMapping : "mapped_to"
+    User ||--o{ UserFilter : "has"
+    UserFilter ||--o{ UserFilterOption : "consists_of"
+    
+    Property {
+        bigint id PK
+        varchar platform_type
+        varchar platform_id
+        varchar name
+        varchar type
+        varchar trade_type
+        decimal price
+        decimal area
+        point location
+        etc etc
+        timestamp last_checked
+    }
+
+    PropertyHistory {
+        bigint id PK
+        bigint property_id FK
+        varchar change_type
+        text before_value
+        text after_value
+        timestamp created_at
+    }
+
+    PropertyMapping {
+        bigint id PK
+        bigint base_property_id FK
+        bigint mapped_property_id FK
+        decimal similarity_score
+        timestamp created_at
+    }
+
+    User {
+        bigint id PK
+        varchar email
+        varchar password
+        varchar name
+        varchar provider
+        timestamp created_at
+    }
+
+    UserFilter {
+        bigint id PK
+        bigint user_id FK
+        varchar name
+        varchar description
+        timestamp created_at
+    }
+
+    UserFilterOption {
+        bigint id PK
+        bigint user_filter_id FK
+        varchar category
+        varchar name
+        integer priority 
+        decimal weight
+        jsonb config
+    }
+```
 
 ## 6. API 명세
-[Swagger UI 링크]
+
+### Properties
+```http
+GET /api/v1/properties
+    ?bounds=nw_lat,nw_lng,se_lat,se_lng
+    &filters={"transport":{"stations":["강남역"],"maxMinutes":30}}
+    &page=0 ⚠️변경가능
+    &size=20 ⚠️변경가능
+
+GET /api/v1/properties/{id}
+
+GET /api/v1/properties/search
+    ?keyword=강남역
+    &filters=
+    &page=0 ⚠️변경가능
+    &size=20 ⚠️변경가능
+```
+
+### User Preferences 
+```http
+POST /api/v1/users/preferences
+GET /api/v1/users/preferences
+PUT /api/v1/users/preferences/{id}
+```
+
+### Facilities
+```http
+GET /api/v1/facilities
+    ?type=HOSPITAL
+    &bounds=nw_lat,nw_lng,se_lat,se_lng
+```
+
+# Filter Set 관리
+```http
+POST /api/v1/users/filter-sets
+GET /api/v1/users/filter-sets
+GET /api/v1/users/filter-sets/{id}
+PUT /api/v1/users/filter-sets/{id}
+DELETE /api/v1/users/filter-sets/{id}
+```
+
+# Filter Set 내 필터 관리
+```http
+POST /api/v1/users/filter-sets/{setId}/filters
+GET /api/v1/users/filter-sets/{setId}/filters
+PUT /api/v1/users/filter-sets/{setId}/filters/{filterId}
+DELETE /api/v1/users/filter-sets/{setId}/filters/{filterId}
+PATCH /api/v1/users/filter-sets/{setId}/filters/reorder
+```
+
+### Authentication
+```http
+POST /api/v1/auth/signup
+POST /api/v1/auth/login
+POST /api/v1/auth/oauth/{provider}
+POST /api/v1/auth/refresh
+DELETE /api/v1/auth/logout
+```
+
 
 ## 7. Technical Challenge
 
