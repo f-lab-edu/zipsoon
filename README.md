@@ -17,15 +17,15 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
       <img src="/assets/images/guest-screen.png" alt="메인 화면(게스트)" style="display: block; margin: 0 auto;">
       <br>
       • <i>인기 매물</i> 순위별 노출<br>
-      • 디폴트 옵션 3개로 매물 점수 계산<br>
+      • 게스트용 필터로 매물 점수 계산<br>
       • 매물 가격 노출
     </td>
     <td style="text-align: center;">
       <img src="/assets/images/user-screen.png" alt="메인 화면(회원)" style="display: block; margin: 0 auto;">
       <br>
       • <i>사용자 지정 매물</i> 순위별 노출<br>
-      • 사용자가 설정한 옵션들로 매물 점수 계산<br>
-      • 매물 가격, 상위 3개옵션 점수 노출
+      • 사용자가 설정한 필터로 매물 점수 계산<br>
+      • 매물 가격, 상위 3개필터 노출
     </td>
   </tr>
   <tr>
@@ -37,16 +37,18 @@ Zipsoon은 사용자의 라이프스타일과 우선순위에 기반하여 최�
       <img src="/assets/images/detail-screen.png" alt="매물 상세보기 화면" style="display: block; margin: 0 auto;">
       <br>
       • 매물 종합 평점과 세부 정보 제공<br>
-      • 사용자가 선택한 옵션별 점수 노출
+      • 사용자가 선택한 필터별 점수 노출
     </td>
     <td style="text-align: center;">
       <img src="/assets/images/settings-screen.png" alt="유저 정보 화면" style="display: block; margin: 0 auto;">
       <br>
-      • 사전 제공되는 옵션 목록 제공<br>
-      • 사용자 옵션 추가, 제거, 순위 변경 기능 제공
+      • 사전 제공되는 필터 제공<br>
+      • 필터 추가, 제거, 순위 변경 기능 제공
     </td>
   </tr>
 </table>
+
+![zipsoon_specification](https://github.com/user-attachments/assets/f576f0b6-dc21-4ace-b5f7-e3aef9801c47)
 
 ## 3. Tech Stack
 
