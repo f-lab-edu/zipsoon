@@ -193,7 +193,7 @@ GET /api/v1/facilities
     &bounds=nw_lat,nw_lng,se_lat,se_lng
 ```
 
-# Filter Set 관리
+### Filter Set 관리
 ```http
 POST /api/v1/users/filter-sets
 GET /api/v1/users/filter-sets
@@ -202,7 +202,7 @@ PUT /api/v1/users/filter-sets/{id}
 DELETE /api/v1/users/filter-sets/{id}
 ```
 
-# Filter Set 내 필터 관리
+### Filter Set 내 필터 관리
 ```http
 POST /api/v1/users/filter-sets/{setId}/filters
 GET /api/v1/users/filter-sets/{setId}/filters
