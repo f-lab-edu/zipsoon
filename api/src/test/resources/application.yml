@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgis:15-3.4:///test_db
+
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+
+  test:
+    database:
+      replace: none
+
+logging:
+  level:
+    root: DEBUG
+    org.testcontainers: INFO
+    org.springframework.test: INFO
+    org.springframework.jdbc.datasource.init: DEBUG
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.zipsoon.common.domain
+  configuration:
+    map-underscore-to-camel-case: true
+
+naver:
+  land:
+    base-url: https://new.land.naver.com/api
+    auth-token: ${NAVER_AUTH_TOKEN}
