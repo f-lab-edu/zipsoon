@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db.wdnnpbyamdkwzwxskak.supabase.co:5432/postgres
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+logging:
+  file:
+    name: ./logs/zipsoon-api.log
+  level:
+    root: INFO
+    com.zipsoon.api: INFO

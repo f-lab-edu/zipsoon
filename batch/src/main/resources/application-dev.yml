@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DEV_DB_JDBC_URI}
+    username: ${DEV_DB_USER}
+    password: ${DEV_DB_PASSWORD}
+
+logging:
+  file:
+    name: ./logs/zipsoon-batch.log
+  level:
+    root: DEBUG
+    org.springframework.batch: DEBUG
+    com.zipsoon.batch: DEBUG

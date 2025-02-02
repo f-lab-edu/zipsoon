@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zipsoon.common.repository.PropertySnapshotMapper">
+
+    <insert id="insertPropertySnapshots" parameterType="java.util.List">
+        INSERT INTO property_snapshot (
+            platform_type,
+            platform_id,
+            raw_data,
+            prop_name,
+            prop_type,
+            trade_type,
+            price,
+            rent_price,
+            area_meter,
+            area_pyeong,
+            location,
+            address,
+            tags,
+            dong_code,
+            created_at
+        ) VALUES
+        <foreach collection="list" item="propertySnapshot" separator=",">
+            (
+            #{propertySnapshot.platformType, typeHandler=com.zipsoon.common.config.typehandler.PlatformTypeHandler},
+            #{propertySnapshot.platformId},
+            #{propertySnapshot.rawData, typeHandler=com.zipsoon.common.config.typehandler.JsonTypeHandler},
+            #{propertySnapshot.propName},
+            #{propertySnapshot.propType, typeHandler=com.zipsoon.common.config.typehandler.PropTypeHandler},
+            #{propertySnapshot.tradeType, typeHandler=com.zipsoon.common.config.typehandler.TradeTypeHandler},
+            #{propertySnapshot.price},
+            #{propertySnapshot.rentPrice},
+            #{propertySnapshot.areaMeter},
+            #{propertySnapshot.areaPyeong},
+            #{propertySnapshot.location, typeHandler=com.zipsoon.common.config.typehandler.PointTypeHandler, jdbcType=OTHER},
+            #{propertySnapshot.address},
+            #{propertySnapshot.tags, typeHandler=com.zipsoon.common.config.typehandler.StringArrayTypeHandler},
+            #{propertySnapshot.dongCode},
+            #{propertySnapshot.createdAt}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectAllPropertySnapshots" resultType="com.zipsoon.common.domain.PropertySnapshot">
+        SELECT
+            id,
+            platform_type,
+            platform_id,
+            raw_data,
+            prop_name,
+            prop_type,
+            trade_type,
+            price,
+            rent_price,
+            area_meter,
+            area_pyeong,
+            ST_AsText(location) as location,
+            address,
+            tags,
+            dong_code,
+            created_at
+        FROM property_snapshot
+    </select>
+
+    <select id="findPropertiesInRadius" resultType="com.zipsoon.common.domain.PropertySnapshot">
+        SELECT
+            id,
+            platform_type,
+            platform_id,
+            raw_data,
+            prop_name,
+            prop_type,
+            trade_type,
+            price,
+            rent_price,
+            area_meter,
+            area_pyeong,
+            ST_AsText(location) as location,
+            address,
+            tags,
+            dong_code,
+            created_at
+        FROM property_snapshot
+        WHERE ST_DWithin(
+            location,
+            ST_SetSRID(ST_MakePoint(#{point.x}, #{point.y}), 4326)::geography,
+            #{radius}
+        )
+    </select>
+
+</mapper>

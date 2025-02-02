@@ -1,0 +1,17 @@
+spring:
+  config:
+    import: 
+      - classpath:application.yml
+      - optional:file:../.env
+  datasource:
+    url: jdbc:postgresql://localhost:5432/zipsoon_api_dev
+    username: postgres
+    password: postgres
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-handlers-package: com.zipsoon.api.config.typehandler
+
+logging:
+  level:
+    com.zipsoon.api: DEBUG
