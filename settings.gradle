@@ -1,0 +1,4 @@
+rootProject.name = 'zipsoon'
+include 'api'
+include 'batch'
+include 'common'
