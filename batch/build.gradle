@@ -1,0 +1,23 @@
+dependencies {
+    implementation project(':common')
+
+    // Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+    // Test
+    testImplementation 'org.springframework.batch:spring-batch-test'
+}
+
+processResources {
+    from("${rootProject.projectDir}/config") {
+        include "*.env"
+    }
+}
+
+bootRun {
+    args = ["--spring.config.additional-location=optional:${rootProject.projectDir}/config/"]
+}
+
+test {
+    systemProperty "spring.config.additional-location", "optional:${rootProject.projectDir}/config/"
+}
