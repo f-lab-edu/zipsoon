@@ -96,39 +96,22 @@ flowchart TD
 ## 5. ERD
 ```mermaid
 erDiagram
-    Property ||--o{ PropertyHistory : "changes"
-    Property ||--o{ PropertyMapping : "mapped_to"
-    User ||--o{ UserFilter : "has"
-    UserFilter ||--o{ UserFilterOption : "consists_of"
-    
-    Property {
+    PropertySnapshot {
         bigint id PK
-        varchar platform_type
-        varchar platform_id
-        varchar name
-        varchar type
-        varchar trade_type
-        decimal price
-        decimal area
-        point location
-        etc etc
-        timestamp last_checked
-    }
-
-    PropertyHistory {
-        bigint id PK
-        bigint property_id FK
-        varchar change_type
-        text before_value
-        text after_value
-        timestamp created_at
-    }
-
-    PropertyMapping {
-        bigint id PK
-        bigint base_property_id FK
-        bigint mapped_property_id FK
-        decimal similarity_score
+        varchar platform_type "네이버/직방/다방 등"
+        varchar platform_id "플랫폼별 매물 ID"
+        jsonb raw_data "원본 데이터 보관"
+        varchar prop_name "매물명"
+        varchar prop_type "아파트/오피스텔/빌라"
+        varchar trade_type "매매/전세/월세"
+        numeric price "매매가/보증금"
+        numeric rent_price "월세"
+        numeric area_meter "전용면적(㎡)"
+        numeric area_pyeong "전용면적(평)"
+        geometry location "위치(PostGIS Point)"
+        varchar address "주소"
+        varchar[] tags "태그 목록"
+        varchar dong_code "법정동 코드"
         timestamp created_at
     }
 
@@ -141,23 +124,38 @@ erDiagram
         timestamp created_at
     }
 
-    UserFilter {
+    UserFilters {
         bigint id PK
         bigint user_id FK
         varchar name
         varchar description
+        boolean is_active
         timestamp created_at
     }
 
-    UserFilterOption {
+    Filter {
         bigint id PK
-        bigint user_filter_id FK
-        varchar category
-        varchar name
-        integer priority 
-        decimal weight
-        jsonb config
+        bigint filter_set_id FK
+        varchar category "시설/환경/통근"
+        varchar name "필터명"
+        integer priority "우선순위"
+        decimal weight "가중치"
+        jsonb config "필터별 설정"
     }
+
+    ScoreSnapshot {
+        bigint id PK
+        bigint property_id FK
+        bigint filter_set_id FK
+        decimal score "0-10점"
+        jsonb details "상세 점수"
+        timestamp created_at
+    }
+
+    PropertySnapshot ||--o{ Filter : has
+    User ||--o{ UserFilters : owns
+    UserFilters ||--o{ FilterOption : contains
+    UserFilters ||--o{ ScoreSnapshot : produces
 ```
 
 ## 6. API 명세
