@@ -36,4 +36,5 @@ mybatis:
 naver:
   land:
     base-url: https://new.land.naver.com/api
-    auth-token: ${NAVER_AUTH_TOKEN}
+#    auth-token: ${NAVER_AUTH_TOKEN}
+    auth-token: test-token
