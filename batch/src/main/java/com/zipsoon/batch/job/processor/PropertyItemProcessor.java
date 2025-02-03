@@ -2,7 +2,9 @@ package com.zipsoon.batch.job.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.batch.dto.NaverResponseDto;
+import com.zipsoon.batch.exception.PropertyProcessingException;
 import com.zipsoon.common.domain.PropertySnapshot;
+import com.zipsoon.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -13,9 +15,10 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -25,11 +28,35 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
 
     @Override
     public List<PropertySnapshot> process(NaverResponseDto item) {
-        List<PropertySnapshot> snapshots = new ArrayList<>();
+        if (item == null || item.articleList() == null) {
+            throw new PropertyProcessingException(
+                ErrorCode.EXTERNAL_API_ERROR,
+                "Received null or invalid data from Naver API");
+        }
+        String processingDongCode = item.dongCode();
 
-        for (NaverResponseDto.ArticleDto article : item.articleList()) {
-            try {
-                PropertySnapshot snapshot = PropertySnapshot.builder()
+        try {
+            return Arrays.stream(item.articleList())
+                .map(article -> convertToSnapshot(article, processingDongCode))
+                .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            throw new PropertyProcessingException(
+                ErrorCode.EXTERNAL_API_ERROR,
+                "Invalid property data encountered: " + e.getMessage(),
+                Map.of("NaverResponseDto", item)
+            );
+        } catch (Exception e) {
+            throw new PropertyProcessingException(
+                ErrorCode.EXTERNAL_API_ERROR,
+                "Unexpected error during property processing: " + e.getMessage(),
+                Map.of("item", item, "error", e)
+            );
+        }
+    }
+
+    private PropertySnapshot convertToSnapshot(NaverResponseDto.ArticleDto article, String processingDongCode) {
+        try {
+            return PropertySnapshot.builder()
                     .platformType(PropertySnapshot.PlatformType.네이버)
                     .platformId(article.articleNo())
                     .rawData(objectMapper.valueToTree(article))
@@ -43,18 +70,17 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
                     .location(createPoint(article.longitude(), article.latitude()))
                     .address(article.detailAddress())
                     .tags(Arrays.asList(article.tagList()))
-                    .dongCode(item.dongCode())
+                    .dongCode(processingDongCode)
                     .createdAt(LocalDateTime.now())
                     .build();
-                snapshots.add(snapshot);
-            } catch (Exception e) {
-                log.error("Failed to process article {}: {}", article.articleNo(), e.getMessage());
-            }
+        } catch (Exception e) {
+            throw new PropertyProcessingException(
+                    ErrorCode.EXTERNAL_API_ERROR,
+                    "Failed to convert article to PropertySnapshot: " + e.getMessage(),
+                    Map.of("article", article, "error", e)
+            );
         }
-
-        return snapshots;
     }
-
 
     private BigDecimal parsePrice(String priceString) {
         if (priceString == null || priceString.isEmpty()) {
