@@ -1,16 +1,14 @@
 package com.zipsoon.common.domain.user;
 
 import com.zipsoon.common.security.model.AuthProvider;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User {
     private Long id;
     private String email;
@@ -24,21 +22,42 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @Builder
-    public User(Long id, String email, String password, String name, String imageUrl,
-                boolean emailVerified, Role role, AuthProvider provider, String providerId,
-                LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
+    public User withUpdatedProfile(String name, String imageUrl) {
+        return User.builder()
+            .id(this.id)
+            .email(this.email)
+            .password(this.password)
+            .name(name)
+            .imageUrl(imageUrl)
+            .role(this.role)
+            .provider(this.provider)
+            .providerId(this.providerId)
+            .createdAt(this.createdAt)
+            .updatedAt(LocalDateTime.now())
+            .build();
+    }
+
+    public static User createNewUser(String email, String password, String name, PasswordEncoder encoder) {
+        return User.builder()
+                .email(email)
+                .password(encoder.encode(password))
+                .name(name)
+                .role(Role.USER)
+                .emailVerified(false)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public void updateProfile(String name, String imageUrl) {
         this.name = name;
         this.imageUrl = imageUrl;
-        this.emailVerified = emailVerified;
-        this.role = role;
-        this.provider = provider;
-        this.providerId = providerId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public boolean isValidPassword(PasswordEncoder encoder, String rawPassword) {
@@ -48,4 +67,5 @@ public class User {
     public boolean hasRole(Role role) {
         return this.role == role;
     }
+
 }

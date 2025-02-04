@@ -1,6 +1,5 @@
 package com.zipsoon.common.exception;
 
-import com.zipsoon.common.exception.domain.BusinessException;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -29,28 +27,28 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         return ResponseEntity
-            .status(ErrorCode.REQUEST_INVALID.getHttpStatus())
-            .body(ErrorResponseFactory.from(ErrorCode.REQUEST_INVALID, fieldErrors));
+            .status(ErrorCode.BAD_REQUEST.getHttpStatus())
+            .body(ErrorResponseFactory.from(ErrorCode.BAD_REQUEST, fieldErrors));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
         return ResponseEntity
-            .status(ErrorCode.AUTH_FORBIDDEN.getHttpStatus())
-            .body(ErrorResponseFactory.from(ErrorCode.AUTH_FORBIDDEN));
+            .status(ErrorCode.FORBIDDEN_ACCESS.getHttpStatus())
+            .body(ErrorResponseFactory.from(ErrorCode.FORBIDDEN_ACCESS));
     }
 
     @ExceptionHandler(InvalidValueException.class)
     protected ResponseEntity<ErrorResponse> handleInvalidValue(InvalidValueException e) {
         return ResponseEntity
-            .status(e.getErrorCode().getHttpStatus())
+            .status(e.getErrorCode().getHttpStatusCode())
             .body(ErrorResponseFactory.from(e.getErrorCode(), e.getData()));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException e) {
         return ResponseEntity
-            .status(e.getErrorCode().getHttpStatus())
+            .status(e.getErrorCode().getHttpStatusCode())
             .body(ErrorResponseFactory.from(e.getErrorCode(), e.getData()));
     }
 
