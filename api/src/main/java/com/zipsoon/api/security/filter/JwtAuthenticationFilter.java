@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (!jwtProvider.validateToken(token)) {
-                throw new AuthenticationException(ErrorCode.AUTH_UNAUTHORIZED);
+                throw new AuthenticationException(ErrorCode.INVALID_CREDENTIALS);
             }
 
             Authentication auth = jwtProvider.getAuthentication(token);
