@@ -27,7 +27,7 @@ public class ErrorResponseFactory {
 
     public static ErrorResponse from(ErrorCode errorCode) {
         return new ErrorResponse(
-            errorCode.getHttpStatus(),
+            errorCode.getHttpStatusCode(),
             errorCode.getMessage(),
             generateRequestId(),
             LocalDateTime.now(),
@@ -37,7 +37,7 @@ public class ErrorResponseFactory {
 
     public static ErrorResponse from(ErrorCode errorCode, Object data) {
         return new ErrorResponse(
-            errorCode.getHttpStatus(),
+            errorCode.getHttpStatusCode(),
             errorCode.getMessage(),
             generateRequestId(),
             LocalDateTime.now(),
