@@ -25,7 +25,8 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
-naver:
-  land:
-    base-url: https://new.land.naver.com/api
-    auth-token: ${NAVER_AUTH_TOKEN}
+jwt:
+  secret-key: your-secret-key-here
+  access-token-validity-in-milliseconds: 3600000
+  refresh-token-validity-in-milliseconds: 604800000
+
