@@ -2,10 +2,11 @@ package com.zipsoon.common.domain.user;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Mapper
+@Repository
 public interface UserRepository {
     Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
