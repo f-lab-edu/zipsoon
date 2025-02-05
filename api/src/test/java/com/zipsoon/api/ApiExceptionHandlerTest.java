@@ -1,9 +1,9 @@
 package com.zipsoon.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zipsoon.api.auth.controller.UserController;
-import com.zipsoon.api.auth.dto.UserLoginRequest;
-import com.zipsoon.api.auth.service.UserService;
+import com.zipsoon.api.user.controller.UserController;
+import com.zipsoon.api.user.dto.UserLoginRequest;
+import com.zipsoon.api.user.service.UserService;
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;

@@ -1,11 +1,11 @@
 package com.zipsoon.api;
 
-import com.zipsoon.api.auth.dto.UserLoginRequest;
-import com.zipsoon.api.auth.dto.UserSignupRequest;
-import com.zipsoon.api.auth.service.UserService;
+import com.zipsoon.api.user.dto.UserLoginRequest;
+import com.zipsoon.api.user.dto.UserSignupRequest;
+import com.zipsoon.api.user.service.UserService;
 import com.zipsoon.common.domain.user.Role;
 import com.zipsoon.common.domain.user.User;
-import com.zipsoon.common.domain.user.UserRepository;
+import com.zipsoon.common.repository.UserRepository;
 import com.zipsoon.common.exception.domain.AuthenticationException;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.security.dto.AuthToken;
