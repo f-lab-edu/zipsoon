@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zipsoon.api.property.mapper.PropertyMapper">
+
+    <resultMap id="propertyResultMap" type="com.zipsoon.common.domain.PropertySnapshot">
+        <result column="location" property="location" typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"/>
+    </resultMap>
+
+    <select id="findInViewport" resultMap="propertyResultMap">
+        SELECT * FROM property_snapshot
+        WHERE ST_Intersects(
+            location,
+            ST_MakeEnvelope(#{viewport.swLng}, #{viewport.swLat}, #{viewport.neLng}, #{viewport.neLat}, 4326)
+        )
+        LIMIT #{limit}
+    </select>
+
+</mapper>
