@@ -56,7 +56,7 @@ public class NaverClient {
 
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new NaverApiException(
-                    ErrorCode.REQUEST_TIMEOUT, "Naver API call failed.");
+                    ErrorCode.EXTERNAL_API_ERROR, "Naver API call failed.");
             }
             return response.getBody();
         } catch (RestClientException e) {

@@ -92,7 +92,7 @@ class BatchExceptionHandlerTest {
     @DisplayName("배치 작업 중 예기치 않은 실패 예외가 발생한다")
     void exceptionTest_BatchJobFailure() {
         assertThrows(BatchJobFailureException.class, () -> {
-            throw new BatchJobFailureException(ErrorCode.BATCH_JOB_FAILED);
+            throw new BatchJobFailureException(ErrorCode.SERVER_ERROR);
         });
     }
 }

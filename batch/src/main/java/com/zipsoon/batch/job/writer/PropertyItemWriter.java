@@ -36,7 +36,7 @@ public class PropertyItemWriter implements ItemWriter<List<PropertySnapshot>> {
                 );
             } catch (Exception e) {
                 throw new InvalidValueException(
-                    ErrorCode.BATCH_JOB_FAILED,
+                    ErrorCode.INTERNAL_ERROR,
                     "Unexpected failure during batch job execution"
                 );
             }
