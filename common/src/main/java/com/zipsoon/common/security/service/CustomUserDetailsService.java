@@ -1,7 +1,7 @@
 package com.zipsoon.common.security.service;
 
 import com.zipsoon.common.domain.user.User;
-import com.zipsoon.common.domain.user.UserRepository;
+import com.zipsoon.common.repository.UserRepository;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
 import com.zipsoon.common.security.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;

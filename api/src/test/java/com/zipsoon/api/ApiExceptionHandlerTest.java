@@ -1,9 +1,9 @@
 package com.zipsoon.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zipsoon.api.auth.controller.AuthController;
-import com.zipsoon.api.auth.dto.LoginRequest;
-import com.zipsoon.api.auth.service.UserService;
+import com.zipsoon.api.user.controller.UserController;
+import com.zipsoon.api.user.dto.UserLoginRequest;
+import com.zipsoon.api.user.service.UserService;
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class ApiExceptionHandlerTest {
 
@@ -40,28 +40,28 @@ class ApiExceptionHandlerTest {
     @Test
     @DisplayName("validation 어노테이션의 제약조건 위반 시 400 Bad Request")
     void exceptionTest_MethodArgumentNotValid() throws Exception {
-        LoginRequest invalidRequest = new LoginRequest("invalid-email", "");
+        UserLoginRequest invalidRequest = new UserLoginRequest("invalid-email", "");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value(ErrorCode.REQUEST_INVALID.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.getHttpStatus()));
     }
 
     @Test
     @DisplayName("잘못된 요청값으로 비즈니스 로직 처리 실패 시 400 Bad Request")
     void exceptionTest_InvalidValue() throws Exception {
         when(userService.login(any()))
-            .thenThrow(new InvalidValueException(ErrorCode.REQUEST_INVALID));
+            .thenThrow(new InvalidValueException(ErrorCode.BAD_REQUEST));
 
-        LoginRequest request = new LoginRequest("test@test.com", "password");
+        UserLoginRequest request = new UserLoginRequest("test@test.com", "password");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value(ErrorCode.REQUEST_INVALID.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.getHttpStatus()));
     }
 
     @Test
@@ -70,13 +70,13 @@ class ApiExceptionHandlerTest {
         when(userService.login(any()))
             .thenThrow(new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        LoginRequest request = new LoginRequest("test@test.com", "password");
+        UserLoginRequest request = new UserLoginRequest("test@test.com", "password");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.code").value(ErrorCode.USER_NOT_FOUND.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.USER_NOT_FOUND.getHttpStatusCode()));
     }
 
     @Test
@@ -85,7 +85,7 @@ class ApiExceptionHandlerTest {
         when(userService.login(any()))
             .thenThrow(new RuntimeException("Unexpected error"));
 
-        LoginRequest request = new LoginRequest("test@test.com", "password");
+        UserLoginRequest request = new UserLoginRequest("test@test.com", "password");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -100,12 +100,12 @@ class ApiExceptionHandlerTest {
         when(userService.login(any()))
             .thenThrow(new AccessDeniedException("Access denied"));
 
-        LoginRequest request = new LoginRequest("test@test.com", "password");
+        UserLoginRequest request = new UserLoginRequest("test@test.com", "password");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.code").value(ErrorCode.AUTH_FORBIDDEN.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.FORBIDDEN_ACCESS.getHttpStatus()));
     }
 }
