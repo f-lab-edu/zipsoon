@@ -1,5 +1,6 @@
 package com.zipsoon.common.exception;
 
+import com.zipsoon.common.exception.domain.AuthenticationException;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(ErrorCode.FORBIDDEN_ACCESS.getHttpStatus())
             .body(ErrorResponseFactory.from(ErrorCode.FORBIDDEN_ACCESS));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    protected ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException e) {
+        return ResponseEntity
+            .status(e.getErrorCode().getHttpStatusCode())
+            .body(ErrorResponseFactory.from(e.getErrorCode(), e.getData()));
     }
 
     @ExceptionHandler(InvalidValueException.class)
