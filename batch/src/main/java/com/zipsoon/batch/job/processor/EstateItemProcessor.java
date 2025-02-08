@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, List<EstateSnapshot>> {
+public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List<EstateSnapshot>> {
     private final ObjectMapper objectMapper;
 
     @Override
@@ -42,13 +42,13 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
         } catch (IllegalArgumentException e) {
             throw new EstateProcessingException(
                 ErrorCode.EXTERNAL_API_ERROR,
-                "Invalid property data encountered: " + e.getMessage(),
+                "Invalid estate data encountered: " + e.getMessage(),
                 Map.of("NaverResponseDto", item)
             );
         } catch (Exception e) {
             throw new EstateProcessingException(
                 ErrorCode.EXTERNAL_API_ERROR,
-                "Unexpected error during property processing: " + e.getMessage(),
+                "Unexpected error during estate processing: " + e.getMessage(),
                 Map.of("item", item, "error", e)
             );
         }
@@ -76,7 +76,7 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
         } catch (Exception e) {
             throw new EstateProcessingException(
                     ErrorCode.EXTERNAL_API_ERROR,
-                    "Failed to convert article to PropertySnapshot: " + e.getMessage(),
+                    "Failed to convert article to EstateSnapshot: " + e.getMessage(),
                     Map.of("article", article, "error", e)
             );
         }

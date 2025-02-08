@@ -5,14 +5,14 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
 @Slf4j
-public class PropertyJobListener implements JobExecutionListener {
+public class EstateJobListener implements JobExecutionListener {
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        log.info("Property job starting: {}", jobExecution.getJobInstance().getJobName());
+        log.info("Estate job starting: {}", jobExecution.getJobInstance().getJobName());
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        log.info("Property job finished. Status: {}", jobExecution.getStatus());
+        log.info("Estate job finished. Status: {}", jobExecution.getStatus());
     }
 }

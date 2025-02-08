@@ -1,4 +1,4 @@
-package com.zipsoon.api.property.dto;
+package com.zipsoon.api.estate.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

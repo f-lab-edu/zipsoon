@@ -6,7 +6,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 @Slf4j
-public class PropertyStepListener implements StepExecutionListener {
+public class EstateStepListener implements StepExecutionListener {
     @Override
     public void beforeStep(StepExecution stepExecution) {
         log.info("Step starting: {}", stepExecution.getStepName());

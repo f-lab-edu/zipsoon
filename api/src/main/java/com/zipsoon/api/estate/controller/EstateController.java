@@ -1,9 +1,9 @@
-package com.zipsoon.api.property.controller;
+package com.zipsoon.api.estate.controller;
 
-import com.zipsoon.api.property.dto.PropertyDetailResponse;
-import com.zipsoon.api.property.dto.PropertyResponse;
-import com.zipsoon.api.property.dto.ViewportRequest;
-import com.zipsoon.api.property.service.PropertyService;
+import com.zipsoon.api.estate.dto.EstateDetailResponse;
+import com.zipsoon.api.estate.dto.EstateResponse;
+import com.zipsoon.api.estate.dto.ViewportRequest;
+import com.zipsoon.api.estate.service.EstateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,26 +15,26 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/properties")
+@RequestMapping("/api/v1/estates")
 @RequiredArgsConstructor
-public class PropertyController {
-    private final PropertyService propertyService;
+public class EstateController {
+    private final EstateService estateService;
 
     @GetMapping("/map")
-    public ResponseEntity<List<PropertyResponse>> getPropertiesInViewport(
+    public ResponseEntity<List<EstateResponse>> getEstatesInViewport(
         @Valid ViewportRequest request
     ) {
         return ResponseEntity.ok(
-            propertyService.findPropertiesInViewport(request)
+            estateService.findEstatesInViewport(request)
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PropertyDetailResponse> getPropertyDetail(
+    public ResponseEntity<EstateDetailResponse> getEstateDetail(
         @PathVariable Long id
     ) {
         return ResponseEntity.ok(
-            propertyService.findPropertyDetail(id)
+            estateService.findEstateDetail(id)
         );
     }
 }
