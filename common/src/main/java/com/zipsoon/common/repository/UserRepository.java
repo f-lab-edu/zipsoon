@@ -1,6 +1,6 @@
-package com.zipsoon.common.domain.user;
+package com.zipsoon.common.repository;
 
-import org.apache.ibatis.annotations.Mapper;
+import com.zipsoon.common.domain.user.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

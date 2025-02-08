@@ -1,4 +1,4 @@
-package com.zipsoon.common.mapper;
+package com.zipsoon.api.user.mapper;
 
 import com.zipsoon.common.domain.user.User;
 import org.apache.ibatis.annotations.Mapper;

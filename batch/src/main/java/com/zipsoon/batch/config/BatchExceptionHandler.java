@@ -2,7 +2,7 @@ package com.zipsoon.batch.config;
 
 import com.zipsoon.batch.exception.BatchJobFailureException;
 import com.zipsoon.batch.exception.NaverApiException;
-import com.zipsoon.batch.exception.PropertyProcessingException;
+import com.zipsoon.batch.exception.EstateProcessingException;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -23,7 +23,7 @@ public class BatchExceptionHandler implements StepExecutionListener {
             return ExitStatus.NOOP;
         } else if (cause instanceof NaverApiException) {
             return new ExitStatus("API_FAILURE");
-        } else if (cause instanceof PropertyProcessingException) {
+        } else if (cause instanceof EstateProcessingException) {
             return new ExitStatus("PROCESSING_FAILURE");
         } else if (cause instanceof BatchJobFailureException) {
             return new ExitStatus("JOB_FAILURE");

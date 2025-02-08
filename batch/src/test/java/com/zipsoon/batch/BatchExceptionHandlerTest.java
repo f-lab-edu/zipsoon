@@ -4,17 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.batch.dto.NaverResponseDto;
 import com.zipsoon.batch.exception.BatchJobFailureException;
 import com.zipsoon.batch.exception.NaverApiException;
-import com.zipsoon.batch.exception.PropertyProcessingException;
-import com.zipsoon.batch.job.processor.PropertyItemProcessor;
-import com.zipsoon.batch.job.writer.PropertyItemWriter;
+import com.zipsoon.batch.exception.EstateProcessingException;
+import com.zipsoon.batch.job.processor.EstateItemProcessor;
+import com.zipsoon.batch.job.writer.EstateItemWriter;
 import com.zipsoon.batch.service.NaverClient;
-import com.zipsoon.common.domain.PropertySnapshot;
+import com.zipsoon.common.domain.EstateSnapshot;
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.InvalidValueException;
-import com.zipsoon.common.repository.PropertySnapshotRepository;
+import com.zipsoon.common.repository.EstateSnapshotRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -51,11 +50,11 @@ class BatchExceptionHandlerTest {
 
     @Test
     @DisplayName("매물 정보 처리 중 예외가 발생한다")
-    void exceptionTest_PropertyProcessing() {
-        PropertyItemProcessor processor = new PropertyItemProcessor(new ObjectMapper());
+    void exceptionTest_EstateProcessing() {
+        EstateItemProcessor processor = new EstateItemProcessor(new ObjectMapper());
         NaverResponseDto invalidResponse = new NaverResponseDto(true, null, null);
 
-        assertThrows(PropertyProcessingException.class, () -> {
+        assertThrows(EstateProcessingException.class, () -> {
             processor.process(invalidResponse);
         });
     }
@@ -63,16 +62,16 @@ class BatchExceptionHandlerTest {
     @Test
     @DisplayName("데이터 무결성 위반으로 유효성 예외가 발생한다")
     void exceptionTest_DataIntegrityViolation() {
-        PropertySnapshotRepository repository = mock(PropertySnapshotRepository.class);
-        PropertyItemWriter writer = new PropertyItemWriter(repository);
+        EstateSnapshotRepository repository = mock(EstateSnapshotRepository.class);
+        EstateItemWriter writer = new EstateItemWriter(repository);
 
-        List<PropertySnapshot> snapshots = List.of(
-            PropertySnapshot.builder()
-                .platformType(PropertySnapshot.PlatformType.네이버)
+        List<EstateSnapshot> snapshots = List.of(
+            EstateSnapshot.builder()
+                .platformType(EstateSnapshot.PlatformType.네이버)
                 .platformId("SAME_ID")
                 .build(),
-            PropertySnapshot.builder()
-                .platformType(PropertySnapshot.PlatformType.네이버)
+            EstateSnapshot.builder()
+                .platformType(EstateSnapshot.PlatformType.네이버)
                 .platformId("SAME_ID")
                 .build()
         );
