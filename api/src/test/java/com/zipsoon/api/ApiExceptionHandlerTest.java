@@ -46,7 +46,7 @@ class ApiExceptionHandlerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(invalidRequest)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.getHttpStatus().value()));
     }
 
     @Test
@@ -61,7 +61,7 @@ class ApiExceptionHandlerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.BAD_REQUEST.getHttpStatus().value()));
     }
 
     @Test
@@ -91,7 +91,7 @@ class ApiExceptionHandlerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
             .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("$.code").value(ErrorCode.SERVER_ERROR.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.SERVER_ERROR.getHttpStatus().value()));
     }
 
     @Test
@@ -106,6 +106,6 @@ class ApiExceptionHandlerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(request)))
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.code").value(ErrorCode.FORBIDDEN_ACCESS.getHttpStatus()));
+            .andExpect(jsonPath("$.code").value(ErrorCode.FORBIDDEN_ACCESS.getHttpStatus().value()));
     }
 }
