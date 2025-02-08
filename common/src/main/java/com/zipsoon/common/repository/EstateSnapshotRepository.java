@@ -1,6 +1,6 @@
 package com.zipsoon.common.repository;
 
-import com.zipsoon.common.domain.PropertySnapshot;
+import com.zipsoon.common.domain.EstateSnapshot;
 import com.zipsoon.common.mapper.PropertySnapshotMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,11 +13,11 @@ public class PropertySnapshotRepository {
 
     private final PropertySnapshotMapper propertySnapshotMapper;
 
-    public void saveAll(List<PropertySnapshot> propertySnapshots) {
-        propertySnapshotMapper.insertPropertySnapshots(propertySnapshots);
+    public void saveAll(List<EstateSnapshot> estateSnapshots) {
+        propertySnapshotMapper.insertPropertySnapshots(estateSnapshots);
     }
 
-    public List<PropertySnapshot> findAll() {
+    public List<EstateSnapshot> findAll() {
         return propertySnapshotMapper.selectAllPropertySnapshots();
     }
 }

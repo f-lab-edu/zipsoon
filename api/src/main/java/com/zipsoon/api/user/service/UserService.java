@@ -1,12 +1,12 @@
-package com.zipsoon.api.auth.service;
+package com.zipsoon.api.user.service;
 
-import com.zipsoon.api.auth.dto.*;
+import com.zipsoon.api.user.dto.*;
 import com.zipsoon.common.domain.user.User;
-import com.zipsoon.common.domain.user.UserRepository;
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.AuthenticationException;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
+import com.zipsoon.common.repository.UserRepository;
 import com.zipsoon.common.security.dto.AuthToken;
 import com.zipsoon.common.security.jwt.JwtTokenProvider;
 import com.zipsoon.common.security.model.UserPrincipal;

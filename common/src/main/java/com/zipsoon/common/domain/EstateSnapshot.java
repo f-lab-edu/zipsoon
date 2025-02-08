@@ -12,7 +12,7 @@ import java.util.List;
 @Builder(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PropertySnapshot {
+public class EstateSnapshot {
 
     private Long id;
 
@@ -22,9 +22,9 @@ public class PropertySnapshot {
 
     private JsonNode rawData;
 
-    private String propName;
+    private String estateName;
 
-    private PropType propType;
+    private EstateType estateType;
 
     private TradeType tradeType;
 
@@ -70,14 +70,14 @@ public class PropertySnapshot {
         }
     }
 
-    public enum PropType {
+    public enum EstateType {
         아파트("아파트"),
         오피스텔("오피스텔"),
         빌라("빌라");
 
         private final String koreanName;
 
-        PropType(String koreanName) {
+        EstateType(String koreanName) {
             this.koreanName = koreanName;
         }
 
@@ -85,10 +85,10 @@ public class PropertySnapshot {
             return koreanName;
         }
 
-        public static PropType of(String koreanName) {
-            for (PropType propType: values()) {
-                if (propType.koreanName.equals(koreanName)) {
-                    return propType;
+        public static EstateType of(String koreanName) {
+            for (EstateType estateType : values()) {
+                if (estateType.koreanName.equals(koreanName)) {
+                    return estateType;
                 }
             }
             return null;

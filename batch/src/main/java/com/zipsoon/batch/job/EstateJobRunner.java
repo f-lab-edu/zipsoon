@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PropertyJobRunner implements CommandLineRunner {
+public class EstateJobRunner implements CommandLineRunner {
     private final JobLauncher jobLauncher;
-    private final Job propertyJob;
+    private final Job estateJob;
 
     @Override
     public void run(String... args) throws Exception {
@@ -25,8 +25,8 @@ public class PropertyJobRunner implements CommandLineRunner {
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting property job with parameters: {}", jobParameters);
-        JobExecution execution = jobLauncher.run(propertyJob, jobParameters);
+        log.info("Starting estate job with parameters: {}", jobParameters);
+        JobExecution execution = jobLauncher.run(estateJob, jobParameters);
         log.info("Job finished with status: {}", execution.getStatus());
     }
 }

@@ -1,7 +1,9 @@
-package com.zipsoon.api.auth.controller;
+package com.zipsoon.api.user.controller;
 
-import com.zipsoon.api.auth.dto.*;
-import com.zipsoon.api.auth.service.UserService;
+import com.zipsoon.api.user.dto.*;
+import com.zipsoon.api.user.dto.UserLoginRequest;
+import com.zipsoon.api.user.dto.UserProfileResponse;
+import com.zipsoon.api.user.service.UserService;
 import com.zipsoon.common.security.dto.AuthToken;
 import com.zipsoon.common.security.model.UserPrincipal;
 import jakarta.validation.Valid;

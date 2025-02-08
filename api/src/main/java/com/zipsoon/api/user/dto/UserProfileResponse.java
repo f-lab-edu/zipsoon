@@ -1,4 +1,4 @@
-package com.zipsoon.api.auth.dto;
+package com.zipsoon.api.user.dto;
 
 import com.zipsoon.common.domain.user.User;
 

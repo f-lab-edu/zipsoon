@@ -1,7 +1,7 @@
 package com.zipsoon.batch;
 
 import com.zipsoon.common.config.TestDatabaseConfig;
-import com.zipsoon.common.repository.PropertySnapshotRepository;
+import com.zipsoon.common.repository.EstateSnapshotRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
 public class PropertyBatchJobTest {
 
     @Autowired
-    private PropertySnapshotRepository psr;
+    private EstateSnapshotRepository psr;
 
 //    @Test
 //    void testPropertyBatchJob_InsertPropertySnapshot() throws Exception {

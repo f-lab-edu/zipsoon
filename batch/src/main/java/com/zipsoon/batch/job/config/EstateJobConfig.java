@@ -18,7 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 @Slf4j
 public class PropertyJobConfig {
-    private static final String JOB_NAME = "propertyJob";
+    private static final String JOB_NAME = "estateJob";
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;

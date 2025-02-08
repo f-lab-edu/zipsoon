@@ -7,7 +7,7 @@ import com.zipsoon.batch.job.processor.PropertyItemProcessor;
 import com.zipsoon.batch.job.reader.PropertyItemReader;
 import com.zipsoon.batch.service.DongCodeService;
 import com.zipsoon.batch.job.writer.PropertyItemWriter;
-import com.zipsoon.common.domain.PropertySnapshot;
+import com.zipsoon.common.domain.EstateSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
@@ -34,7 +34,7 @@ public class PropertyStepConfig {
     @Bean
     public Step propertyWorkerStep() {
         return new StepBuilder("propertyWorkerStep", jobRepository)
-            .<NaverResponseDto, List<PropertySnapshot>>chunk(1, transactionManager)
+            .<NaverResponseDto, List<EstateSnapshot>>chunk(1, transactionManager)
             .reader(propertyItemReader)
             .processor(propertyItemProcessor)
             .writer(propertyItemWriter)

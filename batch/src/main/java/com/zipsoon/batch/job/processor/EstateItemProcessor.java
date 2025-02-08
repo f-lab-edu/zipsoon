@@ -2,8 +2,8 @@ package com.zipsoon.batch.job.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.batch.dto.NaverResponseDto;
-import com.zipsoon.batch.exception.PropertyProcessingException;
-import com.zipsoon.common.domain.PropertySnapshot;
+import com.zipsoon.batch.exception.EstateProcessingException;
+import com.zipsoon.common.domain.EstateSnapshot;
 import com.zipsoon.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, List<PropertySnapshot>> {
+public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, List<EstateSnapshot>> {
     private final ObjectMapper objectMapper;
 
     @Override
-    public List<PropertySnapshot> process(NaverResponseDto item) {
+    public List<EstateSnapshot> process(NaverResponseDto item) {
         if (item == null || item.articleList() == null) {
-            throw new PropertyProcessingException(
+            throw new EstateProcessingException(
                 ErrorCode.EXTERNAL_API_ERROR,
                 "Received null or invalid data from Naver API");
         }
@@ -40,13 +40,13 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
                 .map(article -> convertToSnapshot(article, processingDongCode))
                 .collect(Collectors.toList());
         } catch (IllegalArgumentException e) {
-            throw new PropertyProcessingException(
+            throw new EstateProcessingException(
                 ErrorCode.EXTERNAL_API_ERROR,
                 "Invalid property data encountered: " + e.getMessage(),
                 Map.of("NaverResponseDto", item)
             );
         } catch (Exception e) {
-            throw new PropertyProcessingException(
+            throw new EstateProcessingException(
                 ErrorCode.EXTERNAL_API_ERROR,
                 "Unexpected error during property processing: " + e.getMessage(),
                 Map.of("item", item, "error", e)
@@ -54,15 +54,15 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
         }
     }
 
-    private PropertySnapshot convertToSnapshot(NaverResponseDto.ArticleDto article, String processingDongCode) {
+    private EstateSnapshot convertToSnapshot(NaverResponseDto.ArticleDto article, String processingDongCode) {
         try {
-            return PropertySnapshot.builder()
-                    .platformType(PropertySnapshot.PlatformType.네이버)
+            return EstateSnapshot.builder()
+                    .platformType(EstateSnapshot.PlatformType.네이버)
                     .platformId(article.articleNo())
                     .rawData(objectMapper.valueToTree(article))
-                    .propName(article.articleName())
-                    .propType(PropertySnapshot.PropType.of(article.articleRealEstateTypeName()))
-                    .tradeType(PropertySnapshot.TradeType.of(article.tradeTypeName()))
+                    .estateName(article.articleName())
+                    .estateType(EstateSnapshot.EstateType.of(article.articleRealEstateTypeName()))
+                    .tradeType(EstateSnapshot.TradeType.of(article.tradeTypeName()))
                     .price(parsePrice(article.dealOrWarrantPrc()))
                     .rentPrice(parsePrice(article.rentPrc()))
                     .areaMeter(BigDecimal.valueOf(article.area1()))
@@ -74,7 +74,7 @@ public class PropertyItemProcessor implements ItemProcessor<NaverResponseDto, Li
                     .createdAt(LocalDateTime.now())
                     .build();
         } catch (Exception e) {
-            throw new PropertyProcessingException(
+            throw new EstateProcessingException(
                     ErrorCode.EXTERNAL_API_ERROR,
                     "Failed to convert article to PropertySnapshot: " + e.getMessage(),
                     Map.of("article", article, "error", e)
