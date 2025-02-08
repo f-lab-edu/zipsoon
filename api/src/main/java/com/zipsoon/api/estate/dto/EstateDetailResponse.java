@@ -1,18 +1,18 @@
-package com.zipsoon.api.property.dto;
+package com.zipsoon.api.estate.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.zipsoon.common.domain.PropertySnapshot;
+import com.zipsoon.common.domain.EstateSnapshot;
 import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public record PropertyDetailResponse(
+public record EstateDetailResponse(
     Long id,
     String name,
-    PropertySnapshot.PropType type,
-    PropertySnapshot.TradeType tradeType,
+    EstateSnapshot.EstateType type,
+    EstateSnapshot.TradeType tradeType,
     BigDecimal price,
     BigDecimal rentPrice,
     BigDecimal areaMeter,
@@ -23,11 +23,11 @@ public record PropertyDetailResponse(
     List<String> tags,
     JsonNode rawData
 ) {
-    public static PropertyDetailResponse from(PropertySnapshot snapshot) {
-        return new PropertyDetailResponse(
+    public static EstateDetailResponse from(EstateSnapshot snapshot) {
+        return new EstateDetailResponse(
             snapshot.getId(),
-            snapshot.getPropName(),
-            snapshot.getPropType(),
+            snapshot.getEstateName(),
+            snapshot.getEstateType(),
             snapshot.getTradeType(),
             snapshot.getPrice(),
             snapshot.getRentPrice(),

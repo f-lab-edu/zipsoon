@@ -1,6 +1,6 @@
 package com.zipsoon.api;
 
-import com.zipsoon.api.property.dto.ViewportRequest;
+import com.zipsoon.api.estate.dto.ViewportRequest;
 import com.zipsoon.common.config.TestDatabaseConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -21,17 +21,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @Import(TestDatabaseConfig.class)
-@MapperScan({"com.zipsoon.api.property.mapper", "com.zipsoon.common.mapper"})
+@MapperScan({"com.zipsoon.api.estate.mapper", "com.zipsoon.common.mapper"})
 @AutoConfigureMockMvc(addFilters = false)
-class PropertyControllerTest {
+class EstateControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     @Test
     @DisplayName("Viewport 내의 매물을 조회한다")
-    @Sql("/datasets/ShouldFindPropertiesWithinDistance.sql")
-    void shouldGetPropertiesInViewport() throws Exception {
+    @Sql("/datasets/shouldGetEstatesInViewport.sql")
+    void shouldGetEstatesInViewport() throws Exception {
         ViewportRequest request = new ViewportRequest(
                 126.96,
                 37.57,
@@ -40,7 +39,7 @@ class PropertyControllerTest {
                 15
         );
 
-        mockMvc.perform(get("/api/v1/properties/map")
+        mockMvc.perform(get("/api/v1/estates/map")
                         .param("swLng", String.valueOf(request.swLng()))
                         .param("swLat", String.valueOf(request.swLat()))
                         .param("neLng", String.valueOf(request.neLng()))

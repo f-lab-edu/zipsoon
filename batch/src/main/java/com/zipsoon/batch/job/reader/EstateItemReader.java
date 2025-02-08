@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PropertyItemReader implements ItemReader<NaverResponseDto> {
+public class EstateItemReader implements ItemReader<NaverResponseDto> {
     private static final int MAX_PAGE_LIMIT = 50;
 
     private final NaverClient naverClient;

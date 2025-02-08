@@ -1,6 +1,6 @@
 package com.zipsoon.batch.job.config;
 
-import com.zipsoon.batch.job.listener.PropertyJobListener;
+import com.zipsoon.batch.job.listener.EstateJobListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -17,32 +17,32 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class PropertyJobConfig {
+public class EstateJobConfig {
     private static final String JOB_NAME = "estateJob";
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final TaskExecutor taskExecutor;
 
-    private final PropertyStepConfig propertyStepConfig;
+    private final EstateStepConfig estateStepConfig;
 
-    @Value("${property.job.partition.size:5}")
+    @Value("${estate.job.partition.size:5}")
     private int partitionSize;
 
     @Bean
-    public Job propertyJob() {
+    public Job estateJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
-            .start(propertyMasterStep())
-            .listener(new PropertyJobListener())
+            .start(estateMasterStep())
+            .listener(new EstateJobListener())
             .build();
     }
 
     @Bean
-    public Step propertyMasterStep() {
-        return new StepBuilder("propertyMasterStep", jobRepository)
-            .partitioner(propertyStepConfig.propertyWorkerStep().getName(),
-                        propertyStepConfig.dongCodePartitioner())
-            .step(propertyStepConfig.propertyWorkerStep())
+    public Step estateMasterStep() {
+        return new StepBuilder("estateMasterStep", jobRepository)
+            .partitioner(estateStepConfig.estateWorkerStep().getName(),
+                        estateStepConfig.dongCodePartitioner())
+            .step(estateStepConfig.estateWorkerStep())
             .gridSize(partitionSize)
             .taskExecutor(taskExecutor)
             .build();

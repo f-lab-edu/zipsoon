@@ -1,10 +1,10 @@
-INSERT INTO property_snapshot (
+INSERT INTO estate_snapshot (
     id,
     platform_type,
     platform_id,
     raw_data,
-    prop_name,
-    prop_type,
+    estate_name,
+    estate_type,
     trade_type,
     price,
     rent_price,

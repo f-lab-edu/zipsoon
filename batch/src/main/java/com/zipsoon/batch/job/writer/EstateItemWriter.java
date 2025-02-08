@@ -3,7 +3,7 @@ package com.zipsoon.batch.job.writer;
 import com.zipsoon.common.domain.EstateSnapshot;
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.InvalidValueException;
-import com.zipsoon.common.repository.PropertySnapshotRepository;
+import com.zipsoon.common.repository.EstateSnapshotRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -17,20 +17,20 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PropertyItemWriter implements ItemWriter<List<EstateSnapshot>> {
+public class EstateItemWriter implements ItemWriter<List<EstateSnapshot>> {
 
-    private final PropertySnapshotRepository propertySnapshotRepository;
+    private final EstateSnapshotRepository estateSnapshotRepository;
 
     @Override
     public void write(Chunk<? extends List<EstateSnapshot>> items) {
         for (List<EstateSnapshot> estateSnapshots : items) {
             try {
-                propertySnapshotRepository.saveAll(estateSnapshots);
-                log.info("Saved properties: {}", estateSnapshots);
+                estateSnapshotRepository.saveAll(estateSnapshots);
+                log.info("Saved estates: {}", estateSnapshots);
             } catch (DataIntegrityViolationException e) {
                 throw new InvalidValueException(
                     ErrorCode.RESOURCE_CONFLICT,
-                    "Failed to save properties due to data integrity violation",
+                    "Failed to save estates due to data integrity violation",
                     Map.of("failedItems", estateSnapshots)
                 );
             } catch (Exception e) {

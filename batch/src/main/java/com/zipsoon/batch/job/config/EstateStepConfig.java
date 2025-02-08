@@ -2,11 +2,11 @@ package com.zipsoon.batch.job.config;
 
 import com.zipsoon.batch.dto.NaverResponseDto;
 import com.zipsoon.batch.job.partitioner.DongCodePartitioner;
-import com.zipsoon.batch.job.listener.PropertyStepListener;
-import com.zipsoon.batch.job.processor.PropertyItemProcessor;
-import com.zipsoon.batch.job.reader.PropertyItemReader;
+import com.zipsoon.batch.job.listener.EstateStepListener;
+import com.zipsoon.batch.job.processor.EstateItemProcessor;
+import com.zipsoon.batch.job.reader.EstateItemReader;
 import com.zipsoon.batch.service.DongCodeService;
-import com.zipsoon.batch.job.writer.PropertyItemWriter;
+import com.zipsoon.batch.job.writer.EstateItemWriter;
 import com.zipsoon.common.domain.EstateSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,23 +22,23 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class PropertyStepConfig {
+public class EstateStepConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final DongCodeService dongCodeService;
 
-    private final PropertyItemReader propertyItemReader;
-    private final PropertyItemProcessor propertyItemProcessor;
-    private final PropertyItemWriter propertyItemWriter;
+    private final EstateItemReader estateItemReader;
+    private final EstateItemProcessor estateItemProcessor;
+    private final EstateItemWriter estateItemWriter;
 
     @Bean
-    public Step propertyWorkerStep() {
-        return new StepBuilder("propertyWorkerStep", jobRepository)
+    public Step estateWorkerStep() {
+        return new StepBuilder("estateWorkerStep", jobRepository)
             .<NaverResponseDto, List<EstateSnapshot>>chunk(1, transactionManager)
-            .reader(propertyItemReader)
-            .processor(propertyItemProcessor)
-            .writer(propertyItemWriter)
-            .listener(new PropertyStepListener())
+            .reader(estateItemReader)
+            .processor(estateItemProcessor)
+            .writer(estateItemWriter)
+            .listener(new EstateStepListener())
             .build();
     }
 
