@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @MappedTypes(EstateSnapshot.EstateType.class)
-public class PropTypeHandler extends BaseTypeHandler<EstateSnapshot.EstateType> {
+public class EstateTypeHandler extends BaseTypeHandler<EstateSnapshot.EstateType> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, EstateSnapshot.EstateType parameter, JdbcType jdbcType) throws SQLException {
         ps.setString(i, parameter.getKoreanName());

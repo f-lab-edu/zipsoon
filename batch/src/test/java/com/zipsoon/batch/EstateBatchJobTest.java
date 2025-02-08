@@ -12,22 +12,9 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest
 @SpringBatchTest
 @Import(TestDatabaseConfig.class)
-public class PropertyBatchJobTest {
+public class EstateBatchJobTest {
 
     @Autowired
-    private EstateSnapshotRepository psr;
-
-//    @Test
-//    void testPropertyBatchJob_InsertPropertySnapshot() throws Exception {
-//        propertyJobRunner.run();
-//
-//        List<PropertySnapshot> insertedSnapshots = psr.findAll();
-//
-//        assertThat(insertedSnapshots).hasSize(20);
-//
-//        PropertySnapshot firstSnapshot = insertedSnapshots.get(0);
-//        assertThat(firstSnapshot.getPlatformType()).isEqualTo(PropertySnapshot.PlatformType.네이버);
-//    }
-//
+    private EstateSnapshotRepository esr;
 
 }

@@ -8,10 +8,10 @@ import org.locationtech.jts.geom.Point;
 import java.util.List;
 
 @Mapper
-public interface PropertySnapshotMapper {
-    void insertPropertySnapshots(List<EstateSnapshot> estateSnapshots);
-    List<EstateSnapshot> selectAllPropertySnapshots();
-    List<EstateSnapshot> findPropertiesInRadius(
+public interface EstateSnapshotMapper {
+    void insertEstateSnapshots(List<EstateSnapshot> estateSnapshots);
+    List<EstateSnapshot> selectAllEstateSnapshots();
+    List<EstateSnapshot> findEstatesInRadius(
         @Param("point") Point point,
         @Param("radius") int radius
     );
