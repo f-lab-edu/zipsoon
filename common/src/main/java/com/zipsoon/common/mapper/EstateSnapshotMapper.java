@@ -9,6 +9,10 @@ import java.util.List;
 
 @Mapper
 public interface EstateSnapshotMapper {
+    default int getWgs84Srid() {
+        return 4326;        // WGS84 좌표계 SRID 값
+    }
+
     void insertEstateSnapshots(List<EstateSnapshot> estateSnapshots);
     List<EstateSnapshot> selectAllEstateSnapshots();
     List<EstateSnapshot> findEstatesInRadius(

@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  batch:
+    build:
+      context: .
+      dockerfile: batch/Dockerfile
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile

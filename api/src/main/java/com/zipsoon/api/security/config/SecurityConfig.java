@@ -2,7 +2,7 @@ package com.zipsoon.api.security.config;
 
 import com.zipsoon.api.security.filter.JwtAuthenticationFilter;
 import com.zipsoon.api.security.handler.JwtAuthenticationEntryPoint;
-import com.zipsoon.common.security.jwt.JwtProvider;
+import com.zipsoon.api.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

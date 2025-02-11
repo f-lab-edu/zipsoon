@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 public class ErrorResponseFactory {
 
     private static String generateRequestId() {

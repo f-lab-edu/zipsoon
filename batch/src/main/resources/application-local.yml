@@ -1,0 +1,8 @@
+spring:
+  config:
+    import: optional:file:.env.local
+  datasource:
+    url: ${LOCAL_SPRING_DATASOURCE_URL}
+#    url: jdbc:postgresql://172.18.0.2:5432/${LOCAL_DB_USERNAME}   # 172.18.0.2를 docker inspect로 찾아 대체하세요
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_USERNAME}

@@ -1,4 +1,4 @@
-package com.zipsoon.common.security.dto;
+package com.zipsoon.api.security.dto;
 
 import java.time.LocalDateTime;
 

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db.wdnnpbyamdkwzwxskak.supabase.co:5432/postgres
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
 logging:
   file:

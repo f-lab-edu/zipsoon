@@ -1,12 +1,8 @@
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${PROD_DB_JDBC_URI}
-    username: ${PROD_DB_USER}
-    password: ${PROD_DB_PASSWORD}
-  batch:
-    job:
-      enabled: true
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
 logging:
   file:

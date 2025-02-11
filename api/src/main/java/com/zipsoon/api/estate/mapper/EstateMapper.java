@@ -10,6 +10,10 @@ import java.util.Optional;
 
 @Mapper
 public interface EstateMapper {
+    default int getWgs84Srid() {
+        return 4326;        // WGS84 좌표계 SRID 값
+    }
+
     List<EstateSnapshot> findAllInViewport(
         @Param("viewport") ViewportRequest viewport,
         @Param("limit") int limit

@@ -2,7 +2,7 @@ package com.zipsoon.api.security.filter;
 
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.AuthenticationException;
-import com.zipsoon.common.security.jwt.JwtProvider;
+import com.zipsoon.api.security.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

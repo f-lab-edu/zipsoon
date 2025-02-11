@@ -1,15 +1,15 @@
 package com.zipsoon.api.user.service;
 
 import com.zipsoon.api.user.dto.*;
-import com.zipsoon.common.domain.user.User;
+import com.zipsoon.api.user.domain.User;
 import com.zipsoon.common.exception.ErrorCode;
 import com.zipsoon.common.exception.domain.AuthenticationException;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
-import com.zipsoon.common.repository.UserRepository;
-import com.zipsoon.common.security.dto.AuthToken;
-import com.zipsoon.common.security.jwt.JwtTokenProvider;
-import com.zipsoon.common.security.model.UserPrincipal;
+import com.zipsoon.api.user.repository.UserRepository;
+import com.zipsoon.api.security.dto.AuthToken;
+import com.zipsoon.api.security.jwt.JwtTokenProvider;
+import com.zipsoon.api.security.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

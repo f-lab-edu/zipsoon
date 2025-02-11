@@ -1,16 +1,22 @@
 package com.zipsoon.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zipsoon.api.estate.mapper.EstateMapper;
+import com.zipsoon.api.security.jwt.JwtProvider;
 import com.zipsoon.api.user.controller.UserController;
 import com.zipsoon.api.user.dto.UserLoginRequest;
+import com.zipsoon.api.user.mapper.UserMapper;
+import com.zipsoon.api.user.repository.UserRepository;
 import com.zipsoon.api.user.service.UserService;
 import com.zipsoon.common.exception.ErrorCode;
+import com.zipsoon.common.exception.GlobalExceptionHandler;
 import com.zipsoon.common.exception.domain.InvalidValueException;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
-import com.zipsoon.common.security.jwt.JwtProvider;
+import com.zipsoon.common.mapper.EstateSnapshotMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -33,6 +39,18 @@ class ApiExceptionHandlerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private UserMapper userMapper;
+
+    @MockitoBean
+    private EstateMapper estateMapper;
+
+    @MockitoBean
+    private UserRepository userRepository;
+
+    @MockitoBean
+    private EstateSnapshotMapper estateSnapshotMapper;
 
     @MockitoBean
     private JwtProvider jwtProvider;

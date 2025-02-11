@@ -10,7 +10,13 @@
         SELECT * FROM estate_snapshot
         WHERE ST_Intersects(
             location,
-            ST_MakeEnvelope(#{viewport.swLng}, #{viewport.swLat}, #{viewport.neLng}, #{viewport.neLat}, 4326)
+            ST_MakeEnvelope(
+                #{viewport.swLng},
+                #{viewport.swLat},
+                #{viewport.neLng},
+                #{viewport.neLat},
+                ${getWgs84Srid}
+            )
         )
         LIMIT #{limit}
     </select>

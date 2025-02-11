@@ -1,4 +1,4 @@
-package com.zipsoon.common.domain.user;
+package com.zipsoon.api.user.domain;
 
 public enum Role {
     USER,

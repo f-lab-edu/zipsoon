@@ -9,13 +9,22 @@ dependencies {
 }
 
 processResources {
-    from("${rootProject.projectDir}/config") {
-        include "*.env"
+    from("${rootProject.projectDir}") {
+        include "*.env.local"
     }
 }
 
 bootRun {
     args = ["--spring.config.additional-location=optional:${rootProject.projectDir}/config/"]
+}
+
+bootJar {
+    enabled = true
+    archiveFileName = "api.jar"
+}
+
+tasks.named('jar') {
+    enabled = false
 }
 
 test {

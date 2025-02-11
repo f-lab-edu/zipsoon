@@ -1,9 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/zipsoon_batch_dev
-    username: postgres
-    password: postgres
-
+    driver-class-name: org.postgresql.Driver
   batch:
     job:
       enabled: true
@@ -13,13 +10,18 @@ spring:
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
   type-aliases-package: com.zipsoon.common.domain
+  configuration:
+    map-underscore-to-camel-case: true
 
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
+    root: INFO
     org.springframework.batch: DEBUG
     com.zipsoon.batch: DEBUG
 
 naver:
   land:
-    base-url: https://new.land.naver.com/api
-    auth-token: ${NAVER_AUTH_TOKEN}
+    base-url: ${NAVER_LAND_BASE_URL}
+    auth-token: ${NAVER_LAND_AUTH_TOKEN}

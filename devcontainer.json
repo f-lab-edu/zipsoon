@@ -1,0 +1,22 @@
+{
+  "name": "Zipsoon Development",
+  "dockerComposeFile": ["../docker-compose.yml", "../docker-compose.local.yml"],
+  "service": "api",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installGradle": true
+    }
+  },
+  "forwardPorts": [8080, 5432]
+}
