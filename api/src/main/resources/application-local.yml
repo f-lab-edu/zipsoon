@@ -1,0 +1,12 @@
+spring:
+  config:
+    import: optional:file:.env.local
+  datasource:
+#    url: ${LOCAL_SPRING_DATASOURCE_URL}
+    url: jdbc:postgresql://172.18.0.2:5432/${LOCAL_DB_USERNAME}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_USERNAME}
+
+logging:
+  level:
+    com.zipsoon.api: DEBUG
