@@ -1,4 +1,4 @@
-package com.zipsoon.common.security.model;
+package com.zipsoon.api.security.model;
 
 public enum AuthProvider {
     LOCAL,

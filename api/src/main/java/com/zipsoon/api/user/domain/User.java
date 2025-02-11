@@ -1,10 +1,10 @@
-package com.zipsoon.api.user.domain.user;
+package com.zipsoon.api.user.domain;
 
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.security.AuthProvider;
+import com.zipsoon.api.security.model.AuthProvider;
 import java.time.LocalDateTime;
 
 @Getter

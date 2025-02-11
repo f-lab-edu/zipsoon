@@ -83,7 +83,10 @@
         FROM estate_snapshot
         WHERE ST_DWithin(
             location,
-            ST_SetSRID(ST_MakePoint(#{point.x}, #{point.y}), 4326)::geography,
+            ST_SetSRID(
+                ST_MakePoint(#{point.x}, #{point.y}),
+                ${getWgs84Srid}
+            )::geography,
             #{radius}
         )
     </select>

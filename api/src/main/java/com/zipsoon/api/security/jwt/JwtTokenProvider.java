@@ -1,6 +1,6 @@
-package com.zipsoon.common.security.jwt;
+package com.zipsoon.api.security.jwt;
 
-import com.zipsoon.common.security.model.UserPrincipal;
+import com.zipsoon.api.security.model.UserPrincipal;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;

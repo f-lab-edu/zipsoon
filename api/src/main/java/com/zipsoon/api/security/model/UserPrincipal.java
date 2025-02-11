@@ -1,6 +1,6 @@
-package com.zipsoon.common.security.model;
+package com.zipsoon.api.security.model;
 
-import com.zipsoon.common.domain.user.User;
+import com.zipsoon.api.user.domain.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;

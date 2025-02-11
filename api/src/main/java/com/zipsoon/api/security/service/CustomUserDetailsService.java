@@ -1,9 +1,9 @@
-package com.zipsoon.common.security.service;
+package com.zipsoon.api.security.service;
 
-import com.zipsoon.common.domain.user.User;
-import com.zipsoon.common.repository.UserRepository;
+import com.zipsoon.api.user.domain.User;
+import com.zipsoon.api.user.repository.UserRepository;
 import com.zipsoon.common.exception.domain.ResourceNotFoundException;
-import com.zipsoon.common.security.model.UserPrincipal;
+import com.zipsoon.api.security.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

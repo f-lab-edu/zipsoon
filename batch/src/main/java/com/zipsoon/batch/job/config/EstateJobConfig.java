@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,7 +20,6 @@ public class EstateJobConfig {
     private static final String JOB_NAME = "estateJob";
 
     private final JobRepository jobRepository;
-    private final PlatformTransactionManager transactionManager;
     private final TaskExecutor taskExecutor;
 
     private final EstateStepConfig estateStepConfig;

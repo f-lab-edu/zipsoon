@@ -1,12 +1,8 @@
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/testdbbatch
-    username: postgres
-    password: postgres
-
-mybatis:
-  type-handlers-package: com.zipsoon.api.config.typehandler
+    url: ${DEV_DB_JDBC_URI}
+    username: ${DEV_DB_USERNAME}
+    password: ${DEV_DB_PASSWORD}
 
 logging:
   file:

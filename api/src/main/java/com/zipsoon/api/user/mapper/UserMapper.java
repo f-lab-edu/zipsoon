@@ -1,6 +1,6 @@
 package com.zipsoon.api.user.mapper;
 
-import com.zipsoon.common.domain.user.User;
+import com.zipsoon.api.user.domain.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

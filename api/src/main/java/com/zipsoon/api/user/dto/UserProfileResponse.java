@@ -1,6 +1,6 @@
 package com.zipsoon.api.user.dto;
 
-import com.zipsoon.common.domain.user.User;
+import com.zipsoon.api.user.domain.User;
 
 import java.time.LocalDateTime;
 

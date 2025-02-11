@@ -1,4 +1,4 @@
-package com.zipsoon.common.security.jwt;
+package com.zipsoon.api.security.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,17 +1,24 @@
 spring:
-  config:
-    import: 
-      - classpath:application.yml
-      - optional:file:../.env
   datasource:
-    url: jdbc:postgresql://localhost:5432/zipsoon_api_dev
-    username: postgres
-    password: postgres
+    driver-class-name: org.postgresql.Driver
 
 mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-  type-handlers-package: com.zipsoon.api.config.typehandler
+  mapper-locations:
+    - classpath*:mapper/**/*.xml
+    - classpath*:com/zipsoon/**/mapper/*.xml
+  type-handlers-package: com.zipsoon.common.config.typehandler
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.zipsoon.common.domain,com.zipsoon.api.estate.dto
 
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
+    root: INFO
     com.zipsoon.api: DEBUG
+
+jwt:
+  secret-key: test-key
+  access-token-validity-in-milliseconds: 3600000
+  refresh-token-validity-in-milliseconds: 604800000

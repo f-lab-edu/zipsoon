@@ -1,6 +1,6 @@
-package com.zipsoon.common.repository;
+package com.zipsoon.api.user.repository;
 
-import com.zipsoon.common.domain.user.User;
+import com.zipsoon.api.user.domain.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
