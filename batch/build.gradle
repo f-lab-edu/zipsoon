@@ -6,7 +6,7 @@ dependencies {
 
 processResources {
     from("${rootProject.projectDir}") {
-        include "*.env.local"
+        include "*.env.example"
     }
 }
 

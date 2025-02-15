@@ -19,17 +19,5 @@ logging:
     org.springframework.test: INFO
     org.springframework.jdbc.datasource.init: DEBUG
 
-mybatis:
-  mapper-locations:
-    - classpath*:mapper/**/*.xml
-    - classpath*:com/zipsoon/**/mapper/*.xml
-  type-handlers-package: com.zipsoon.common.config.typehandler
-  configuration:
-    map-underscore-to-camel-case: true
-  type-aliases-package: com.zipsoon.common.domain,com.zipsoon.api.estate.dto
-
 jwt:
-  secret-key: your-secret-key-here
-  access-token-validity-in-milliseconds: 3600000
-  refresh-token-validity-in-milliseconds: 604800000
-
+  secret-key: test-only-secret-key

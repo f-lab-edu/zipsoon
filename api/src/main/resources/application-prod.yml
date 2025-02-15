@@ -4,9 +4,18 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
+jwt:
+  secret-key: ${PROD_JWT_SECRET}
+
 logging:
   file:
-    name: ./logs/zipsoon-api.log
+    name: /var/log/zipsoon/zipsoon-api.log
   level:
     root: INFO
     com.zipsoon.api: INFO
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false

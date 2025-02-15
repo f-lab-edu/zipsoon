@@ -2,9 +2,7 @@ package com.zipsoon.batch.job.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.batch.dto.NaverResponseDto;
-import com.zipsoon.batch.exception.EstateProcessingException;
 import com.zipsoon.common.domain.EstateSnapshot;
-import com.zipsoon.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -17,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,9 +26,7 @@ public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List
     @Override
     public List<EstateSnapshot> process(NaverResponseDto item) {
         if (item == null || item.articleList() == null) {
-            throw new EstateProcessingException(
-                ErrorCode.EXTERNAL_API_ERROR,
-                "Received null or invalid data from Naver API");
+            throw new IllegalArgumentException("Received null or invalid data from Naver API");
         }
         String processingDongCode = item.dongCode();
 
@@ -40,17 +35,9 @@ public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List
                 .map(article -> convertToSnapshot(article, processingDongCode))
                 .collect(Collectors.toList());
         } catch (IllegalArgumentException e) {
-            throw new EstateProcessingException(
-                ErrorCode.EXTERNAL_API_ERROR,
-                "Invalid estate data encountered: " + e.getMessage(),
-                Map.of("NaverResponseDto", item)
-            );
+            throw new IllegalArgumentException("Invalid estate data encountered: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new EstateProcessingException(
-                ErrorCode.EXTERNAL_API_ERROR,
-                "Unexpected error during estate processing: " + e.getMessage(),
-                Map.of("item", item, "error", e)
-            );
+            throw new RuntimeException("Unexpected error during estate processing: " + e.getMessage(), e);
         }
     }
 
@@ -74,11 +61,7 @@ public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List
                     .createdAt(LocalDateTime.now())
                     .build();
         } catch (Exception e) {
-            throw new EstateProcessingException(
-                    ErrorCode.EXTERNAL_API_ERROR,
-                    "Failed to convert article to EstateSnapshot: " + e.getMessage(),
-                    Map.of("article", article, "error", e)
-            );
+            throw new IllegalStateException("Failed to convert article to EstateSnapshot: " + e.getMessage(), e);
         }
     }
 
