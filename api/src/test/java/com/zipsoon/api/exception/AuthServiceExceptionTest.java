@@ -1,10 +1,12 @@
 package com.zipsoon.api.exception;
 
+import com.zipsoon.api.auth.domain.Role;
 import com.zipsoon.api.auth.dto.LoginRequest;
 import com.zipsoon.api.auth.dto.SignupRequest;
 import com.zipsoon.api.auth.service.AuthService;
+import com.zipsoon.api.exception.custom.ServiceException;
+import com.zipsoon.api.exception.model.ErrorCode;
 import com.zipsoon.api.security.jwt.JwtProvider;
-import com.zipsoon.api.user.domain.Role;
 import com.zipsoon.api.user.domain.User;
 import com.zipsoon.api.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Optional;
 
@@ -42,10 +43,10 @@ class AuthServiceExceptionTest {
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
 
         // When & Then
-        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> authService.login(request));
+        ServiceException exception = assertThrows(ServiceException.class, () -> authService.login(request));
 
         // 예외 메시지 검증
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(ErrorCode.USER_NOT_FOUND, exception.getErrorCode());
     }
 
     @Test
@@ -56,10 +57,10 @@ class AuthServiceExceptionTest {
         when(userRepository.existsByEmail(request.email())).thenReturn(true);
 
         // When & Then
-        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> authService.signup(request));
+        ServiceException exception = assertThrows(ServiceException.class, () -> authService.signup(request));
 
         // 예외 메시지 검증
-        assertEquals("User already exists", exception.getMessage());
+        assertEquals(ErrorCode.USER_DUPLICATE, exception.getErrorCode());
     }
 
     @Test
@@ -73,14 +74,14 @@ class AuthServiceExceptionTest {
             .role(Role.USER)
             .build();
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
-        when(jwtProvider.createAccessToken(any())).thenThrow(new BadCredentialsException("Invalid credentials"));
+        when(jwtProvider.createAccessToken(any())).thenThrow(new ServiceException(ErrorCode.INVALID_CREDENTIALS));
 
         // When & Then
-        BadCredentialsException exception = assertThrows(BadCredentialsException.class,
+        ServiceException exception = assertThrows(ServiceException.class,
             () -> authService.login(request));
 
         // 예외 메시지 검증
-        assertEquals("Invalid credentials", exception.getMessage());
+        assertEquals(ErrorCode.INVALID_CREDENTIALS, exception.getErrorCode());
     }
 
 }
