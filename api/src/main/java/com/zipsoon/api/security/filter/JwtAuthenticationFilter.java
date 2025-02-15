@@ -1,5 +1,6 @@
 package com.zipsoon.api.security.filter;
 
+import com.zipsoon.api.exception.custom.JwtAuthenticationException;
 import com.zipsoon.api.security.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,25 +24,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
        @NonNull HttpServletResponse response,
        @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = jwtProvider.extractToken(request);
-
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
-            if (!jwtProvider.validateToken(token)) {
-                throw new BadCredentialsException("Invalid JWT token");
+            String token = jwtProvider.extractToken(request);
+            if (token != null) {
+                jwtProvider.validateToken(token);
+                Authentication auth = jwtProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
-
-            Authentication auth = jwtProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        } catch (BadCredentialsException e) {
+            filterChain.doFilter(request, response);
+        } catch (JwtAuthenticationException e) {
             SecurityContextHolder.clearContext();
-            throw e;
+            throw new ServletException(e);
         }
-        filterChain.doFilter(request, response);
     }
 }
 

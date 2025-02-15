@@ -6,7 +6,6 @@ import com.zipsoon.api.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -18,10 +17,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Import(MyBatisConfig.class)
 public class SecurityConfig {
 
-    private final JwtProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtProvider jwtProvider;
 
 	@Bean
 	public WebSecurityCustomizer configure() {
@@ -51,18 +50,13 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
-                jwtAuthenticationFilter(),
+                new JwtAuthenticationFilter(jwtProvider),
                 UsernamePasswordAuthenticationFilter.class
             )
             .exceptionHandling(ex ->
-                ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
             .build();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider);
     }
 
 }

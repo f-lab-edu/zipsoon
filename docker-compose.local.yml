@@ -28,7 +28,7 @@ services:
   batch:
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - SPRING_DATASOURCE_URL=${LOCAL_SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
       - SPRING_DATASOURCE_USERNAME=${LOCAL_DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${LOCAL_DB_PASSWORD}
       - NAVER_LAND_BASE_URL=${NAVER_LAND_BASE_URL}
@@ -44,14 +44,12 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - SPRING_DATASOURCE_URL=${LOCAL_SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
       - SPRING_DATASOURCE_USERNAME=${LOCAL_DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${LOCAL_DB_PASSWORD}
+      - LOCAL_JWT_SECRET=${LOCAL_JWT_SECRET}
     networks:
       - zipsoon-network
     depends_on:
       db:
         condition: service_healthy
-
-#volumes:
-#  zipsoon-data:

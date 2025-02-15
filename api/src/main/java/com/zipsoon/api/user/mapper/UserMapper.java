@@ -8,14 +8,13 @@ import java.util.Optional;
 
 @Mapper
 public interface UserMapper {
+    Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
-
     Optional<User> findByProviderAndProviderId(
         @Param("provider") String provider,
         @Param("providerId") String providerId
     );
-
-    void save(User user);
-
     boolean existsByEmail(String email);
+    void save(User user);
+    void delete(Long id);
 }

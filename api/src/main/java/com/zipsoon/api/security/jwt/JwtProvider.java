@@ -1,16 +1,16 @@
 package com.zipsoon.api.security.jwt;
 
 import com.zipsoon.api.auth.model.UserPrincipal;
+import com.zipsoon.api.exception.custom.JwtAuthenticationException;
+import com.zipsoon.api.exception.model.ErrorCode;
 import com.zipsoon.api.security.user.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -42,20 +42,21 @@ public class JwtProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token);
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.warn("Invalid JWT signature");
-            throw new BadCredentialsException("Invalid JWT signature");
+        } catch (SecurityException e) {
+            throw new JwtAuthenticationException(ErrorCode.INVALID_SIGNATURE);
+        } catch (MalformedJwtException e) {
+            throw new JwtAuthenticationException(ErrorCode.MALFORMED_TOKEN);
         } catch (ExpiredJwtException e) {
-            log.warn("Expired JWT token");
-            throw new AuthenticationException("Expired JWT token") {};
+            throw new JwtAuthenticationException(ErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
-            log.warn("Unsupported JWT token");
-            throw new AuthenticationException("Unsupported JWT token") {};
+            throw new JwtAuthenticationException(ErrorCode.UNSUPPORTED_TOKEN);
         } catch (IllegalArgumentException e) {
-            log.warn("JWT claims string is empty");
-            throw new BadCredentialsException("JWT claims string is empty");
+            throw new JwtAuthenticationException(ErrorCode.INVALID_TOKEN);
         }
     }
 
