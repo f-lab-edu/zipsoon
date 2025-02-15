@@ -15,7 +15,7 @@
                 #{viewport.swLat},
                 #{viewport.neLng},
                 #{viewport.neLat},
-                ${getWgs84Srid}
+                ${srid}
             )
         )
         LIMIT #{limit}

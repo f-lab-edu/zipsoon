@@ -4,9 +4,12 @@ spring:
     username: ${DEV_DB_USERNAME}
     password: ${DEV_DB_PASSWORD}
 
+jwt:
+  secret-key: ${DEV_JWT_SECRET}
+
 logging:
   file:
-    name: ./logs/zipsoon-api.log
+    name: /var/log/zipsoon/zipsoon-api.log
   level:
     root: INFO
     com.zipsoon.api: DEBUG

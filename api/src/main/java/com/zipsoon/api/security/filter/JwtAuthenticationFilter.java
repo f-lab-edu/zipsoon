@@ -1,7 +1,5 @@
 package com.zipsoon.api.security.filter;
 
-import com.zipsoon.common.exception.ErrorCode;
-import com.zipsoon.common.exception.domain.AuthenticationException;
 import com.zipsoon.api.security.jwt.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,15 +33,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (!jwtProvider.validateToken(token)) {
-                throw new AuthenticationException(ErrorCode.INVALID_CREDENTIALS);
+                throw new BadCredentialsException("Invalid JWT token");
             }
 
             Authentication auth = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            filterChain.doFilter(request, response);
-        } finally {
+        } catch (BadCredentialsException e) {
             SecurityContextHolder.clearContext();
+            throw e;
         }
+        filterChain.doFilter(request, response);
     }
 }
 

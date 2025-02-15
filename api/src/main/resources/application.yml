@@ -13,12 +13,19 @@ mybatis:
 
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-  level:
-    root: INFO
-    com.zipsoon.api: DEBUG
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{X-Request-Id}] %-5level %logger{36} - %msg%n"
 
 jwt:
-  secret-key: test-key
   access-token-validity-in-milliseconds: 3600000
-  refresh-token-validity-in-milliseconds: 604800000
+  refresh-token-validity-in-milliseconds: 86400000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: false
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

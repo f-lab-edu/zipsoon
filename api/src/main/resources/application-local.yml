@@ -1,12 +1,8 @@
 spring:
-  config:
-    import: optional:file:.env.local
   datasource:
-#    url: ${LOCAL_SPRING_DATASOURCE_URL}
-    url: jdbc:postgresql://172.18.0.2:5432/${LOCAL_DB_USERNAME}
+    url: ${LOCAL_SPRING_DATASOURCE_URL}
     username: ${LOCAL_DB_USERNAME}
-    password: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
 
-logging:
-  level:
-    com.zipsoon.api: DEBUG
+jwt:
+  secret-key: ${LOCAL_JWT_SECRET}

@@ -1,12 +1,14 @@
 package com.zipsoon.batch.service;
 
 import com.zipsoon.batch.dto.NaverResponseDto;
-import com.zipsoon.batch.exception.NaverApiException;
-import com.zipsoon.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.step.skip.SkipException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -15,8 +17,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -45,7 +45,7 @@ public class NaverClient {
         maxAttempts = 3,
         backoff = @Backoff(delay = 2000)
     )
-    public NaverResponseDto get(String cortarNo, int page) {
+    public NaverResponseDto get(String cortarNo, int page) throws SkipException {
         try {
             ResponseEntity<NaverResponseDto> response = restTemplate.exchange(
                 buildUrl(cortarNo, page),
@@ -55,15 +55,12 @@ public class NaverClient {
             );
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new NaverApiException(
-                    ErrorCode.EXTERNAL_API_ERROR, "Naver API call failed.");
+                throw new RestClientException("Failed to retrieve data from Naver API");
             }
             return response.getBody();
         } catch (RestClientException e) {
-            throw new NaverApiException(ErrorCode.EXTERNAL_API_ERROR,
-                "Failed to connect to Naver API",
-                Map.of("error", e.getMessage())
-            );
+            log.error("API error, returning null or fallback response", e);
+            throw e;
         }
     }
 

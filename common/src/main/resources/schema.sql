@@ -21,3 +21,19 @@ CREATE TABLE estate_snapshot (
 );
 
 CREATE INDEX estate_snapshot_location_idx ON estate_snapshot USING GIST (location);
+
+CREATE TABLE app_user (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    email_verified BOOLEAN NOT NULL DEFAULT false,
+    name VARCHAR(255) NOT NULL,
+    image_url VARCHAR(2048),
+    role VARCHAR(20) NOT NULL,
+    provider VARCHAR(20),
+    provider_id VARCHAR(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_provider_provider_id ON app_user (provider, provider_id);
+CREATE UNIQUE INDEX uk_provider_provider_id ON app_user (provider, provider_id);

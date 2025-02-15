@@ -10,7 +10,10 @@ import java.util.Optional;
 public interface UserRepository {
     Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
-    Optional<User> findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
+    Optional<User> findByProviderAndProviderId(
+        @Param("provider") String provider,
+        @Param("providerId") String providerId
+    );
     boolean existsByEmail(String email);
     void save(User user);
     void update(User user);
