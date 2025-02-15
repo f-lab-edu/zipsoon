@@ -1,5 +1,6 @@
 package com.zipsoon.api.user.domain;
 
+import com.zipsoon.api.auth.domain.Role;
 import com.zipsoon.api.auth.model.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;

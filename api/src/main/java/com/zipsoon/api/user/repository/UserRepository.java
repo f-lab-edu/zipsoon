@@ -1,5 +1,6 @@
 package com.zipsoon.api.user.repository;
 
+
 import com.zipsoon.api.user.domain.User;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,5 @@ public interface UserRepository {
     );
     boolean existsByEmail(String email);
     void save(User user);
-    void update(User user);
     void delete(Long id);
 }
