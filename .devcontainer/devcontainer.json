@@ -19,6 +19,6 @@
     }
   },
   "forwardPorts": [8080, 5432],
-  "updateContentCommand": "apt-get update && apt-get install -y zip unzip",
+  "initializeCommand": "apt-get update && apt-get install -y zip unzip",
   "postCreateCommand": "[ -f .env ] || cp .env.example .env"
 }
