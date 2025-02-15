@@ -7,6 +7,16 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+    // auth
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_001", "인증되지 않은 요청입니다"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_002", "유효하지 않은 토큰입니다"),
+    MALFORMED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_003", "잘못된 형식의 토큰입니다"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_004", "만료된 토큰입니다"),
+    UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_005", "지원되지 않는 토큰입니다"),
+    INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "AUTH_006", "유효하지 않은 토큰 서명입니다"),
+    INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_007", "잘못된 인증 정보입니다"),
+//    INSUFFICIENT_PERMISSIONS(HttpStatus.FORBIDDEN, "AUTH_008", "권한이 부족합니다"),
+
     // user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "사용자를 찾을 수 없습니다"),
     USER_DUPLICATE(HttpStatus.CONFLICT, "USER_002", "이미 존재하는 사용자입니다"),
