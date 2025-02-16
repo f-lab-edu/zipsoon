@@ -18,5 +18,6 @@
       "installGradle": true
     }
   },
-  "forwardPorts": [8080, 5432]
+  "forwardPorts": [8080, 5432],
+  "postCreateCommand": "echo 'Running post-create command...' && if [ ! -f .env ] && [ -f .env.example ]; then cp .env.example .env && echo '.env file created from .env.example'; else echo 'Skipping .env creation'; fi",
 }
