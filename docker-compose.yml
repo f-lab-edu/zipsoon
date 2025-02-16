@@ -17,7 +17,7 @@ services:
       - NAVER_LAND_BASE_URL=${NAVER_LAND_BASE_URL}
       - NAVER_LAND_AUTH_TOKEN=${NAVER_LAND_AUTH_TOKEN}
     volumes:
-      - .:/workspaces
+      - .:/workspaces:cached
 
   api:
     build:
@@ -30,4 +30,4 @@ services:
       - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
       - LOCAL_JWT_SECRET=${LOCAL_JWT_SECRET}
     volumes:
-      - .:/workspaces
+      - .:/workspaces:cached
