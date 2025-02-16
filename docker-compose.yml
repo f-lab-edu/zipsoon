@@ -1,10 +1,29 @@
 services:
+  db:
+    environment:
+      - POSTGRES_DB=${LOCAL_DB_NAME:-zipsoon}
+      - POSTGRES_USER=${LOCAL_DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD:-postgres}
+
   batch:
     build:
       context: .
       dockerfile: batch/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - LOCAL_SPRING_DATASOURCE_URL=${LOCAL_SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/zipsoon}
+      - LOCAL_DB_USERNAME=${LOCAL_DB_USERNAME:-postgres}
+      - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD:-postgres}
+      - NAVER_LAND_BASE_URL=${NAVER_LAND_BASE_URL:-https://new.land.naver.com/api}
+      - NAVER_LAND_AUTH_TOKEN=${NAVER_LAND_AUTH_TOKEN:-}
 
   api:
     build:
       context: .
       dockerfile: api/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - LOCAL_SPRING_DATASOURCE_URL=${LOCAL_SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/zipsoon}
+      - LOCAL_DB_USERNAME=${LOCAL_DB_USERNAME:-postgres}
+      - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD:-postgres}
+      - LOCAL_JWT_SECRET=${LOCAL_JWT_SECRET:-I0MmD+U3v9veSAsyg1bo7J3uKJo/N1qi3IdmOV86KDoTrSc0k3EGe7QIK7VGOX78iTPotJfJM7ZNKfBrrSLpOg==}
