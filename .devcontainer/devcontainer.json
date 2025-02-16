@@ -19,5 +19,5 @@
     }
   },
   "forwardPorts": [8080, 5432],
-  "postCreateCommand": "cp .env.example .env"
+  "onCreateCommand": "cp .env.example .env"
 }
