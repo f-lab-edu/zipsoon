@@ -19,5 +19,5 @@
     }
   },
   "forwardPorts": [8080, 5432],
-  "postCreateCommand": "[ -f .env ] || cp .env.example .env"
+  "postCreateCommand": "cp .env.example .env && ls -al && cat .env"
 }
