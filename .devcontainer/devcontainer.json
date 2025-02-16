@@ -13,7 +13,7 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/java:1": {
+    "ghcr.io/devcontainers/features/java:1.6.0": {
       "version": "17",
       "installGradle": true
     }
