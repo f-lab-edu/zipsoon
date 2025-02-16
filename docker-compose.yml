@@ -1,20 +1,10 @@
-x-env-files: &env-files
-  env_file:
-    - .env.example
-    - .env
-
 services:
-  db:
-    <<: *env-files
-
   batch:
     build:
       context: .
       dockerfile: batch/Dockerfile
-    <<: *env-files
 
   api:
     build:
       context: .
       dockerfile: api/Dockerfile
-    <<: *env-files
