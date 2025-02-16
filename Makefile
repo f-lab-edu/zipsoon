@@ -1,10 +1,10 @@
 .PHONY: local up down clean localdb
 
 local:
-	docker-compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml build --no-cache
+	docker-compose -f docker-compose.yml -f docker-compose.local.yml build --no-cache
 
 up:
-	docker-compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml up
+	docker-compose -f docker-compose.yml -f docker-compose.local.yml up
 
 # prod:
 #     ...
@@ -17,4 +17,4 @@ clean: down
 	docker system prune -f
 
 localdb:
-	docker-compose --env-file .env -f docker-compose.yml -f docker-compose.local.yml up -d db
+	docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d db
