@@ -18,6 +18,5 @@
       "installGradle": true
     }
   },
-  "forwardPorts": [8080, 5432],
-  "initializeCommand": "echo 'LOCAL_DB_NAME=zipsoon\nLOCAL_DB_USERNAME=postgres\nLOCAL_DB_PASSWORD=postgres\nLOCAL_SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/zipsoon\nNAVER_LAND_BASE_URL=https://new.land.naver.com/api\nNAVER_LAND_AUTH_TOKEN=\nLOCAL_JWT_SECRET=I0MmD+U3v9veSAsyg1bo7J3uKJo/N1qi3IdmOV86KDoTrSc0k3EGe7QIK7VGOX78iTPotJfJM7ZNKfBrrSLpOg==' > .env"
+  "forwardPorts": [8080, 5432]
 }

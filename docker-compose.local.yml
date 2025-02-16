@@ -5,32 +5,21 @@ networks:
 services:
   db:
     image: postgis/postgis:15-3.4
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_DB=${LOCAL_DB_NAME}
-      - POSTGRES_USER=${LOCAL_DB_USERNAME}
-      - POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD}
     volumes:
       - ./common/src/main/resources/init-users.sql:/docker-entrypoint-initdb.d/00-init-users.sql
       - ./common/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./batch/src/main/resources/schema/schema-postgresql.sql:/docker-entrypoint-initdb.d/02-schema-postgresql.sql
+    ports:
+      - "5432:5432"
     networks:
       - zipsoon-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${LOCAL_DB_USERNAME} -d ${LOCAL_DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   batch:
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
-      - SPRING_DATASOURCE_USERNAME=${LOCAL_DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${LOCAL_DB_PASSWORD}
-      - NAVER_LAND_BASE_URL=${NAVER_LAND_BASE_URL}
-      - NAVER_LAND_AUTH_TOKEN=${NAVER_LAND_AUTH_TOKEN}
     networks:
       - zipsoon-network
     depends_on:
@@ -40,12 +29,6 @@ services:
   api:
     ports:
       - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
-      - SPRING_DATASOURCE_USERNAME=${LOCAL_DB_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${LOCAL_DB_PASSWORD}
-      - LOCAL_JWT_SECRET=${LOCAL_JWT_SECRET}
     networks:
       - zipsoon-network
     depends_on:
