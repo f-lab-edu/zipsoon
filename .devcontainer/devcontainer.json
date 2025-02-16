@@ -18,6 +18,5 @@
       "installGradle": true
     }
   },
-  "forwardPorts": [8080, 5432],
-  "onCreateCommand": "cp .env.example .env"
+  "forwardPorts": [8080, 5432]
 }
