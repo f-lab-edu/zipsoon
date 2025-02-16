@@ -13,12 +13,11 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/java:1": {
+    "ghcr.io/devcontainers/features/java:1.6.0": {
       "version": "17",
       "installGradle": true
     }
   },
   "forwardPorts": [8080, 5432],
-  "initializeCommand": "apt-get update && apt-get install -y zip unzip",
   "postCreateCommand": "[ -f .env ] || cp .env.example .env"
 }
