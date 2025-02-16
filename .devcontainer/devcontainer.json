@@ -3,15 +3,6 @@
   "dockerComposeFile": ["../docker-compose.yml", "../docker-compose.local.yml"],
   "service": "api",
   "workspaceFolder": "/workspaces/zipsoon",
-  "containerEnv": {
-    "LOCAL_DB_NAME": "zipsoon",
-    "LOCAL_DB_USERNAME": "zipsoon",
-    "LOCAL_DB_PASSWORD": "zipsoon",
-    "LOCAL_JWT_SECRET": "test-only-secret-key-for-development-environment",
-    "LOCAL_SPRING_DATASOURCE_URL": "jdbc:postgresql://db:5432/zipsoon",
-    "NAVER_LAND_BASE_URL": "https://new.land.naver.com/api",
-    "NAVER_LAND_AUTH_TOKEN": "test-token"
-  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -27,5 +18,6 @@
       "installGradle": true
     }
   },
-  "forwardPorts": [8080, 5432]
+  "forwardPorts": [8080, 5432],
+  "onCreateCommand": "cp .env.example .env"
 }
