@@ -9,10 +9,9 @@ COPY settings.gradle .
 COPY gradlew .
 RUN chmod +x ./gradlew
 
-RUN ./gradlew clean :api:bootJar --no-daemon
-
 COPY api api/
 COPY common common/
+RUN ./gradlew clean :api:bootJar --no-daemon
 
 FROM openjdk:17-jdk-slim
 WORKDIR /app
