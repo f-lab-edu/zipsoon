@@ -10,7 +10,6 @@ COPY gradlew .
 RUN chmod +x ./gradlew
 
 RUN ./gradlew clean :api:bootJar --no-daemon
-RUN ls -l /build/api/build/libs/
 
 COPY api api/
 COPY common common/

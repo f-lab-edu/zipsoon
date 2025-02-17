@@ -4,8 +4,6 @@ services:
       - POSTGRES_DB=${LOCAL_DB_NAME}
       - POSTGRES_USER=${LOCAL_DB_USERNAME}
       - POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD}
-      - POSTGRES_HOSTNAME=localhost
-      - POSTGRES_PORT=5432
 
   batch:
     build:
@@ -13,13 +11,11 @@ services:
       dockerfile: batch/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - LOCAL_SPRING_DATASOURCE_URL=${LOCAL_SPRING_DATASOURCE_URL}
+      - LOCAL_SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
       - LOCAL_DB_USERNAME=${LOCAL_DB_USERNAME}
       - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
       - NAVER_LAND_BASE_URL=${NAVER_LAND_BASE_URL}
       - NAVER_LAND_AUTH_TOKEN=${NAVER_LAND_AUTH_TOKEN}
-    volumes:
-      - .:/workspaces:cached
 
   api:
     build:
@@ -27,9 +23,7 @@ services:
       dockerfile: api/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=local
-      - LOCAL_SPRING_DATASOURCE_URL=${LOCAL_SPRING_DATASOURCE_URL}
+      - LOCAL_SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
       - LOCAL_DB_USERNAME=${LOCAL_DB_USERNAME}
       - LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
       - LOCAL_JWT_SECRET=${LOCAL_JWT_SECRET}
-    volumes:
-      - .:/workspaces:cached
