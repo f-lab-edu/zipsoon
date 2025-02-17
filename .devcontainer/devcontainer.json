@@ -2,7 +2,7 @@
   "name": "Zipsoon Development",
   "dockerComposeFile": ["../docker-compose.yml", "../docker-compose.local.yml"],
   "service": "api",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "customizations": {
     "vscode": {
       "extensions": [
