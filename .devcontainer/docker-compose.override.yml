@@ -1,0 +1,6 @@
+services:
+  api:
+    image: electronyoon/zipsoon-api:latest
+    
+  batch:
+    image: electronyoon/zipsoon-batch:latest
