@@ -10,7 +10,6 @@ COPY gradlew .
 RUN chmod +x ./gradlew
 
 RUN ./gradlew clean :batch:bootJar --no-daemon
-RUN ls -l /build/batch/build/libs/
 
 COPY batch batch/
 COPY common common/

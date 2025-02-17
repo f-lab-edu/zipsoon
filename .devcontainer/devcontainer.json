@@ -2,7 +2,7 @@
   "name": "Zipsoon Development",
   "dockerComposeFile": ["../docker-compose.yml", "../docker-compose.local.yml"],
   "service": "api",
-  "workspaceFolder": "/workspaces/zipsoon",
+  "workspaceFolder": "/workspace",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,6 +12,7 @@
       ]
     }
   },
+  "initializeCommand": "cp .env.example .env",
   "features": {
     "ghcr.io/devcontainers/features/java:1.6.0": {
       "version": "17",
