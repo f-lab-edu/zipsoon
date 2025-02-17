@@ -1,7 +1,8 @@
 # macOS
 .DS_Store
 
-# IntelliJ IDEA
+# IDE
+.vscode/
 .idea/
 *.iml
 
@@ -11,3 +12,6 @@
 # Gradle
 .gradle
 build/
+
+# Compiled class files
+**/bin/
