@@ -35,4 +35,4 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - .:/workspace
+      - .:/workspaces/zipsoon
