@@ -5,7 +5,7 @@ spring:
     job:
       enabled: true
     jdbc:
-      initialize-schema: never
+      initialize-schema: always
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
