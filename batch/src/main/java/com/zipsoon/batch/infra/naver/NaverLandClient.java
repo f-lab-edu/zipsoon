@@ -1,6 +1,6 @@
-package com.zipsoon.batch.service;
+package com.zipsoon.batch.infra.naver;
 
-import com.zipsoon.batch.dto.NaverResponseDto;
+import com.zipsoon.batch.infra.naver.dto.NaverClientDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.step.skip.SkipException;
@@ -45,13 +45,13 @@ public class NaverClient {
         maxAttempts = 3,
         backoff = @Backoff(delay = 2000)
     )
-    public NaverResponseDto get(String cortarNo, int page) throws SkipException {
+    public NaverClientDto get(String cortarNo, int page) throws SkipException {
         try {
-            ResponseEntity<NaverResponseDto> response = restTemplate.exchange(
+            ResponseEntity<NaverClientDto> response = restTemplate.exchange(
                 buildUrl(cortarNo, page),
                 HttpMethod.GET,
                 buildHttpEntity(),
-                NaverResponseDto.class
+                NaverClientDto.class
             );
 
             if (!response.getStatusCode().is2xxSuccessful()) {

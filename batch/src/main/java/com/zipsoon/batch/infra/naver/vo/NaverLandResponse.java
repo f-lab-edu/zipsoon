@@ -1,6 +1,6 @@
-package com.zipsoon.batch.dto;
+package com.zipsoon.batch.infra.naver.dto;
 
-public record NaverResponseDto(
+public record NaverLandResponse(
     boolean isMoreData,
     String dongCode,
     ArticleDto[] articleList
