@@ -1,11 +1,11 @@
-package com.zipsoon.batch.dto;
+package com.zipsoon.batch.infra.naver.vo;
 
-public record NaverResponseDto(
+public record NaverLandResponse(
     boolean isMoreData,
     String dongCode,
-    ArticleDto[] articleList
+    NaverLandResponseArticle[] articleList
 ) {
-    public record ArticleDto(
+    public record NaverLandResponseArticle(
         String articleNo,
         String articleName,
         String articleStatus,

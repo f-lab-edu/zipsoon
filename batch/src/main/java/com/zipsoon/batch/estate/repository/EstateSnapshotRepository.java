@@ -1,7 +1,7 @@
-package com.zipsoon.batch.repository;
+package com.zipsoon.batch.estate.repository;
 
 import com.zipsoon.common.domain.EstateSnapshot;
-import com.zipsoon.batch.mapper.EstateSnapshotMapper;
+import com.zipsoon.batch.estate.mapper.EstateSnapshotMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

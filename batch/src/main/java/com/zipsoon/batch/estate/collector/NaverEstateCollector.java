@@ -1,14 +1,14 @@
-package com.zipsoon.batch.job.processor;
+package com.zipsoon.batch.estate.collector;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zipsoon.batch.dto.NaverResponseDto;
+import com.zipsoon.batch.infra.naver.NaverLandClient;
+import com.zipsoon.batch.infra.naver.vo.NaverLandResponse;
 import com.zipsoon.common.domain.EstateSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,28 +20,37 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List<EstateSnapshot>> {
+public class NaverEstateCollector implements EstateCollector {
+    private final NaverLandClient naverLandClient;
     private final ObjectMapper objectMapper;
+    private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Override
-    public List<EstateSnapshot> process(NaverResponseDto item) {
-        if (item == null || item.articleList() == null) {
-            throw new IllegalArgumentException("Received null or invalid data from Naver API");
-        }
-        String processingDongCode = item.dongCode();
-
-        try {
-            return Arrays.stream(item.articleList())
-                .map(article -> convertToSnapshot(article, processingDongCode))
-                .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid estate data encountered: " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Unexpected error during estate processing: " + e.getMessage(), e);
-        }
+    public String getPlatformName() {
+        return EstateSnapshot.PlatformType.네이버.name();
     }
 
-    private EstateSnapshot convertToSnapshot(NaverResponseDto.ArticleDto article, String processingDongCode) {
+    @Override
+    public List<EstateSnapshot> collect(String dongCode, int page) {
+        NaverLandResponse response = naverLandClient.get(dongCode, page);
+
+        if (response == null || response.articleList() == null) {
+            log.warn("No data received from Naver for dongCode: {}, page: {}", dongCode, page);
+            return List.of();
+        }
+
+        return Arrays.stream(response.articleList())
+                    .map(article -> convertToSnapshot(article, dongCode))
+                    .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean hasMoreData(String dongCode, int page) {
+        NaverLandResponse response = naverLandClient.get(dongCode, page);
+        return response != null && response.isMoreData();
+    }
+
+    private EstateSnapshot convertToSnapshot(NaverLandResponse.NaverLandResponseArticle article, String dongCode) {
         try {
             return EstateSnapshot.builder()
                     .platformType(EstateSnapshot.PlatformType.네이버)
@@ -57,11 +66,12 @@ public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List
                     .location(createPoint(article.longitude(), article.latitude()))
                     .address(article.detailAddress())
                     .tags(Arrays.asList(article.tagList()))
-                    .dongCode(processingDongCode)
+                    .dongCode(dongCode)
                     .createdAt(LocalDateTime.now())
                     .build();
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to convert article to EstateSnapshot: " + e.getMessage(), e);
+            log.error("Failed to convert article to EstateSnapshot: {}", article, e);
+            throw new IllegalStateException("매물 정보 변환 실패: " + e.getMessage());
         }
     }
 
@@ -76,8 +86,11 @@ public class EstateItemProcessor implements ItemProcessor<NaverResponseDto, List
         if (longitude == null || latitude == null) {
             return null;
         }
-        return new GeometryFactory().createPoint(
-            new Coordinate(Double.parseDouble(longitude), Double.parseDouble(latitude))
+        return geometryFactory.createPoint(
+            new Coordinate(
+                Double.parseDouble(longitude),
+                Double.parseDouble(latitude)
+            )
         );
     }
 

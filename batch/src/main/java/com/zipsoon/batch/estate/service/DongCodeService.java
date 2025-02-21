@@ -1,6 +1,6 @@
-package com.zipsoon.batch.service;
+package com.zipsoon.batch.estate.service;
 
-import com.zipsoon.batch.domain.DongCode;
+import com.zipsoon.batch.estate.domain.DongCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
