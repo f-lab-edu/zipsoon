@@ -33,17 +33,6 @@ class BatchExceptionHandlerTest {
         });
     }
 
-//    @Test
-//    @DisplayName("매물 정보 처리 중 예외가 발생한다")
-//    void exceptionTest_EstateProcessing() {
-//        EstateItemProcessor processor = new EstateItemProcessor(new ObjectMapper());
-//        NaverLandResponse invalidResponse = new NaverLandResponse(true, null, null);
-//
-//        assertThrows(IllegalArgumentException.class, () -> {
-//            processor.process(invalidResponse);
-//        });
-//    }
-
     @Test
     @DisplayName("데이터 무결성 위반으로 유효성 예외가 발생한다")
     void exceptionTest_DataIntegrityViolation() {
