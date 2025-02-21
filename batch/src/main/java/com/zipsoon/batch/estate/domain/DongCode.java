@@ -1,4 +1,4 @@
-package com.zipsoon.batch.estate.job;
+package com.zipsoon.batch.estate.domain;
 
 import java.io.Serializable;
 

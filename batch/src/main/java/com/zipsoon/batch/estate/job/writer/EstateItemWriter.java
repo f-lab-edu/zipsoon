@@ -1,7 +1,7 @@
-package com.zipsoon.batch.job.writer;
+package com.zipsoon.batch.estate.job.writer;
 
 import com.zipsoon.common.domain.EstateSnapshot;
-import com.zipsoon.batch.repository.EstateSnapshotRepository;
+import com.zipsoon.batch.estate.repository.EstateSnapshotRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;

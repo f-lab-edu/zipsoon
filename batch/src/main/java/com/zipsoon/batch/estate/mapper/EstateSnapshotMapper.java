@@ -1,9 +1,7 @@
-package com.zipsoon.batch.mapper;
+package com.zipsoon.batch.estate.mapper;
 
 import com.zipsoon.common.domain.EstateSnapshot;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.locationtech.jts.geom.Point;
 
 import java.util.List;
 

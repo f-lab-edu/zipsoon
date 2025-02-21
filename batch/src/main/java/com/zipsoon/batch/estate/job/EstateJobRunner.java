@@ -1,4 +1,4 @@
-package com.zipsoon.batch.job;
+package com.zipsoon.batch.estate.job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
