@@ -1,4 +1,4 @@
-package com.zipsoon.batch.estate.job;
+package com.zipsoon.batch.score.job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,17 +14,17 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EstateJobRunner {
+public class EstateScoreJobRunner {
     private final JobLauncher jobLauncher;
-    private final Job estateJob;
+    private final Job estateScoreJob;
 
     public void run() throws Exception {
         JobParameters params = new JobParametersBuilder()
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting estate job with parameters: {}", params);
-        JobExecution execution = jobLauncher.run(estateJob, params);
-        log.info("Estate collection job finished with status: {}", execution.getStatus());
+        log.info("Starting estate score calculation job...");
+        JobExecution execution = jobLauncher.run(estateScoreJob, params);
+        log.info("Score calculation job finished with status: {}", execution.getStatus());
     }
 }

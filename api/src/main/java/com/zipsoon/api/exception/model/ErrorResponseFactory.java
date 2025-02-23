@@ -5,7 +5,6 @@ import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("ALL")
 public class ErrorResponseFactory {
@@ -17,7 +16,7 @@ public class ErrorResponseFactory {
                 error.getDefaultMessage(),
                 "FIELD_VALIDATION_ERROR"
             ))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public static ErrorResponse from(ErrorCode errorCode) {

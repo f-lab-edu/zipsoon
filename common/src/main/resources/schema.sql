@@ -37,3 +37,29 @@ CREATE TABLE app_user (
 
 CREATE INDEX idx_provider_provider_id ON app_user (provider, provider_id);
 CREATE UNIQUE INDEX uk_provider_provider_id ON app_user (provider, provider_id);
+
+CREATE TABLE score_type (
+    id serial PRIMARY KEY,
+    name varchar(50) NOT NULL UNIQUE,
+    description text,
+    active boolean DEFAULT true,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO score_type (name, description) VALUES
+('공원', '공원의 개수와 규모를 점수화합니다');
+
+
+CREATE TABLE estate_score (
+    id bigserial PRIMARY KEY,
+    estate_snapshot_id bigint NOT NULL,
+    score_type_id int NOT NULL,
+    score numeric(5,2) NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (estate_snapshot_id) REFERENCES estate_snapshot(id),
+    FOREIGN KEY (score_type_id) REFERENCES score_type(id)
+);
+
+CREATE INDEX idx_estate_location_score_estate_id ON estate_score(estate_snapshot_id);
+CREATE INDEX idx_estate_location_score_type_id ON estate_score(score_type_id);

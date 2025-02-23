@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -41,7 +40,7 @@ public class NaverEstateCollector implements EstateCollector {
 
         return Arrays.stream(response.articleList())
                     .map(article -> convertToSnapshot(article, dongCode))
-                    .collect(Collectors.toList());
+                    .toList();
     }
 
     @Override
