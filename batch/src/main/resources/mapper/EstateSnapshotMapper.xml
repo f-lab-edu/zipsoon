@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zipsoon.batch.estate.mapper.EstateSnapshotMapper">
 
+    <resultMap id="EstateSnapshotResultMap" type="EstateSnapshot">
+        <result column="platform_type"
+                property="platformType"
+                typeHandler="com.zipsoon.common.config.typehandler.PlatformTypeHandler"/>
+        <result column="raw_data"
+                property="rawData"
+                typeHandler="com.zipsoon.common.config.typehandler.JsonTypeHandler"/>
+        <result column="estate_type"
+                property="estateType"
+                typeHandler="com.zipsoon.common.config.typehandler.EstateTypeHandler"/>
+        <result column="trade_type"
+                property="tradeType"
+                typeHandler="com.zipsoon.common.config.typehandler.TradeTypeHandler"/>
+        <result column="location"
+                property="location"
+                typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"
+                jdbcType="OTHER"/>
+        <result column="tags"
+                property="tags"
+                typeHandler="com.zipsoon.common.config.typehandler.StringArrayTypeHandler"/>
+    </resultMap>
+
     <insert id="insertEstateSnapshots" parameterType="java.util.List">
         INSERT INTO estate_snapshot (
             platform_type,
@@ -22,23 +44,28 @@
         ) VALUES
         <foreach collection="list" item="estateSnapshot" separator=",">
             (
-            #{estateSnapshot.platformType, typeHandler=com.zipsoon.common.config.typehandler.PlatformTypeHandler},
+            #{estateSnapshot.platformType},
             #{estateSnapshot.platformId},
-            #{estateSnapshot.rawData, typeHandler=com.zipsoon.common.config.typehandler.JsonTypeHandler},
+            #{estateSnapshot.rawData},
             #{estateSnapshot.estateName},
-            #{estateSnapshot.estateType, typeHandler=com.zipsoon.common.config.typehandler.EstateTypeHandler},
-            #{estateSnapshot.tradeType, typeHandler=com.zipsoon.common.config.typehandler.TradeTypeHandler},
+            #{estateSnapshot.estateType},
+            #{estateSnapshot.tradeType},
             #{estateSnapshot.price},
             #{estateSnapshot.rentPrice},
             #{estateSnapshot.areaMeter},
             #{estateSnapshot.areaPyeong},
-            #{estateSnapshot.location, typeHandler=com.zipsoon.common.config.typehandler.PointTypeHandler, jdbcType=OTHER},
+            #{estateSnapshot.location},
             #{estateSnapshot.address},
-            #{estateSnapshot.tags, typeHandler=com.zipsoon.common.config.typehandler.StringArrayTypeHandler},
+            #{estateSnapshot.tags},
             #{estateSnapshot.dongCode},
             #{estateSnapshot.createdAt}
             )
         </foreach>
     </insert>
+
+    <select id="selectLatestAll" resultType="EstateSnapshot" resultMap="EstateSnapshotResultMap">
+        SELECT *
+        FROM estate_snapshot
+    </select>
 
 </mapper>
