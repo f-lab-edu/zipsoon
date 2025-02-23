@@ -1,22 +1,24 @@
 package com.zipsoon.batch.config;
 
 import com.zipsoon.batch.estate.job.EstateJobRunner;
-import com.zipsoon.batch.score.job.ScoreJobRunner;
+import com.zipsoon.batch.score.job.EstateScoreJobRunner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
+@EnableScheduling
 @RequiredArgsConstructor
-public class BatchConfig {
+public class ScheduleConfig {
     private final EstateJobRunner estateJobRunner;
-    private final ScoreJobRunner scoreJobRunner;
+    private final EstateScoreJobRunner estateScoreJobRunner;
 
-    public void runEstateCollection() {
-        jobLauncher.run(estateJob, params);
+    public void runEstateJob() throws Exception {
+        estateJobRunner.run();
     }
 
-    public void runSourceCollection() {
-        jobLauncher.run(sourceJob, params);
+    public void runScoreJob() throws Exception {
+        estateScoreJobRunner.run();
     }
 
 //    public void runScoreCalculation() {
