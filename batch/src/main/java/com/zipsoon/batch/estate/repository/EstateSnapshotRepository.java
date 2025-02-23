@@ -10,11 +10,13 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class EstateSnapshotRepository {
-
     private final EstateSnapshotMapper estateSnapshotMapper;
 
     public void saveAll(List<EstateSnapshot> estateSnapshots) {
         estateSnapshotMapper.insertEstateSnapshots(estateSnapshots);
     }
 
+    public List<EstateSnapshot> findAllLatest() {
+        return estateSnapshotMapper.selectLatestAll();
+    }
 }

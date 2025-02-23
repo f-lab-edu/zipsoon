@@ -12,4 +12,6 @@ public interface EstateSnapshotMapper {
     }
 
     void insertEstateSnapshots(List<EstateSnapshot> estateSnapshots);
+
+    List<EstateSnapshot> selectLatestAll();
 }
