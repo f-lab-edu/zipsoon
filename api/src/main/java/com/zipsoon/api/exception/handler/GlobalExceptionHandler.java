@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -51,7 +50,7 @@ public class GlobalExceptionHandler {
                 detail.message(),
                 detail.code()
             ))
-            .collect(Collectors.toList());
+            .toList();
 
         return ResponseEntity
             .status(e.getErrorCode().getHttpStatus())
