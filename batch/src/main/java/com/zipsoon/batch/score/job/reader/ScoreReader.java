@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EstateScoreReader implements ItemReader<EstateSnapshot> {
+public class ScoreReader implements ItemReader<EstateSnapshot> {
 
     private final EstateSnapshotRepository estateSnapshotRepository;
 

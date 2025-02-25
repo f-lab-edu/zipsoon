@@ -6,6 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface EstateScoreMapper {
-    void insertAll(List<EstateScore> scores);
+public interface ScoreMapper {
+    void insertAll(List<EstateScore> rawScores);
 }

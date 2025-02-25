@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zipsoon.batch.normalize.mapper.NormalizeMapper">
+
+    <select id="selectAllActiveScoreType" resultType="com.zipsoon.batch.score.model.ScoreType">
+        SELECT
+            id,
+            name,
+            description,
+            active,
+            created_at as createdAt
+        FROM score_type
+        WHERE active = true
+        ORDER BY id
+    </select>
+
+    <select id="selectScoresById" resultType="com.zipsoon.batch.score.model.EstateScore">
+        SELECT
+            id,
+            estate_snapshot_id,
+            score_type_id,
+            raw_score,
+            normalized_score,
+            created_at
+        FROM estate_score
+        WHERE score_type_id = #{scoreTypeId}
+        ORDER BY id
+    </select>
+
+    <update id="updateScoresNormalizedByScoreTypeAndIds">
+        UPDATE estate_score
+        SET
+            normalized_score = CASE id
+                <foreach collection="updates" index="id" item="score">
+                    WHEN CAST(#{id} AS BIGINT) THEN #{score}
+                </foreach>
+            END
+        WHERE score_type_id = #{scoreTypeId}
+        AND id IN
+        <foreach collection="updates.keySet()" item="id" open="(" separator="," close=")">
+            CAST(#{id} AS BIGINT)
+        </foreach>
+    </update>
+</mapper>

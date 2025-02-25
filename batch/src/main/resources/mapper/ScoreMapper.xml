@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.batch.score.mapper.EstateScoreMapper">
+<mapper namespace="com.zipsoon.batch.score.mapper.ScoreMapper">
     <insert id="insertAll" parameterType="java.util.List">
         INSERT INTO estate_score (
             estate_snapshot_id,
             score_type_id,
-            score,
+            raw_score,
             created_at
         ) VALUES
-        <foreach collection="list" item="score" separator=",">
+        <foreach collection="list" item="rawScore" separator=",">
             (
-                #{score.estateSnapshotId},
-                #{score.scoreTypeId},
-                #{score.score},
-                #{score.createdAt}
+                #{rawScore.estateSnapshotId},
+                #{rawScore.scoreTypeId},
+                #{rawScore.rawScore},
+                #{rawScore.createdAt}
             )
         </foreach>
     </insert>

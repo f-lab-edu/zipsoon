@@ -45,7 +45,7 @@ class ParkScoreCalculatorTest {
             .thenReturn(List.of());
 
         // when
-        double score = parkScoreCalculator.calculate(estate);
+        double score = parkScoreCalculator.calculateRawScore(estate);
 
         // then
         assertThat(score).isZero();
@@ -62,11 +62,11 @@ class ParkScoreCalculatorTest {
             createPark("park2", "공원2", PARK_LONGITUDE, PARK_LATITUDE, 2000.0)
         );
 
-        when(parkRepository.findParksWithin(any(Point.class), eq(300.0)))
+        when(parkRepository.findParksWithin(any(Point.class), eq(600.0)))
             .thenReturn(nearbyParks);
 
         // when
-        double score = parkScoreCalculator.calculate(estate);
+        double score = parkScoreCalculator.calculateRawScore(estate);
 
         // then
         assertThat(score)
