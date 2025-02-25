@@ -44,19 +44,19 @@
         ) VALUES
         <foreach collection="list" item="estateSnapshot" separator=",">
             (
-            #{estateSnapshot.platformType},
+            #{estateSnapshot.platformType, typeHandler=com.zipsoon.common.config.typehandler.PlatformTypeHandler},
             #{estateSnapshot.platformId},
-            #{estateSnapshot.rawData},
+            #{estateSnapshot.rawData, typeHandler=com.zipsoon.common.config.typehandler.JsonTypeHandler},
             #{estateSnapshot.estateName},
-            #{estateSnapshot.estateType},
-            #{estateSnapshot.tradeType},
+            #{estateSnapshot.estateType, typeHandler=com.zipsoon.common.config.typehandler.EstateTypeHandler},
+            #{estateSnapshot.tradeType, typeHandler=com.zipsoon.common.config.typehandler.TradeTypeHandler},
             #{estateSnapshot.price},
             #{estateSnapshot.rentPrice},
             #{estateSnapshot.areaMeter},
             #{estateSnapshot.areaPyeong},
-            #{estateSnapshot.location},
+            #{estateSnapshot.location, typeHandler=com.zipsoon.common.config.typehandler.PointTypeHandler, jdbcType=OTHER},
             #{estateSnapshot.address},
-            #{estateSnapshot.tags},
+            #{estateSnapshot.tags, typeHandler=com.zipsoon.common.config.typehandler.StringArrayTypeHandler},
             #{estateSnapshot.dongCode},
             #{estateSnapshot.createdAt}
             )
