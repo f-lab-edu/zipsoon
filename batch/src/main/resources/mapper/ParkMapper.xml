@@ -17,13 +17,12 @@
             지정고시일 as designatedDate,
             관리기관명 as managementAgency
         FROM parks
-        WHERE 제공기관명 = '서울특별시 종로구'
-            AND location IS NOT NULL
+        WHERE location IS NOT NULL
             AND ST_DWithin(
                 location::geography,
                 #{location, typeHandler=com.zipsoon.common.config.typehandler.PointTypeHandler}::geography,
                 #{radius}
-            );
+            )
     </select>
 
 </mapper>
