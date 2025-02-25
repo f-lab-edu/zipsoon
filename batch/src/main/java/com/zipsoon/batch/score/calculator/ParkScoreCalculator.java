@@ -1,6 +1,8 @@
 package com.zipsoon.batch.score.calculator;
 
 import com.zipsoon.batch.score.domain.Park;
+import com.zipsoon.batch.normalize.normalizer.LinearScoreNormalizer;
+import com.zipsoon.batch.normalize.normalizer.ScoreNormalizer;
 import com.zipsoon.batch.score.repository.ParkRepository;
 import com.zipsoon.common.domain.EstateSnapshot;
 import lombok.RequiredArgsConstructor;
@@ -15,40 +17,65 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ParkScoreCalculator implements ScoreCalculator {
     private final ParkRepository parkRepository;
-    private static final double RADIUS = 300.0;     // 도보 5분 내 접근 가능한 거리
-    private static final double MAX_SCORE = 10.0;
+    private static final Long SCORE_TYPE_PRIMARY_KEY = 1L;
+    private static final double WALKING_DISTANCE = 600.0; // 도보 10분
 
     @Override
-    public String getScoreTypeName() {
-        return "공원";
+    public Long getScoreId() {
+        return SCORE_TYPE_PRIMARY_KEY;
     }
 
     @Override
-    public double calculate(EstateSnapshot estate) {
+    public ScoreNormalizer getNormalizer() {
+        return new LinearScoreNormalizer();
+    }
+
+    @Override
+    public double calculateRawScore(EstateSnapshot estate) {
         List<Park> nearbyParks = parkRepository.findParksWithin(
             (Point) estate.getLocation(),
-            RADIUS
+            WALKING_DISTANCE
         );
-        log.debug("estate: {}({}), nearby parks: {}", estate.getEstateName(), estate.getLocation(), nearbyParks.size());
 
         if (nearbyParks.isEmpty()) {
-            return 0.0;
+            log.debug("estate {}({}):: no parks found =====> totalScore: 0", estate.getEstateName(), estate.getLocation());
+            return 0;
         }
 
-        // 1. 가장 큰 공원의 면적 점수: 6점 만점
-        double largestParkArea = nearbyParks.stream()
+        // 1. 가장 가까운 공원까지의 거리 점수 (40%)
+        double nearestDistance = nearbyParks.stream()
+            .mapToDouble(park -> calculateDistance((Point) estate.getLocation(), park.getLocation()))
+            .min()
+            .orElse(WALKING_DISTANCE);
+        double distanceScore = Math.max(0, (1 - nearestDistance / WALKING_DISTANCE) * 4);
+
+        // 2. 총 면적 점수 (60%)
+        double totalArea = nearbyParks.stream()
             .mapToDouble(Park::getArea)
-            .max()
-            .orElse(0.0);
-        double areaScore = Math.min(6.0, largestParkArea / 1000.0);
+            .sum();
+        double areaScore = Math.min(totalArea / 50000.0, 1.0) * 6;
 
-        // 2. 공원 개수에 따른 추가 점수: 4점 만점
-        int parkCount = nearbyParks.size();
-        double countScore = Math.min(4.0, parkCount * 1.5);
-
-        double totalScore = Math.min(MAX_SCORE, areaScore + countScore);
-        log.debug("area score: {}, count score: {}, total score: {}", areaScore, countScore, totalScore);
+        double totalScore = distanceScore + areaScore;
+        log.debug("estate {}({}):: distance: {}, area: {} =====> totalScore: {}",
+                estate.getEstateName(), estate.getLocation(), distanceScore, areaScore, totalScore);
         return totalScore;
     }
 
+    private double calculateDistance(Point p1, Point p2) {
+        final double EARTH_RADIUS = 6371000;
+
+        double lat1 = Math.toRadians(p1.getY());
+        double lon1 = Math.toRadians(p1.getX());
+        double lat2 = Math.toRadians(p2.getY());
+        double lon2 = Math.toRadians(p2.getX());
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1) * Math.cos(lat2)
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
+    }
 }
