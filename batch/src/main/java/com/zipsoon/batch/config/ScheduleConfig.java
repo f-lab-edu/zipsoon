@@ -3,6 +3,7 @@ package com.zipsoon.batch.config;
 import com.zipsoon.batch.estate.job.EstateJobRunner;
 import com.zipsoon.batch.normalize.job.NormalizeJobRunner;
 import com.zipsoon.batch.score.job.ScoreJobRunner;
+import com.zipsoon.batch.source.job.ScoreSourceJobRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Slf4j
 public class ScheduleConfig {
     private final EstateJobRunner estateJobRunner;
+    private final ScoreSourceJobRunner sourceJobRunner;
     private final ScoreJobRunner scoreJobRunner;
     private final NormalizeJobRunner normalizeJobRunner;
 
@@ -23,15 +25,25 @@ public class ScheduleConfig {
         try {
             log.info("Starting scheduled estate data collection");
             estateJobRunner.run();
-            runScoreJobAfterEstate();
+            runSourceJobAfterEstate();
         } catch (Exception e) {
             log.error("Failed to run scheduled estate job", e);
         }
     }
 
+    public void runSourceJobAfterEstate() {
+        try {
+            log.info("Triggering source after estate job");
+            sourceJobRunner.run();
+            runScoreJobAfterEstate();
+        } catch (Exception e) {
+            log.error("Failed to run source job", e);
+        }
+    }
+
     public void runScoreJobAfterEstate() {
         try {
-            log.info("Triggering score calculation after estate job");
+            log.info("Triggering score calculation after source job");
             scoreJobRunner.run();
             runNormalizeJobAfterScore();
         } catch (Exception e) {
@@ -47,9 +59,5 @@ public class ScheduleConfig {
             log.error("Failed to run normalize job", e);
         }
     }
-
-//    public void runScoreCalculation() {
-//        jobLauncher.run(scoreJob, params);
-//    }
 
 }
