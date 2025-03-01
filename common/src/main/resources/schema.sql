@@ -54,7 +54,8 @@ CREATE TABLE estate_score (
     id bigserial PRIMARY KEY,
     estate_snapshot_id bigint NOT NULL,
     score_type_id int NOT NULL,
-    score numeric(5,2) NOT NULL,
+    raw_score numeric(5,2) NOT NULL,
+    normalized_score numeric(5,2),
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (estate_snapshot_id) REFERENCES estate_snapshot(id),
