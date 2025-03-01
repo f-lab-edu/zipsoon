@@ -21,9 +21,11 @@ public record EstateDetailResponse(
     @JsonProperty("lng") double longitude,
     String address,
     List<String> tags,
+    List<String> images,
+    ScoreDetails score,
     JsonNode rawData
 ) {
-    public static EstateDetailResponse from(EstateSnapshot snapshot) {
+    public static EstateDetailResponse from(EstateSnapshot snapshot, ScoreDetails scoreDetails) {
         return new EstateDetailResponse(
             snapshot.getId(),
             snapshot.getEstateName(),
@@ -37,6 +39,8 @@ public record EstateDetailResponse(
             ((Point) snapshot.getLocation()).getX(),
             snapshot.getAddress(),
             snapshot.getTags(),
+            snapshot.getImageUrls(),
+            scoreDetails,
             snapshot.getRawData()
         );
     }
