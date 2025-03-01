@@ -1,0 +1,143 @@
+body {
+    height: 100vh;
+    padding: 20px;
+    background-color: #ebbbaa;
+    position: relative;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.code-content {
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+    font-size: 11px;
+    white-space: pre;
+    text-align: left;
+    overflow: auto;
+    user-select: text;
+    height: 100%;
+}
+
+.panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.panel.iphone-panel {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.panel.app-panel {
+    width: 25%;
+    justify-content: center;
+    align-items: center;
+}
+
+.panel.db-panel {
+    width: 50%;
+}
+
+#erd-container {
+    width: 95%;
+    height: 95%;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: white;
+    overflow: auto;
+    max-width: none;
+    max-height: none;
+}
+
+/* 화살표 컨테이너 */
+.arrow-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 2; /* 패널보다 위에 위치하도록 변경 */
+}
+
+/* 화살표 스타일 */
+.arrow {
+    position: absolute;
+    height: 2px;
+    background-color: #333;
+    transform-origin: 0 50%;
+    z-index: 0; /* 화살표의 z-index 설정 */
+}
+
+.arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -6px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px 0 6px 12px;
+    border-color: transparent transparent transparent #333;
+}
+
+/* 화살표 라벨 */
+.arrow-label {
+    position: absolute;
+    background-color: white;
+    color: #333;
+    width: 200px;
+    height: 300px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+    font-weight: normal;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    z-index: 3; /* 화살표 위에 표시되도록 설정 */
+    pointer-events: auto; /* 상호작용 가능하도록 설정 */
+    overflow: hidden; /* 내용물이 넘치지 않도록 */
+}
+
+/* 개별 화살표 위치와 스타일 */
+/* 왼쪽→중앙 (Client → App) */
+.arrow-client-to-app {
+    left: 26%;
+    top: 48%;
+    width: 6%;
+    transform: rotate(0deg);
+}
+
+/* 중앙→왼쪽 (App → Client) */
+.arrow-app-to-client {
+    left: 32%;
+    top: 52%;
+    width: 6%;
+    transform: rotate(180deg);
+}
+
+/* 중앙→오른쪽 (App → DB) */
+.arrow-app-to-db {
+    left: 44%;
+    top: 48%;
+    width: 6%;
+    transform: rotate(0deg);
+}
+
+/* 오른쪽→중앙 (DB → App) */
+.arrow-db-to-app {
+    left: 50%;
+    top: 52%;
+    width: 6%;
+    transform: rotate(180deg);
+}
