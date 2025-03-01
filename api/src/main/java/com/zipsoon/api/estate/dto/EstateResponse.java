@@ -20,11 +20,6 @@ public record EstateResponse(
     @JsonProperty("lng") double longitude
 ) {
     public static EstateResponse from(EstateSnapshot snapshot) {
-        log.info("Geometry: {}", snapshot.getLocation());
-        Point location = (Point) snapshot.getLocation();
-        double latitude = location != null ? location.getY() : 0.0;
-        double longitude = location != null ? location.getX() : 0.0;
-        log.info("location: {}, latitude: {}, longitude: {}", location, latitude, longitude);
         return new EstateResponse(
             snapshot.getId(),
             snapshot.getEstateName(),
