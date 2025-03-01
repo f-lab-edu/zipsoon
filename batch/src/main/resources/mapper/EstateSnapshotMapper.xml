@@ -39,6 +39,7 @@
             location,
             address,
             tags,
+            image_urls,
             dong_code,
             created_at
         ) VALUES
@@ -57,6 +58,7 @@
             #{estateSnapshot.location, typeHandler=com.zipsoon.common.config.typehandler.PointTypeHandler, jdbcType=OTHER},
             #{estateSnapshot.address},
             #{estateSnapshot.tags, typeHandler=com.zipsoon.common.config.typehandler.StringArrayTypeHandler},
+            #{estateSnapshot.imageUrls, typeHandler=com.zipsoon.common.config.typehandler.StringArrayTypeHandler},
             #{estateSnapshot.dongCode},
             #{estateSnapshot.createdAt}
             )
