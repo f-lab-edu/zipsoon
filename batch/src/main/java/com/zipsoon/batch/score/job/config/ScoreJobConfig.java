@@ -3,8 +3,8 @@ package com.zipsoon.batch.score.job.config;
 import com.zipsoon.batch.score.job.processor.ScoreProcessor;
 import com.zipsoon.batch.score.job.reader.ScoreReader;
 import com.zipsoon.batch.score.job.writer.ScoreWriter;
-import com.zipsoon.batch.score.model.EstateScore;
-import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.Estate;
+import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -38,7 +38,7 @@ public class ScoreJobConfig {
     @Bean
     public Step estateScoreStep() {
         return new StepBuilder("estateScoreStep", jobRepository)
-            .<EstateSnapshot, List<EstateScore>>chunk(100, transactionManager)
+            .<Estate, List<EstateScore>>chunk(100, transactionManager)
             .reader(scoreReader)
             .processor(scoreProcessor)
             .writer(scoreWriter)

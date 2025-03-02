@@ -2,8 +2,8 @@ package com.zipsoon.batch.normalize.job.writer;
 
 import com.zipsoon.batch.normalize.repository.NormalizeRepository;
 import com.zipsoon.batch.score.calculator.ScoreCalculator;
-import com.zipsoon.batch.score.model.EstateScore;
 import com.zipsoon.batch.score.model.ScoreType;
+import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;

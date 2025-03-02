@@ -1,7 +1,7 @@
 package com.zipsoon.batch.normalize.mapper;
 
-import com.zipsoon.batch.score.model.EstateScore;
 import com.zipsoon.batch.score.model.ScoreType;
+import com.zipsoon.common.domain.EstateScore;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

@@ -4,6 +4,7 @@ import com.zipsoon.batch.estate.job.writer.EstateItemWriter;
 import com.zipsoon.batch.estate.repository.EstateSnapshotRepository;
 import com.zipsoon.batch.infra.naver.NaverLandClient;
 import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.PlatformType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.Chunk;
@@ -41,17 +42,17 @@ class BatchExceptionHandlerTest {
 
         List<EstateSnapshot> snapshots = List.of(
             EstateSnapshot.builder()
-                .platformType(EstateSnapshot.PlatformType.네이버)
+                .platformType(PlatformType.네이버)
                 .platformId("SAME_ID")
                 .build(),
             EstateSnapshot.builder()
-                .platformType(EstateSnapshot.PlatformType.네이버)
+                .platformType(PlatformType.네이버)
                 .platformId("SAME_ID")
                 .build()
         );
 
         doThrow(new DataIntegrityViolationException("Duplicate key"))
-            .when(repository).saveAll(eq(snapshots));
+            .when(repository).saveAllSnapshots(eq(snapshots));
 
         assertThrows(IllegalArgumentException.class, () -> {
             writer.write(new Chunk<>(List.of(snapshots)));

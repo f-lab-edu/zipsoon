@@ -12,7 +12,7 @@ import java.util.List;
 @Builder(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class EstateSnapshot {
+public class Estate {
 
     private Long id;
 

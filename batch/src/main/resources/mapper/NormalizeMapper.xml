@@ -14,10 +14,10 @@
         ORDER BY id
     </select>
 
-    <select id="selectScoresById" resultType="com.zipsoon.batch.score.model.EstateScore">
+    <select id="selectScoresById" resultType="com.zipsoon.common.domain.EstateScore">
         SELECT
             id,
-            estate_snapshot_id,
+            estate_id,
             score_type_id,
             raw_score,
             normalized_score,
