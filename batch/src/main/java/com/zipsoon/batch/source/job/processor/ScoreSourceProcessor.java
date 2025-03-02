@@ -12,7 +12,12 @@ public class ScoreSourceProcessor implements ItemProcessor<ScoreSourceCollector,
     public ScoreSourceCollector process(ScoreSourceCollector collector) {
         log.info("Processing source data collection");
         collector.create();
+        if (!collector.wasUpdated()) {
+            return collector;
+        }
+        
         collector.collect();
+        collector.preprocess();
         return collector;
     }
 }
