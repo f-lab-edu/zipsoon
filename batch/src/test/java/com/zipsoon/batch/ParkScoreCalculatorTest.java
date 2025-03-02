@@ -3,7 +3,7 @@ package com.zipsoon.batch;
 import com.zipsoon.batch.score.calculator.ParkScoreCalculator;
 import com.zipsoon.batch.score.domain.Park;
 import com.zipsoon.batch.score.repository.ParkRepository;
-import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.Estate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class ParkScoreCalculatorTest {
     @DisplayName("주변에 공원이 없을 때는 0점을 반환한다")
     void shouldReturnZeroScoreWhenNoParkNearby() {
         // given
-        EstateSnapshot estate = createEstateSnapshot(ESTATE_LONGITUDE, ESTATE_LATITUDE);
+        Estate estate = createEstate(ESTATE_LONGITUDE, ESTATE_LATITUDE);
         when(parkRepository.findParksWithin(any(Point.class), eq(300.0)))
             .thenReturn(List.of());
 
@@ -55,7 +55,7 @@ class ParkScoreCalculatorTest {
     @DisplayName("주변에 여러 공원이 있을 때는 양수의 점수를 반환한다")
     void shouldCalculatePositiveScoreWithMultipleParks() {
         // given
-        EstateSnapshot estate = createEstateSnapshot(ESTATE_LONGITUDE, ESTATE_LATITUDE);
+        Estate estate = createEstate(ESTATE_LONGITUDE, ESTATE_LATITUDE);
 
         List<Park> nearbyParks = List.of(
             createPark("park1", "공원1", PARK_LONGITUDE, PARK_LATITUDE, 1000.0),
@@ -74,8 +74,8 @@ class ParkScoreCalculatorTest {
             .isLessThanOrEqualTo(10.0);
     }
 
-    private EstateSnapshot createEstateSnapshot(double longitude, double latitude) {
-        return EstateSnapshot.builder()
+    private Estate createEstate(double longitude, double latitude) {
+        return Estate.builder()
             .location(geometryFactory.createPoint(new Coordinate(longitude, latitude)))
             .build();
     }
