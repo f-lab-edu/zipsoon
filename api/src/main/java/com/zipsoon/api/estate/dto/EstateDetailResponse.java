@@ -2,7 +2,7 @@ package com.zipsoon.api.estate.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.Estate;
 import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
@@ -25,23 +25,23 @@ public record EstateDetailResponse(
     ScoreDetails score,
     JsonNode rawData
 ) {
-    public static EstateDetailResponse from(EstateSnapshot snapshot, ScoreDetails scoreDetails) {
+    public static EstateDetailResponse from(Estate estate, ScoreDetails scoreDetails) {
         return new EstateDetailResponse(
-            snapshot.getId(),
-            snapshot.getEstateName(),
-            snapshot.getEstateType().getKoreanName(),
-            snapshot.getTradeType().getKoreanName(),
-            snapshot.getPrice(),
-            snapshot.getRentPrice(),
-            snapshot.getAreaMeter(),
-            snapshot.getAreaPyeong(),
-            ((Point) snapshot.getLocation()).getY(),
-            ((Point) snapshot.getLocation()).getX(),
-            snapshot.getAddress(),
-            snapshot.getTags(),
-            snapshot.getImageUrls(),
+            estate.getId(),
+            estate.getEstateName(),
+            estate.getEstateType().getKoreanName(),
+            estate.getTradeType().getKoreanName(),
+            estate.getPrice(),
+            estate.getRentPrice(),
+            estate.getAreaMeter(),
+            estate.getAreaPyeong(),
+            ((Point) estate.getLocation()).getY(),
+            ((Point) estate.getLocation()).getX(),
+            estate.getAddress(),
+            estate.getTags(),
+            estate.getImageUrls(),
             scoreDetails,
-            snapshot.getRawData()
+            estate.getRawData()
         );
     }
 }
