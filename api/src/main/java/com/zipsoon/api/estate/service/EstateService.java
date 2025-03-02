@@ -48,8 +48,7 @@ public class EstateService {
     }
 
     private int calculateLimit(int zoom) {
-        if (zoom <= 8) return 100;
-        if (zoom <= 14) return 500;
+        if (zoom >= 14) return 500;
         return MAX_RESULTS_PER_ZOOM;
     }
 }
