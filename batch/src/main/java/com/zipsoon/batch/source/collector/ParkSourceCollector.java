@@ -1,125 +1,125 @@
 package com.zipsoon.batch.source.collector;
 
+import com.zipsoon.batch.source.loader.CsvSourceFileLoader;
+import com.zipsoon.batch.source.mapper.SourceDataMapper;
+import com.zipsoon.batch.source.util.ResourceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.postgresql.copy.CopyManager;
-import org.postgresql.core.BaseConnection;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 
-import javax.sql.DataSource;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ParkSourceCollector implements ScoreSourceCollector {
-    private final DataSource dataSource;
-    
-    private static final String PARK_SCHEMA_PATH = "source/sql/park-score-resource-query.sql";
-    private static final String PARK_DATA_PATH = "source/data/park-score-resource-data.csv";
+    private final SourceDataMapper sourceDataMapper;
+    private final CsvSourceFileLoader csvSourceFileLoader;
+    private final JobExplorer jobExplorer;
+
+    private static final String TABLE_NAME = "parks";
+    private static final String SCHEMA_FILE = "source/sql/park-score-resource-query.sql";
+    private static final String DATA_FILE = "source/data/park-score-resource-data.csv";
+    private static final String JOB_NAME = "sourceJob";
 
     @Override
     public void create() {
         try {
-            String sql = loadResourceAsString(PARK_SCHEMA_PATH);
-            executeStatement(sql);
+            String createTableSql = ResourceUtils.toString(SCHEMA_FILE);
+            sourceDataMapper.executeDDL(createTableSql);
             log.info("공원 테이블 생성/업데이트 완료");
         } catch (IOException e) {
             log.error("SQL 파일 읽기 실패: {}", e.getMessage(), e);
             throw new RuntimeException("SQL 파일 읽기 실패", e);
-        } catch (SQLException e) {
-            log.error("데이터베이스 작업 실패: {}", e.getMessage(), e);
-            throw new RuntimeException("데이터베이스 작업 실패", e);
         }
     }
 
     @Override
     public void collect() {
         try {
-            long rowsCopied = loadCsvData();
-            updateLocationPoints();
+            // 기존 데이터 초기화
+            sourceDataMapper.truncateTable(TABLE_NAME);
+            
+            Reader dataFileReader = ResourceUtils.toReader(DATA_FILE);
+            int rowsCopied = csvSourceFileLoader.load(dataFileReader, TABLE_NAME);
             log.info("총 {}개의 공원 데이터를 가져왔습니다.", rowsCopied);
-        } catch (IOException e) {
-            log.error("CSV 파일 읽기 실패: {}", e.getMessage(), e);
-            throw new RuntimeException("CSV 파일 읽기 실패", e);
-        } catch (SQLException e) {
-            log.error("데이터베이스 작업 실패: {}", e.getMessage(), e);
-            throw new RuntimeException("데이터베이스 작업 실패", e);
+        } catch (IOException | SQLException e) {
+            log.error("CSV 파일 처리 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("데이터 수집 실패", e);
+        }
+    }
+
+    @Override
+    public void preprocess() {
+        try {
+            sourceDataMapper.addLocationColumn(TABLE_NAME);
+            log.info("공원 테이블에 location 컬럼을 추가했습니다.");
+            int updatedRows = sourceDataMapper.updateLocationCoordinates(TABLE_NAME);
+            log.info("{}개의 공원 위치 데이터를 업데이트했습니다.", updatedRows);
+        } catch (Exception e) {
+            log.error("전처리 작업 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("전처리 실패", e);
         }
     }
     
     @Override
-    public boolean validate() {
-        return true;
-    }
-    
-    private String loadResourceAsString(String resourcePath) throws IOException {
-        ClassPathResource resource = new ClassPathResource(resourcePath);
-        return new String(FileCopyUtils.copyToByteArray(resource.getInputStream()));
-    }
-    
-    private void executeStatement(String sql) throws SQLException {
-        try (
-            Connection conn = dataSource.getConnection();
-            Statement stmt = conn.createStatement()
-        ) {
-            conn.setAutoCommit(true);
-            stmt.execute(sql);
-        }
-    }
-    
-    private long loadCsvData() throws IOException, SQLException {
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(false);
+    public boolean wasUpdated() {
+        try {
+            Path resourcePath = ResourceUtils.getResourcePath(DATA_FILE);
+
+            long fileLastModified = Files.getLastModifiedTime(resourcePath).toMillis();
             
-            try {
-                ClassPathResource resource = new ClassPathResource(PARK_DATA_PATH);
-                
-                try (
-                    InputStream inputStream = resource.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                ) {
-                    
-                    BaseConnection pgConn = conn.unwrap(BaseConnection.class);
-                    CopyManager copyManager = new CopyManager(pgConn);
-                    
-                    long rowsCopied = copyManager.copyIn("COPY parks FROM STDIN WITH CSV HEADER", reader);
-                    conn.commit();
-                    return rowsCopied;
-                }
-            } catch (Exception e) {
-                conn.rollback();
-                throw e;
+            LocalDateTime lastSuccessTime = getLastSuccessfulJobTime();
+            
+            boolean needsUpdate = lastSuccessTime == null ||
+                  fileLastModified > lastSuccessTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+            if (needsUpdate) {
+                log.info("소스 파일이 변경되어 데이터를 업데이트합니다. (파일 수정: {})", 
+                        Instant.ofEpochMilli(fileLastModified));
+            } else {
+                log.info("소스 파일에 변경이 없어 데이터 업데이트를 건너뜁니다. (마지막 배치: {})", 
+                        lastSuccessTime);
             }
+            
+            return needsUpdate;
+        } catch (Exception e) {
+            log.error("파일 변경 확인 중 오류 발생: {}", e.getMessage(), e);
+            return true;
         }
     }
     
-    private void updateLocationPoints() throws SQLException {
-        String alterSql = "ALTER TABLE parks ADD COLUMN IF NOT EXISTS location geometry(Point, 4326)";
-        String updateSql = "UPDATE parks " +
-                           "SET location = ST_SetSRID(ST_Point(경도, 위도), 4326) " +
-                           "WHERE 위도 IS NOT NULL AND 경도 IS NOT NULL";
-        
-        try (
-            Connection conn = dataSource.getConnection();
-            Statement stmt = conn.createStatement()
-        ) {
-            conn.setAutoCommit(true);
+    private LocalDateTime getLastSuccessfulJobTime() {
+        try {
+            // JobExplorer를 통해 작업 인스턴스 조회 (최대 100개)
+            List<JobInstance> jobInstances = jobExplorer.getJobInstances(JOB_NAME, 0, 100);
             
-            stmt.execute(alterSql);
-            log.info("공원 테이블에 location 컬럼을 추가했습니다.");
+            if (jobInstances.isEmpty()) {
+                log.info("이전 작업 인스턴스가 없습니다: {}", JOB_NAME);
+                return null;
+            }
             
-            int updatedRows = stmt.executeUpdate(updateSql);
-            log.info("{}개의 공원 위치 데이터를 업데이트했습니다.", updatedRows);
+            // 각 작업 인스턴스의 실행 정보 조회 및 성공한 마지막 실행 시간 찾기
+            return jobInstances.stream()
+                .flatMap(instance -> jobExplorer.getJobExecutions(instance).stream())
+                .filter(execution -> "COMPLETED".equals(execution.getExitStatus().getExitCode()))
+                .map(JobExecution::getEndTime)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+        } catch (Exception e) {
+            log.error("배치 메타데이터 조회 실패: {}", e.getMessage(), e);
+            return null;
         }
     }
 }

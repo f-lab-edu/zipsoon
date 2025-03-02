@@ -17,14 +17,10 @@ public record EstateResponse(
     BigDecimal rentPrice,
     BigDecimal area,
     @JsonProperty("lat") double latitude,
-    @JsonProperty("lng") double longitude
+    @JsonProperty("lng") double longitude,
+    ScoreSummary score
 ) {
-    public static EstateResponse from(EstateSnapshot snapshot) {
-        log.info("Geometry: {}", snapshot.getLocation());
-        Point location = (Point) snapshot.getLocation();
-        double latitude = location != null ? location.getY() : 0.0;
-        double longitude = location != null ? location.getX() : 0.0;
-        log.info("location: {}, latitude: {}, longitude: {}", location, latitude, longitude);
+    public static EstateResponse from(EstateSnapshot snapshot, ScoreSummary scoreSummary) {
         return new EstateResponse(
             snapshot.getId(),
             snapshot.getEstateName(),
@@ -34,7 +30,8 @@ public record EstateResponse(
             snapshot.getRentPrice(),
             snapshot.getAreaMeter(),
             ((Point) snapshot.getLocation()).getY(),
-            ((Point) snapshot.getLocation()).getX()
+            ((Point) snapshot.getLocation()).getX(),
+            scoreSummary
         );
     }
 }

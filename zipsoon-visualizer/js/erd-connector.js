@@ -95,7 +95,7 @@ class ERDConnector {
       if (element) {
         console.log(`테이블 ${tableName} 요소를 찾음:`, element.id);
         // g 요소에 직접 스타일 적용
-        element.setAttribute('style', 'stroke: #ff0000; stroke-width: 2px;');
+        element.setAttribute('style', 'stroke: #ff0000; stroke-width: 1px;');
       } else {
         console.warn(`테이블 요소를 찾을 수 없습니다: ${tableName}`);
         // ID에서 언더스코어를 제거한 이름으로 시도
@@ -108,7 +108,7 @@ class ERDConnector {
         entities.forEach(entity => {
           if (entity.id.includes(noUnderscoreName.toLowerCase())) {
             console.log(`이름이 포함된 엔티티 발견: ${entity.id}`);
-            entity.setAttribute('style', 'stroke: #ff0000; stroke-width: 2px;');
+            entity.setAttribute('style', 'stroke: #ff0000; stroke-width: 1px;');
           }
         });
       }

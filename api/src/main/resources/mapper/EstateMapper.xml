@@ -3,6 +3,8 @@
 <mapper namespace="com.zipsoon.api.estate.mapper.EstateMapper">
 
     <resultMap id="estateResultMap" type="com.zipsoon.common.domain.EstateSnapshot">
+        <result column="estate_type" property="estateType" typeHandler="com.zipsoon.common.config.typehandler.EstateTypeHandler"/>
+        <result column="trade_type" property="tradeType" typeHandler="com.zipsoon.common.config.typehandler.TradeTypeHandler"/>
         <result column="location" property="location" typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"/>
     </resultMap>
 
@@ -21,7 +23,7 @@
         LIMIT #{limit}
     </select>
 
-    <select id="findById" resultType="com.zipsoon.common.domain.EstateSnapshot">
+    <select id="findById" resultMap="estateResultMap">
         SELECT *
         FROM estate_snapshot
         WHERE id = #{id}

@@ -20,6 +20,9 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class NaverEstateCollector implements EstateCollector {
+
+    private final static String NAVER_PREFIX_URL = "https://landthumb-phinf.pstatic.net/";
+
     private final NaverLandClient naverLandClient;
     private final ObjectMapper objectMapper;
     private final GeometryFactory geometryFactory = new GeometryFactory();
@@ -56,8 +59,8 @@ public class NaverEstateCollector implements EstateCollector {
                     .platformId(article.articleNo())
                     .rawData(objectMapper.valueToTree(article))
                     .estateName(article.articleName())
-                    .estateType(EstateSnapshot.EstateType.of(article.articleRealEstateTypeName()))
-                    .tradeType(EstateSnapshot.TradeType.of(article.tradeTypeName()))
+                    .estateType(EstateSnapshot.EstateType.valueOf(article.realEstateTypeCode()))
+                    .tradeType(EstateSnapshot.TradeType.valueOf(article.tradeTypeCode()))
                     .price(parsePrice(article.dealOrWarrantPrc()))
                     .rentPrice(parsePrice(article.rentPrc()))
                     .areaMeter(BigDecimal.valueOf(article.area1()))
@@ -65,6 +68,7 @@ public class NaverEstateCollector implements EstateCollector {
                     .location(createPoint(article.longitude(), article.latitude()))
                     .address(article.detailAddress())
                     .tags(Arrays.asList(article.tagList()))
+                    .imageUrls(List.of(NAVER_PREFIX_URL + article.representativeImgUrl()))
                     .dongCode(dongCode)
                     .createdAt(LocalDateTime.now())
                     .build();
@@ -78,7 +82,20 @@ public class NaverEstateCollector implements EstateCollector {
         if (priceString == null || priceString.isEmpty()) {
             return null;
         }
-        return new BigDecimal(priceString.replaceAll("[^0-9]", ""));
+
+        if (!priceString.contains("억")) {
+            return new BigDecimal(priceString.replaceAll("[^0-9]", ""));
+        }
+
+        String[] parts = priceString.split("억");
+        long billionPart = Long.parseLong(parts[0].trim().replaceAll("[^0-9]", "")) * 10000; // 1억 = 10000만원
+
+        if (parts.length > 1 && !parts[1].trim().isEmpty()) {
+            long millionPart = Long.parseLong(parts[1].trim().replaceAll("[^0-9]", ""));
+            return new BigDecimal(billionPart + millionPart);
+        }
+
+        return new BigDecimal(billionPart);
     }
 
     private Point createPoint(String longitude, String latitude) {

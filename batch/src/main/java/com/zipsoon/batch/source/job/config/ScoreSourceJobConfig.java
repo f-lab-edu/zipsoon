@@ -3,7 +3,6 @@ package com.zipsoon.batch.source.job.config;
 import com.zipsoon.batch.source.collector.ScoreSourceCollector;
 import com.zipsoon.batch.source.job.processor.ScoreSourceProcessor;
 import com.zipsoon.batch.source.job.reader.ScoreSourceReader;
-import com.zipsoon.batch.source.job.writer.ScoreSourceWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -24,7 +23,6 @@ public class ScoreSourceJobConfig {
 
     private final ScoreSourceReader scoreSourceReader;
     private final ScoreSourceProcessor scoreSourceProcessor;
-    private final ScoreSourceWriter scoreSourceWriter;
 
     @Bean(name = JOB_NAME)
     public Job sourceJob() {
@@ -39,7 +37,7 @@ public class ScoreSourceJobConfig {
             .<ScoreSourceCollector, ScoreSourceCollector>chunk(1, transactionManager)
             .reader(scoreSourceReader)
             .processor(scoreSourceProcessor)
-            .writer(scoreSourceWriter)
+            .writer(chunk -> {})    // writer 없음
             .build();
     }
 }

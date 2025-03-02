@@ -5,7 +5,7 @@
 const INTERACTIONS = {
   mapSearch: {
     endpoint: '/api/v1/estates/map',
-    sqlQuery: 'findAllInViewport',
+    sqlQuery: ['findAllInViewport', 'findScoresByEstateId'],
     description: '매물 상세 정보 조회'
   },
   signup: {

@@ -4,31 +4,35 @@
  */
 const SQL_QUERIES = {
   findAllInViewport: {
-    query: `SELECT
-  id,
-  estate_type as type,
-  estate_name as name,
-  trade_type,
-  price,
-  area_meter as area,
-  ST_Y(location) as latitude,
-  ST_X(location) as longitude
-FROM
-  estate_snapshot
-WHERE
-  ST_Y(location) BETWEEN {swLat} AND {neLat}
-  AND ST_X(location) BETWEEN {swLng} AND {neLng}
-ORDER BY
-  created_at DESC
-LIMIT 100`,
+    query: `SELECT * FROM estate_snapshot
+WHERE ST_Intersects(
+    location,
+    ST_MakeEnvelope(
+        {swLng},
+        {swLat},
+        {neLng},
+        {neLat},
+        4326
+    )
+)
+LIMIT {limit}`,
 
     // 쿼리 파라미터 변환
-    paramFormatter: (viewport) => ({
-      swLat: viewport.sw.lat.toFixed(6),
-      swLng: viewport.sw.lng.toFixed(6),
-      neLat: viewport.ne.lat.toFixed(6),
-      neLng: viewport.ne.lng.toFixed(6)
-    }),
+    paramFormatter: (viewport) => {
+      // 보다 정확한 표현을 위해 6자리 고정 소수점 사용
+      const swLat = viewport.sw.lat.toFixed(6);
+      const swLng = viewport.sw.lng.toFixed(6);
+      const neLat = viewport.ne.lat.toFixed(6);
+      const neLng = viewport.ne.lng.toFixed(6);
+      
+      return {
+        swLat: swLat,
+        swLng: swLng,
+        neLat: neLat,
+        neLng: neLng,
+        limit: 100
+      };
+    },
 
     // 쿼리 결과 포맷팅
     resultFormatter: (data) => {
@@ -54,13 +58,14 @@ LIMIT 100`,
           data.forEach((estate, index) => {
             result += `--- Estate ${index + 1} ---\n`;
             result += `id          | ${estate.id}\n`;
-            result += `type        | ${estate.type || estate.estate_type}\n`;
-            result += `name        | ${estate.name || estate.estate_name}\n`;
-            result += `trade_type  | ${estate.trade_type || estate.tradeType}\n`;
+            result += `type        | ${estate.type}\n`;
+            result += `name        | ${estate.name}\n`;
+            result += `trade_type  | ${estate.tradeType}\n`;
             result += `price       | ${estate.price}\n`;
-            result += `area        | ${estate.area || estate.area_meter}\n`;
-            result += `latitude    | ${estate.latitude || estate.lat}\n`;
-            result += `longitude   | ${estate.longitude || estate.lng}\n\n`;
+            result += `rent_price  | ${estate.rentPrice}\n`;
+            result += `area        | ${estate.area}\n`;
+            result += `latitude    | ${estate.lat}\n`;
+            result += `longitude   | ${estate.lng}\n\n`;
           });
         } else {
           result = "No properties found in this area.";
@@ -74,13 +79,14 @@ LIMIT 100`,
           data.estates.forEach((estate, index) => {
             result += `--- Estate ${index + 1} ---\n`;
             result += `id          | ${estate.id}\n`;
-            result += `type        | ${estate.type || estate.estate_type}\n`;
-            result += `name        | ${estate.name || estate.estate_name}\n`;
-            result += `trade_type  | ${estate.trade_type || estate.tradeType}\n`;
+            result += `type        | ${estate.type}\n`;
+            result += `name        | ${estate.name}\n`;
+            result += `trade_type  | ${estate.tradeType}\n`;
             result += `price       | ${estate.price}\n`;
-            result += `area        | ${estate.area || estate.area_meter}\n`;
-            result += `latitude    | ${estate.latitude || estate.lat}\n`;
-            result += `longitude   | ${estate.longitude || estate.lng}\n\n`;
+            result += `rent_price  | ${estate.rentPrice}\n`;
+            result += `area        | ${estate.area}\n`;
+            result += `latitude    | ${estate.lat}\n`;
+            result += `longitude   | ${estate.lng}\n\n`;
           });
         } else {
           result = "No properties found in this area.";
@@ -219,6 +225,87 @@ WHERE
 
     // 영향 받는 테이블 목록
     affectedTables: ['app_user']
+  },
+  
+  findScoresByEstateId: {
+    query: `SELECT
+  es.id as score_id,
+  st.id as score_type_id,
+  st.name as score_type_name,
+  st.description,
+  es.raw_score,
+  es.normalized_score
+FROM
+  estate_score es
+JOIN
+  score_type st ON es.score_type_id = st.id
+WHERE
+  es.estate_snapshot_id = {estateId} <!-- n번 반복 -->
+ORDER BY
+  es.normalized_score DESC`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (data) => {
+      // data가 단일 매물인 경우 또는 매물 목록인 경우 처리
+      const estateId = Array.isArray(data) && data.length > 0 ? data[0].id : (data.id || 1);
+      
+      return {
+        estateId: estateId
+      };
+    },
+
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      let result = '';
+      
+      // 매물 목록 추출
+      let estates = [];
+      
+      if (Array.isArray(data)) {
+        // 매물 목록인 경우
+        estates = data;
+      } else if (data && data.estates && Array.isArray(data.estates)) {
+        // { estates: [...] } 형태인 경우
+        estates = data.estates;
+      } else if (data && data.score) {
+        // 단일 매물인 경우
+        estates = [data];
+      }
+      
+      // 점수 정보가 있는 매물만 필터링
+      const estatesWithScores = estates.filter(estate => estate && estate.score);
+      
+      if (estatesWithScores.length > 0) {
+        // 모든 매물의 점수 정보 표시
+        estatesWithScores.forEach((estate, estateIndex) => {
+          const scoreData = estate.score;
+          
+          // 매물 정보 헤더
+          result += `--- Score ${estateIndex + 1} ---\n`;
+          
+          // 총점 표시
+          result += `Total Score | ${scoreData.total || 0}\n`;
+          
+          // Top Factors 표시
+          if (scoreData.topFactors && Array.isArray(scoreData.topFactors)) {
+            scoreData.topFactors.forEach((factor, factorIndex) => {
+              result += ` + ID       | ${factor.id || 'N/A'}\n`;
+              result += `   Type     | ${factor.name || 'N/A'}\n`;
+              result += `   Score    | ${factor.score || 0}\n`;
+            });
+          }
+
+          result += '\n';
+        });
+      } else {
+        result = "No scores available for any property.";
+      }
+      
+      return result;
+    },
+
+    // 영향 받는 테이블 목록
+    affectedTables: ['estate_score', 'score_type']
   }
 
 };

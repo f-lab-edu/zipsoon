@@ -1,8 +1,6 @@
 package com.zipsoon.api.estate.service;
 
-import com.zipsoon.api.estate.dto.EstateDetailResponse;
-import com.zipsoon.api.estate.dto.EstateResponse;
-import com.zipsoon.api.estate.dto.ViewportRequest;
+import com.zipsoon.api.estate.dto.*;
 import com.zipsoon.api.estate.mapper.EstateMapper;
 import com.zipsoon.api.exception.custom.ServiceException;
 import com.zipsoon.api.exception.model.ErrorCode;
@@ -18,6 +16,7 @@ import static com.zipsoon.api.exception.model.ErrorCode.ESTATE_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 public class EstateService {
+    private final ScoreService scoreService;
     private final EstateMapper estateMapper;
     private static final int MAX_RESULTS_PER_ZOOM = 1000;
     private static final int SRID = 4326;        // WGS84 좌표계 SRID 값
@@ -32,20 +31,24 @@ public class EstateService {
         }
 
         return estates.stream()
-            .map(EstateResponse::from)
+            .map(snapshot -> {
+                ScoreSummary scoreSummary = scoreService.getScoreSummary(snapshot.getId());
+                return EstateResponse.from(snapshot, scoreSummary);
+            })
             .toList();
     }
 
     @Transactional(readOnly = true)
     public EstateDetailResponse findEstateDetail(Long id) {
-        return estateMapper.findById(id)
-                .map(EstateDetailResponse::from)
-                .orElseThrow(() -> new ServiceException(ESTATE_NOT_FOUND));
+        EstateSnapshot snapshot = estateMapper.findById(id)
+            .orElseThrow(() -> new ServiceException(ESTATE_NOT_FOUND));
+
+        ScoreDetails scoreDetails = scoreService.getScoreDetails(snapshot.getId());
+        return EstateDetailResponse.from(snapshot, scoreDetails);
     }
 
     private int calculateLimit(int zoom) {
-        if (zoom <= 8) return 100;
-        if (zoom <= 14) return 500;
+        if (zoom >= 14) return 500;
         return MAX_RESULTS_PER_ZOOM;
     }
 }

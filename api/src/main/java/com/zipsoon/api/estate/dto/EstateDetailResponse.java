@@ -11,8 +11,8 @@ import java.util.List;
 public record EstateDetailResponse(
     Long id,
     String name,
-    EstateSnapshot.EstateType type,
-    EstateSnapshot.TradeType tradeType,
+    String type,
+    String tradeType,
     BigDecimal price,
     BigDecimal rentPrice,
     BigDecimal areaMeter,
@@ -21,14 +21,16 @@ public record EstateDetailResponse(
     @JsonProperty("lng") double longitude,
     String address,
     List<String> tags,
+    List<String> images,
+    ScoreDetails score,
     JsonNode rawData
 ) {
-    public static EstateDetailResponse from(EstateSnapshot snapshot) {
+    public static EstateDetailResponse from(EstateSnapshot snapshot, ScoreDetails scoreDetails) {
         return new EstateDetailResponse(
             snapshot.getId(),
             snapshot.getEstateName(),
-            snapshot.getEstateType(),
-            snapshot.getTradeType(),
+            snapshot.getEstateType().getKoreanName(),
+            snapshot.getTradeType().getKoreanName(),
             snapshot.getPrice(),
             snapshot.getRentPrice(),
             snapshot.getAreaMeter(),
@@ -37,6 +39,8 @@ public record EstateDetailResponse(
             ((Point) snapshot.getLocation()).getX(),
             snapshot.getAddress(),
             snapshot.getTags(),
+            snapshot.getImageUrls(),
+            scoreDetails,
             snapshot.getRawData()
         );
     }

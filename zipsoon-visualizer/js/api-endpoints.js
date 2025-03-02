@@ -27,13 +27,18 @@ const API_ENDPOINTS = {
           total: data.length,
           estates: data.map(estate => ({
             id: estate.id,
-            name: estate.estate_name || estate.name,
-            type: estate.estate_type || estate.type,
-            trade_type: estate.trade_type || estate.tradeType,
+            name: estate.name,
+            type: estate.type,
+            trade_type: estate.tradeType,
             price: estate.price,
-            area: estate.area_meter || estate.area,
-            latitude: estate.latitude || estate.lat,
-            longitude: estate.longitude || estate.lng
+            rent_price: estate.rentPrice,
+            area: estate.area,
+            latitude: estate.lat,
+            longitude: estate.lng,
+            score: estate.score || {
+              total: 0,
+              topFactors: []
+            }
           }))
         };
       }
@@ -43,13 +48,20 @@ const API_ENDPOINTS = {
         total: data.estates ? data.estates.length : 0,
         estates: data.estates ? data.estates.map(estate => ({
           id: estate.id,
-          name: estate.estate_name || estate.name,
-          type: estate.estate_type || estate.type,
-          trade_type: estate.trade_type || estate.tradeType,
+          name: estate.name,
+          type: estate.type,
+          typeName: estate.typeName,
+          trade_type: estate.tradeType,
+          tradeTypeName: estate.tradeTypeName,
           price: estate.price,
+          rent_price: estate.rentPrice,
           area: estate.area_meter || estate.area,
           latitude: estate.latitude || estate.lat,
-          longitude: estate.longitude || estate.lng
+          longitude: estate.longitude || estate.lng,
+          score: estate.score || {
+            total: 0,
+            topFactors: []
+          }
         })) : []
       };
     }

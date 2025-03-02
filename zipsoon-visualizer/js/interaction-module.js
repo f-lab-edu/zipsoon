@@ -43,7 +43,14 @@ class InteractionModule {
     }
     
     const endpoint = API_ENDPOINTS[interaction.endpoint];
-    const sqlQuery = SQL_QUERIES[interaction.sqlQuery];
+    
+    // sqlQuery는 문자열 또는 배열
+    const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+      ? interaction.sqlQuery 
+      : [interaction.sqlQuery];
+    
+    // 첫 번째 SQL 쿼리 가져오기 (기본 호환성 유지)
+    const sqlQuery = SQL_QUERIES[sqlQueryNames[0]];
     
     if (!endpoint || !sqlQuery) {
       console.error('mapSearch 인터랙션에 필요한 엔드포인트/SQL 쿼리 정의를 찾을 수 없음');
@@ -64,9 +71,19 @@ class InteractionModule {
       this.appToClientElement.textContent = '로그인이 필요합니다.\nAPI 요청은 전송되지 않았습니다.';
       this.dbToAppElement.textContent = '로그인이 필요합니다.\nDB 응답이 없습니다.';
       
-      // 테이블 강조 표시
-      if (sqlQuery.affectedTables && window.erdConnector) {
-        window.erdConnector.highlightTables(sqlQuery.affectedTables);
+      // 테이블 강조 표시 - 모든 쿼리의 영향 테이블 표시
+      const affectedTables = [];
+      sqlQueryNames.forEach(queryName => {
+        const query = SQL_QUERIES[queryName];
+        if (query && query.affectedTables) {
+          affectedTables.push(...query.affectedTables);
+        }
+      });
+      
+      if (affectedTables.length > 0 && window.erdConnector) {
+        // 중복 제거
+        const uniqueTables = [...new Set(affectedTables)];
+        window.erdConnector.highlightTables(uniqueTables);
       }
     }
   }
@@ -92,9 +109,16 @@ class InteractionModule {
       this.currentInteraction = interactionId;
       const interaction = this.interactions[interactionId];
 
-      // API 엔드포인트와 SQL 쿼리 가져오기
+      // API 엔드포인트 가져오기
       const endpoint = API_ENDPOINTS[interaction.endpoint];
-      const sqlQuery = SQL_QUERIES[interaction.sqlQuery];
+      
+      // sqlQuery 가져오기 (단일 문자열 또는 배열)
+      const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+        ? interaction.sqlQuery 
+        : [interaction.sqlQuery];
+        
+      // 첫 번째 SQL 쿼리 가져오기 (기본 호환성 유지)
+      const sqlQuery = SQL_QUERIES[sqlQueryNames[0]];
 
       if (!endpoint || !sqlQuery) {
         const error = '엔드포인트 또는 SQL 쿼리가 정의되지 않았습니다.';
@@ -116,9 +140,19 @@ class InteractionModule {
         // 응답 데이터 처리
         this.handleAPIResponse(endpoint, sqlQuery, responseData, data);
 
-        // ERD 테이블 강조 표시
-        if (sqlQuery.affectedTables && window.erdConnector) {
-          window.erdConnector.highlightTables(sqlQuery.affectedTables);
+        // ERD 테이블 강조 표시 - 다중 쿼리인 경우 모든 테이블 표시
+        const affectedTables = [];
+        sqlQueryNames.forEach(queryName => {
+          const query = SQL_QUERIES[queryName];
+          if (query && query.affectedTables) {
+            affectedTables.push(...query.affectedTables);
+          }
+        });
+        
+        if (affectedTables.length > 0 && window.erdConnector) {
+          // 중복 제거
+          const uniqueTables = [...new Set(affectedTables)];
+          window.erdConnector.highlightTables(uniqueTables);
         }
         
         // 프로미스 해결 - 응답 데이터 반환
@@ -245,15 +279,56 @@ class InteractionModule {
         (responseData && responseData._isError) || // fetchAPI에서 표시한 오류
         (responseData && responseData.code && (responseData.code >= 400 || responseData.message)); // API 응답의 오류
       
+      // 현재 인터랙션 가져오기
+      const interaction = this.interactions[this.currentInteraction];
+      if (!interaction) {
+        console.error('현재 인터랙션 정보를 찾을 수 없음');
+        return;
+      }
+      
+      // sqlQuery는 문자열 또는 배열
+      const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+        ? interaction.sqlQuery 
+        : [interaction.sqlQuery];
+      
       // DB -> App 화살표 콘텐츠 업데이트
       if (isErrorResponse) {
         // 에러 응답인 경우 - DB -> App 화살표는 비워둠
         console.log('에러 응답 감지: DB -> App 화살표 콘텐츠 초기화');
         this.dbToAppElement.textContent = '';
-      } else if (sqlQuery.resultFormatter) {
-        // 정상 응답인 경우
-        const resultText = sqlQuery.resultFormatter(responseData);
-        this.dbToAppElement.textContent = resultText;
+      } else if (sqlQueryNames.length === 1) {
+        // 단일 쿼리인 경우 - 기존 로직 사용
+        const currentSqlQuery = SQL_QUERIES[sqlQueryNames[0]];
+        if (currentSqlQuery && currentSqlQuery.resultFormatter) {
+          const resultText = currentSqlQuery.resultFormatter(responseData);
+          this.dbToAppElement.textContent = resultText;
+        }
+      } else {
+        // 다중 쿼리인 경우 - 각 쿼리 결과 포맷팅
+        let formattedResults = '';
+        
+        sqlQueryNames.forEach((queryName, index) => {
+          const currentSqlQuery = SQL_QUERIES[queryName];
+          
+          if (!currentSqlQuery || !currentSqlQuery.resultFormatter) {
+            console.error(`SQL 쿼리 '${queryName}'가 없거나 resultFormatter 속성이 없음`);
+            return;
+          }
+          
+          // 구분자 추가 (첫 번째 결과는 제외)
+          if (index > 0) {
+            formattedResults += '\n\n';
+          }
+          
+          // 여러 쿼리 결과인 경우 헤더 추가
+          formattedResults += `--- Result ${index + 1}: ${queryName} ---\n`;
+          
+          // 모든 쿼리에 원본 데이터 사용
+          const resultText = currentSqlQuery.resultFormatter(responseData);
+          formattedResults += resultText;
+        });
+        
+        this.dbToAppElement.textContent = formattedResults;
       }
 
       // 지도 검색 결과인 경우 지도에 마커 표시
@@ -335,40 +410,78 @@ class InteractionModule {
 
   // App -> DB 화살표 콘텐츠 업데이트
   updateAppToDBContent(sqlQuery, data) {
-    console.log('App -> DB 화살표 업데이트 시작', {
-      hasQuery: sqlQuery ? !!sqlQuery.query : false,
-      hasParamFormatter: sqlQuery ? !!sqlQuery.paramFormatter : false
-    });
+    console.log('App -> DB 화살표 업데이트 시작');
     
-    if (!sqlQuery || !sqlQuery.query) {
-      console.error('SQL 쿼리 또는 query 속성이 없어 업데이트 불가');
+    // 현재 인터랙션 가져오기
+    const interaction = this.interactions[this.currentInteraction];
+    if (!interaction) {
+      console.error('현재 인터랙션 정보를 찾을 수 없음');
       return;
     }
-
+    
+    // sqlQuery는 문자열 또는 배열
+    const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+      ? interaction.sqlQuery 
+      : [interaction.sqlQuery];
+    
+    // 쿼리가 하나도 없으면 종료
+    if (sqlQueryNames.length === 0) {
+      console.error('SQL 쿼리 이름이 없어 업데이트 불가');
+      return;
+    }
+    
     try {
-      let query = sqlQuery.query;
+      let formattedQueries = '';
       
-      if (sqlQuery.paramFormatter) {
-        const params = sqlQuery.paramFormatter(data);
-        console.log('SQL 파라미터 생성 완료:', params);
+      // 각 쿼리 처리
+      sqlQueryNames.forEach((queryName, index) => {
+        const currentSqlQuery = SQL_QUERIES[queryName];
         
-        // 쿼리 파라미터 치환
-        Object.keys(params).forEach(key => {
-          const before = query;
-          query = query.replace(`{${key}}`, params[key]);
+        if (!currentSqlQuery || !currentSqlQuery.query) {
+          console.error(`SQL 쿼리 '${queryName}'가 없거나 query 속성이 없음`);
+          return;
+        }
+        
+        // 쿼리 구분자 추가 (첫 번째 쿼리는 제외)
+        if (index > 0) {
+          formattedQueries += '\n\n';
+        }
+        
+        // 여러 쿼리인 경우 쿼리 헤더 추가
+        if (sqlQueryNames.length > 1) {
+          formattedQueries += `--- Query ${index + 1}: ${queryName} ---\n`;
+        }
+        
+        let query = currentSqlQuery.query;
+        
+        // 파라미터 포맷터가 있으면 적용
+        if (currentSqlQuery.paramFormatter) {
+          // 첫 번째 쿼리는 원본 데이터 사용, 나머지는 첫 번째 쿼리 결과의 첫 항목 사용 (예: 첫 매물 ID)
+          const params = currentSqlQuery.paramFormatter(
+            index === 0 ? data : { id: 1 } // 두 번째 이상 쿼리에는 임의의 ID 사용
+          );
+          console.log(`SQL 파라미터 생성 완료 (${queryName}):`, params);
           
-          // 치환 여부 확인
-          if (before !== query) {
-            console.log(`파라미터 {${key}} 치환 완료`);
-          }
-        });
-      }
+          // 쿼리 파라미터 치환
+          Object.keys(params).forEach(key => {
+            const before = query;
+            query = query.replace(new RegExp(`\\{${key}\\}`, 'g'), params[key]);
+            
+            // 치환 여부 확인
+            if (before !== query) {
+              console.log(`파라미터 {${key}} 치환 완료`);
+            }
+          });
+        }
+        
+        formattedQueries += query;
+      });
       
-      console.log('App -> DB 콘텐츠 업데이트:', query.substring(0, 100) + '...');
+      console.log('App -> DB 콘텐츠 업데이트 완료');
       
       // DOM 요소가 존재하는지 확인
       if (this.appToDbElement) {
-        this.appToDbElement.textContent = query;
+        this.appToDbElement.textContent = formattedQueries;
       } else {
         console.error('appToDbElement DOM 요소를 찾을 수 없음');
       }
@@ -416,17 +529,37 @@ class InteractionModule {
       // 마커 표시
       estates.forEach(estate => {
         // 위도/경도 정보 확인
-        const lat = estate.latitude || estate.lat;
-        const lng = estate.longitude || estate.lng;
+        const lat = estate.lat;
+        const lng = estate.lng;
         
         if (lat && lng) {
+          // 점수 정보 처리
+          let scoreInfo = '';
+          if (estate.score && estate.score.total) {
+            scoreInfo = `<div class="score">점수: ${estate.score.total}</div>`;
+          }
+          
+          // 가격 포맷팅
+          const formatPrice = (price) => {
+            return price ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+          };
+          
+          // 가격 정보 구성
+          let priceText = '';
+          if (estate.price) {
+            priceText = formatPrice(estate.price);
+            if (estate.rentPrice) {
+              priceText += '/' + formatPrice(estate.rentPrice);
+            }
+          }
+          
           // 매물 정보로 마커 툴팁 생성
           const tooltipContent = `
             <div class="estate-tooltip">
-              <strong>${estate.name || estate.estate_name || ''}</strong><br>
-              ${estate.type || estate.estate_type || ''} ${estate.trade_type || estate.tradeType || ''}<br>
-              ${estate.price ? estate.price + '만원' : ''}<br>
-              ${estate.area || estate.area_meter ? (estate.area || estate.area_meter) + '㎡' : ''}
+              <strong>${estate.name || ''}</strong><br>
+              ${estate.type || ''} ${estate.tradeType || ''}<br>
+              ${priceText}<br>
+              ${scoreInfo}
             </div>
           `;
           
