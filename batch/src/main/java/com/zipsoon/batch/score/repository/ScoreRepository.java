@@ -1,7 +1,7 @@
 package com.zipsoon.batch.score.repository;
 
 import com.zipsoon.batch.score.mapper.ScoreMapper;
-import com.zipsoon.batch.score.model.EstateScore;
+import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -12,8 +12,13 @@ import java.util.List;
 public class ScoreRepository {
     private final ScoreMapper scoreMapper;
 
-    public void saveAll(List<EstateScore> rawScores) {
-        scoreMapper.insertAll(rawScores);
+    // 최신 부동산 점수 저장
+    public void saveAll(List<EstateScore> scores) {
+        scoreMapper.insertAll(scores);
     }
-
+    
+    // 오래된 점수 스냅샷으로 이동
+    public void migrateToScoreSnapshot() {
+        scoreMapper.migrateToScoreSnapshot();
+    }
 }

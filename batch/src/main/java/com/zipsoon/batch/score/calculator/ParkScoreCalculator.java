@@ -1,10 +1,10 @@
 package com.zipsoon.batch.score.calculator;
 
-import com.zipsoon.batch.score.domain.Park;
 import com.zipsoon.batch.normalize.normalizer.LinearScoreNormalizer;
 import com.zipsoon.batch.normalize.normalizer.ScoreNormalizer;
+import com.zipsoon.batch.score.domain.Park;
 import com.zipsoon.batch.score.repository.ParkRepository;
-import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
@@ -31,7 +31,7 @@ public class ParkScoreCalculator implements ScoreCalculator {
     }
 
     @Override
-    public double calculateRawScore(EstateSnapshot estate) {
+    public double calculateRawScore(Estate estate) {
         List<Park> nearbyParks = parkRepository.findParksWithin(
             (Point) estate.getLocation(),
             WALKING_DISTANCE
