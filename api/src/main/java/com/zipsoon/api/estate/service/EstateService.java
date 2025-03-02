@@ -4,7 +4,7 @@ import com.zipsoon.api.estate.dto.*;
 import com.zipsoon.api.estate.mapper.EstateMapper;
 import com.zipsoon.api.exception.custom.ServiceException;
 import com.zipsoon.api.exception.model.ErrorCode;
-import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,27 +24,27 @@ public class EstateService {
     @Transactional(readOnly = true)
     public List<EstateResponse> findEstatesInViewport(ViewportRequest request) {
         int limit = calculateLimit(request.zoom());
-        List<EstateSnapshot> estates = estateMapper.findAllInViewport(request, limit, SRID);
+        List<Estate> estates = estateMapper.findAllInViewport(request, limit, SRID);
 
         if (estates.isEmpty()) {
             throw new ServiceException(ErrorCode.ESTATE_NOT_FOUND, "해당 지역에 매물이 없습니다.");
         }
 
         return estates.stream()
-            .map(snapshot -> {
-                ScoreSummary scoreSummary = scoreService.getScoreSummary(snapshot.getId());
-                return EstateResponse.from(snapshot, scoreSummary);
+            .map(estate -> {
+                ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId());
+                return EstateResponse.from(estate, scoreSummary);
             })
             .toList();
     }
 
     @Transactional(readOnly = true)
     public EstateDetailResponse findEstateDetail(Long id) {
-        EstateSnapshot snapshot = estateMapper.findById(id)
+        Estate estate = estateMapper.findById(id)
             .orElseThrow(() -> new ServiceException(ESTATE_NOT_FOUND));
 
-        ScoreDetails scoreDetails = scoreService.getScoreDetails(snapshot.getId());
-        return EstateDetailResponse.from(snapshot, scoreDetails);
+        ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId());
+        return EstateDetailResponse.from(estate, scoreDetails);
     }
 
     private int calculateLimit(int zoom) {
