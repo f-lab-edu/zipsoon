@@ -58,13 +58,14 @@ LIMIT {limit}`,
           data.forEach((estate, index) => {
             result += `--- Estate ${index + 1} ---\n`;
             result += `id          | ${estate.id}\n`;
-            result += `type        | ${estate.type || estate.estate_type}\n`;
-            result += `name        | ${estate.name || estate.estate_name}\n`;
-            result += `trade_type  | ${estate.trade_type || estate.tradeType}\n`;
+            result += `type        | ${estate.type}\n`;
+            result += `name        | ${estate.name}\n`;
+            result += `trade_type  | ${estate.tradeType}\n`;
             result += `price       | ${estate.price}\n`;
-            result += `area        | ${estate.area || estate.area_meter}\n`;
-            result += `latitude    | ${estate.latitude || estate.lat}\n`;
-            result += `longitude   | ${estate.longitude || estate.lng}\n\n`;
+            result += `rent_price  | ${estate.rentPrice}\n`;
+            result += `area        | ${estate.area}\n`;
+            result += `latitude    | ${estate.lat}\n`;
+            result += `longitude   | ${estate.lng}\n\n`;
           });
         } else {
           result = "No properties found in this area.";
@@ -78,13 +79,14 @@ LIMIT {limit}`,
           data.estates.forEach((estate, index) => {
             result += `--- Estate ${index + 1} ---\n`;
             result += `id          | ${estate.id}\n`;
-            result += `type        | ${estate.type || estate.estate_type}\n`;
-            result += `name        | ${estate.name || estate.estate_name}\n`;
-            result += `trade_type  | ${estate.trade_type || estate.tradeType}\n`;
+            result += `type        | ${estate.type}\n`;
+            result += `name        | ${estate.name}\n`;
+            result += `trade_type  | ${estate.tradeType}\n`;
             result += `price       | ${estate.price}\n`;
-            result += `area        | ${estate.area || estate.area_meter}\n`;
-            result += `latitude    | ${estate.latitude || estate.lat}\n`;
-            result += `longitude   | ${estate.longitude || estate.lng}\n\n`;
+            result += `rent_price  | ${estate.rentPrice}\n`;
+            result += `area        | ${estate.area}\n`;
+            result += `latitude    | ${estate.lat}\n`;
+            result += `longitude   | ${estate.lng}\n\n`;
           });
         } else {
           result = "No properties found in this area.";

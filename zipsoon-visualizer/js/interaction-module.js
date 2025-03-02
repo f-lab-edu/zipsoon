@@ -529,8 +529,8 @@ class InteractionModule {
       // 마커 표시
       estates.forEach(estate => {
         // 위도/경도 정보 확인
-        const lat = estate.latitude || estate.lat;
-        const lng = estate.longitude || estate.lng;
+        const lat = estate.lat;
+        const lng = estate.lng;
         
         if (lat && lng) {
           // 점수 정보 처리
@@ -539,12 +539,26 @@ class InteractionModule {
             scoreInfo = `<div class="score">점수: ${estate.score.total}</div>`;
           }
           
+          // 가격 포맷팅
+          const formatPrice = (price) => {
+            return price ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+          };
+          
+          // 가격 정보 구성
+          let priceText = '';
+          if (estate.price) {
+            priceText = formatPrice(estate.price);
+            if (estate.rentPrice) {
+              priceText += '/' + formatPrice(estate.rentPrice);
+            }
+          }
+          
           // 매물 정보로 마커 툴팁 생성
           const tooltipContent = `
             <div class="estate-tooltip">
-              <strong>${estate.name || estate.estate_name || ''}</strong><br>
-              ${estate.type || estate.estate_type || ''} ${estate.trade_type || estate.tradeType || ''}<br>
-              ${estate.price ? estate.price + '만원' : ''}<br>
+              <strong>${estate.name || ''}</strong><br>
+              ${estate.type || ''} ${estate.tradeType || ''}<br>
+              ${priceText}<br>
               ${scoreInfo}
             </div>
           `;
