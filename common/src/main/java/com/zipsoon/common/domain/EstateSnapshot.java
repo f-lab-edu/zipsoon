@@ -1,5 +1,6 @@
 package com.zipsoon.common.domain;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
 import org.locationtech.jts.geom.Geometry;
@@ -98,6 +99,7 @@ public class EstateSnapshot {
             this.koreanName = koreanName;
         }
 
+        @JsonValue
         public String getKoreanName() {
             return koreanName;
         }
@@ -124,6 +126,7 @@ public class EstateSnapshot {
             this.koreanName = koreanName;
         }
 
+        @JsonValue
         public String getKoreanName() {
             return koreanName;
         }

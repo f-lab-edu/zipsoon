@@ -11,8 +11,8 @@ import java.util.List;
 public record EstateDetailResponse(
     Long id,
     String name,
-    EstateSnapshot.EstateType type,
-    EstateSnapshot.TradeType tradeType,
+    String type,
+    String tradeType,
     BigDecimal price,
     BigDecimal rentPrice,
     BigDecimal areaMeter,
@@ -29,8 +29,8 @@ public record EstateDetailResponse(
         return new EstateDetailResponse(
             snapshot.getId(),
             snapshot.getEstateName(),
-            snapshot.getEstateType(),
-            snapshot.getTradeType(),
+            snapshot.getEstateType().getKoreanName(),
+            snapshot.getTradeType().getKoreanName(),
             snapshot.getPrice(),
             snapshot.getRentPrice(),
             snapshot.getAreaMeter(),
