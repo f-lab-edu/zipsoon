@@ -1,8 +1,8 @@
 package com.zipsoon.batch.normalize.repository;
 
 import com.zipsoon.batch.normalize.mapper.NormalizeMapper;
-import com.zipsoon.batch.score.model.EstateScore;
 import com.zipsoon.batch.score.model.ScoreType;
+import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

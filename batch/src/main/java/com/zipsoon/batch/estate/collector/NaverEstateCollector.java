@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.batch.infra.naver.NaverLandClient;
 import com.zipsoon.batch.infra.naver.vo.NaverLandResponse;
 import com.zipsoon.common.domain.EstateSnapshot;
+import com.zipsoon.common.domain.EstateType;
+import com.zipsoon.common.domain.PlatformType;
+import com.zipsoon.common.domain.TradeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -29,7 +32,7 @@ public class NaverEstateCollector implements EstateCollector {
 
     @Override
     public String getPlatformName() {
-        return EstateSnapshot.PlatformType.네이버.name();
+        return PlatformType.네이버.name();
     }
 
     @Override
@@ -55,12 +58,12 @@ public class NaverEstateCollector implements EstateCollector {
     private EstateSnapshot convertToSnapshot(NaverLandResponse.NaverLandResponseArticle article, String dongCode) {
         try {
             return EstateSnapshot.builder()
-                    .platformType(EstateSnapshot.PlatformType.네이버)
+                    .platformType(PlatformType.네이버)
                     .platformId(article.articleNo())
                     .rawData(objectMapper.valueToTree(article))
                     .estateName(article.articleName())
-                    .estateType(EstateSnapshot.EstateType.valueOf(article.realEstateTypeCode()))
-                    .tradeType(EstateSnapshot.TradeType.valueOf(article.tradeTypeCode()))
+                    .estateType(EstateType.valueOf(article.realEstateTypeCode()))
+                    .tradeType(TradeType.valueOf(article.tradeTypeCode()))
                     .price(parsePrice(article.dealOrWarrantPrc()))
                     .rentPrice(parsePrice(article.rentPrc()))
                     .areaMeter(BigDecimal.valueOf(article.area1()))
