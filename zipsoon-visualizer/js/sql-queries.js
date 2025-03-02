@@ -238,7 +238,7 @@ FROM
 JOIN
   score_type st ON es.score_type_id = st.id
 WHERE
-  es.estate_snapshot_id = {estateId}
+  es.estate_snapshot_id = {estateId} <!-- n번 반복 -->
 ORDER BY
   es.normalized_score DESC`,
 

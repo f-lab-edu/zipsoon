@@ -545,7 +545,6 @@ class InteractionModule {
               <strong>${estate.name || estate.estate_name || ''}</strong><br>
               ${estate.type || estate.estate_type || ''} ${estate.trade_type || estate.tradeType || ''}<br>
               ${estate.price ? estate.price + '만원' : ''}<br>
-              ${estate.area || estate.area_meter ? (estate.area || estate.area_meter) + '㎡' : ''}
               ${scoreInfo}
             </div>
           `;
