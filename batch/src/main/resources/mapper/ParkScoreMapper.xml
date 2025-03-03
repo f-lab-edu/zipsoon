@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zipsoon.batch.infrastructure.mapper.score.ParkScoreMapper">
+
+    <resultMap id="parkResultMap" type="com.zipsoon.batch.domain.source.Park">
+        <result property="location" column="location"
+                typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"/>
+    </resultMap>
+
+    <select id="findParksWithin" resultMap="parkResultMap">
+        SELECT
+            관리번호 as id,
+            공원명 as name,
+            공원구분 as type,
+            location,
+            공원면적 as area,
+            지정고시일 as designatedDate,
+            관리기관명 as managementAgency
+        FROM parks
+        WHERE location IS NOT NULL
+            AND ST_DWithin(
+                location::geography,
+                #{location, typeHandler=com.zipsoon.common.config.typehandler.PointTypeHandler}::geography,
+                #{radius}
+            )
+    </select>
+
+</mapper>

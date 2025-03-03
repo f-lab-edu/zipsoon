@@ -45,8 +45,6 @@ CREATE TABLE estate_snapshot (
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 레코드 생성 시간
 );
 
-CREATE INDEX estate_snapshot_location_idx ON estate_snapshot USING GIST (location);  -- 공간 검색을 위한 인덱스
-
 -- 사용자 정보 테이블: 앱 사용자 관리
 CREATE TABLE app_user (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- 고유 식별자
@@ -100,11 +98,11 @@ CREATE TABLE estate_score_snapshot (
     score_type_id int NOT NULL,                         -- score_type 테이블 참조
     raw_score numeric(5,2) NOT NULL,                    -- 원시 점수
     normalized_score numeric(5,2),                      -- 정규화된 점수
-    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- 생성 시간
-
-    FOREIGN KEY (estate_snapshot_id) REFERENCES estate_snapshot(id),  -- estate_snapshot 테이블 외래키
-    FOREIGN KEY (score_type_id) REFERENCES score_type(id)  -- score_type 테이블 외래키
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 생성 시간
 );
 
-CREATE INDEX idx_estate_score_snapshot_estate_id ON estate_score_snapshot(estate_snapshot_id);  -- 매물 기준 점수 이력 조회 인덱스
-CREATE INDEX idx_estate_score_snapshot_type_id ON estate_score_snapshot(score_type_id);  -- 점수 유형 기준 이력 조회 인덱스
+-- 히스토리 조회용 인덱스
+CREATE INDEX idx_estate_snapshot_created_at ON estate_snapshot(created_at);
+CREATE INDEX idx_estate_score_snapshot_created_at ON estate_score_snapshot(created_at);
+CREATE INDEX idx_estate_score_snapshot_estate_id ON estate_score_snapshot(estate_snapshot_id);
+CREATE INDEX idx_estate_score_snapshot_type_id ON estate_score_snapshot(score_type_id);
