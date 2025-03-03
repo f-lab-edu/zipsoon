@@ -1,11 +1,11 @@
 package com.zipsoon.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zipsoon.api.auth.controller.AuthController;
-import com.zipsoon.api.auth.dto.LoginRequest;
-import com.zipsoon.api.auth.service.AuthService;
-import com.zipsoon.api.exception.custom.ServiceException;
-import com.zipsoon.api.exception.model.ErrorCode;
+import com.zipsoon.api.interfaces.api.auth.AuthController;
+import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
+import com.zipsoon.api.application.auth.AuthService;
+import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
+import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

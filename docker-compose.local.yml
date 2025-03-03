@@ -6,7 +6,6 @@ services:
   db:
     image: postgis/postgis:15-3.4
     volumes:
-      - ./common/src/main/resources/init-users.sql:/docker-entrypoint-initdb.d/00-init-users.sql
       - ./common/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./batch/src/main/resources/schema/schema-postgresql.sql:/docker-entrypoint-initdb.d/02-schema-postgresql.sql
     ports:

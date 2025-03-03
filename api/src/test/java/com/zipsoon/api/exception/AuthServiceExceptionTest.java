@@ -1,14 +1,14 @@
 package com.zipsoon.api.exception;
 
-import com.zipsoon.api.auth.domain.Role;
-import com.zipsoon.api.auth.dto.LoginRequest;
-import com.zipsoon.api.auth.dto.SignupRequest;
-import com.zipsoon.api.auth.service.AuthService;
-import com.zipsoon.api.exception.custom.ServiceException;
-import com.zipsoon.api.exception.model.ErrorCode;
-import com.zipsoon.api.security.jwt.JwtProvider;
-import com.zipsoon.api.user.domain.User;
-import com.zipsoon.api.user.repository.UserRepository;
+import com.zipsoon.api.domain.auth.Role;
+import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
+import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
+import com.zipsoon.api.application.auth.AuthService;
+import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
+import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
+import com.zipsoon.api.infrastructure.jwt.JwtProvider;
+import com.zipsoon.api.domain.user.User;
+import com.zipsoon.api.infrastructure.repository.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

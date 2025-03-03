@@ -1,10 +1,10 @@
 package com.zipsoon.api.controller;
 
-import com.zipsoon.api.estate.controller.EstateController;
-import com.zipsoon.api.estate.dto.ViewportRequest;
-import com.zipsoon.api.estate.service.EstateService;
-import com.zipsoon.api.exception.custom.ServiceException;
-import com.zipsoon.api.exception.model.ErrorCode;
+import com.zipsoon.api.interfaces.api.estate.EstateController;
+import com.zipsoon.api.interfaces.api.estate.dto.ViewportRequest;
+import com.zipsoon.api.application.estate.EstateService;
+import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
+import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
