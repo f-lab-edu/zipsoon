@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.batch.infrastructure.mapper.score.ParkMapper">
+<mapper namespace="com.zipsoon.batch.infrastructure.mapper.score.ParkScoreMapper">
 
     <resultMap id="parkResultMap" type="com.zipsoon.batch.domain.source.Park">
         <result property="location" column="location"

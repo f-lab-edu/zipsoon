@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.api.estate.mapper.EstateMapper">
+<mapper namespace="com.zipsoon.api.interfaces.mapper.ApiEstateMapper">
 
     <resultMap id="estateResultMap" type="com.zipsoon.common.domain.Estate">
         <result column="estate_type" property="estateType" typeHandler="com.zipsoon.common.config.typehandler.EstateTypeHandler"/>

@@ -1,32 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.batch.estate.mapper.BatchEstateMapper">
+<mapper namespace="com.zipsoon.batch.infrastructure.mapper.estate.BatchEstateMapper">
 
-    <resultMap id="EstateSnapshotResultMap" type="EstateSnapshot">
-        <result column="platform_type"
-                property="platformType"
-                typeHandler="com.zipsoon.common.config.typehandler.PlatformTypeHandler"/>
-        <result column="raw_data"
-                property="rawData"
-                typeHandler="com.zipsoon.common.config.typehandler.JsonTypeHandler"/>
-        <result column="estate_type"
-                property="estateType"
-                typeHandler="com.zipsoon.common.config.typehandler.EstateTypeHandler"/>
-        <result column="trade_type"
-                property="tradeType"
-                typeHandler="com.zipsoon.common.config.typehandler.TradeTypeHandler"/>
-        <result column="location"
-                property="location"
-                typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"
-                jdbcType="OTHER"/>
-        <result column="tags"
-                property="tags"
-                typeHandler="com.zipsoon.common.config.typehandler.StringArrayTypeHandler"/>
-        <result column="image_urls"
-                property="imageUrls"
-                typeHandler="com.zipsoon.common.config.typehandler.StringArrayTypeHandler"/>
-    </resultMap>
-    
     <resultMap id="EstateResultMap" type="Estate">
         <result column="platform_type"
                 property="platformType"
@@ -92,25 +67,9 @@
             #{estate.createdAt}
             )
         </foreach>
-        ON CONFLICT (platform_type, platform_id) 
-        DO UPDATE SET
-            raw_data = EXCLUDED.raw_data,
-            estate_name = EXCLUDED.estate_name,
-            estate_type = EXCLUDED.estate_type,
-            trade_type = EXCLUDED.trade_type,
-            price = EXCLUDED.price,
-            rent_price = EXCLUDED.rent_price,
-            area_meter = EXCLUDED.area_meter,
-            area_pyeong = EXCLUDED.area_pyeong,
-            location = EXCLUDED.location,
-            address = EXCLUDED.address,
-            tags = EXCLUDED.tags,
-            image_urls = EXCLUDED.image_urls,
-            dong_code = EXCLUDED.dong_code,
-            created_at = EXCLUDED.created_at
     </insert>
     
-    <!-- 기존 매물 정보를 estate_snapshot 테이블로 이동 -->
+    <!-- 기존 매물 정보를 estate_snapshot 테이블로 이동 (모든 데이터) -->
     <insert id="migrateToSnapshot">
         INSERT INTO estate_snapshot (
             platform_type,
@@ -149,10 +108,14 @@
             e.created_at
         FROM 
             estate e
-        WHERE 
-            (e.platform_type, e.platform_id) IN 
-            (SELECT platform_type, platform_id FROM estate WHERE created_at <![CDATA[ < ]]> NOW() - INTERVAL '1 day')
     </insert>
+    
+    <!-- estate 테이블 비우기 (외래키 제약조건 임시 비활성화) -->
+    <update id="truncateEstateTable">
+        SET session_replication_role = replica;
+        TRUNCATE TABLE estate;
+        SET session_replication_role = default;
+    </update>
 
     <!-- 나중에 사용할 estate 테이블의 모든 항목 조회 -->
     <select id="selectAllEstates" resultMap="EstateResultMap">
@@ -161,7 +124,7 @@
     </select>
 
     <!-- 날짜 기준으로 estate_snapshot 테이블의 모든 항목 조회 -->
-    <select id="selectLatestAll" resultMap="EstateSnapshotResultMap">
+    <select id="selectLatestAll" resultMap="EstateResultMap">
         SELECT *
         FROM estate_snapshot
     </select>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.batch.score.mapper.ScoreMapper">
+<mapper namespace="com.zipsoon.batch.infrastructure.mapper.score.BatchScoreMapper">
     <!-- 최신 점수 정보 저장 -->
     <insert id="insertAll" parameterType="java.util.List">
         INSERT INTO estate_score (
@@ -33,7 +33,7 @@
             created_at
         )
         SELECT 
-            es.id as estate_snapshot_id,
+            es.id AS estate_snapshot_id,
             s.score_type_id,
             s.raw_score,
             s.normalized_score,
