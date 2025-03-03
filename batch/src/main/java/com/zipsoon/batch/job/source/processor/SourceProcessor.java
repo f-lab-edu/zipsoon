@@ -1,15 +1,15 @@
-package com.zipsoon.batch.source.job.processor;
+package com.zipsoon.batch.job.source.processor;
 
-import com.zipsoon.batch.infrastructure.whichname.source.ScoreSourceCollector;
+import com.zipsoon.batch.application.service.source.collector.SourceCollector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ScoreSourceProcessor implements ItemProcessor<ScoreSourceCollector, ScoreSourceCollector> {
+public class SourceProcessor implements ItemProcessor<SourceCollector, SourceCollector> {
     @Override
-    public ScoreSourceCollector process(ScoreSourceCollector collector) {
+    public SourceCollector process(SourceCollector collector) {
         log.info("Processing source data collection");
         collector.create();
         if (!collector.wasUpdated()) {

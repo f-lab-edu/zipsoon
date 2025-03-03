@@ -1,4 +1,4 @@
-package com.zipsoon.batch.normalize.job.processor;
+package com.zipsoon.batch.job.normalize.processor;
 
 import com.zipsoon.batch.domain.score.ScoreType;
 import lombok.RequiredArgsConstructor;

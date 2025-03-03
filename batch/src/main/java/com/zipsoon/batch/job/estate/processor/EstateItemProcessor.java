@@ -1,6 +1,6 @@
-package com.zipsoon.batch.estate.job.processor;
+package com.zipsoon.batch.job.estate.processor;
 
-import com.zipsoon.batch.infrastructure.whichname.estate.NaverEstateCollector;
+import com.zipsoon.batch.infrastructure.processor.estate.collector.NaverEstateCollector;
 import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

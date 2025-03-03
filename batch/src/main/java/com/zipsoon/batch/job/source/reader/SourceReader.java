@@ -1,6 +1,6 @@
-package com.zipsoon.batch.source.job.reader;
+package com.zipsoon.batch.job.source.reader;
 
-import com.zipsoon.batch.infrastructure.whichname.source.ScoreSourceCollector;
+import com.zipsoon.batch.application.service.source.collector.SourceCollector;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
@@ -12,12 +12,12 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ScoreSourceReader implements ItemReader<ScoreSourceCollector> {
-    private final List<ScoreSourceCollector> collectors;
-    private Iterator<ScoreSourceCollector> collectorsIterator;
+public class SourceReader implements ItemReader<SourceCollector> {
+    private final List<SourceCollector> collectors;
+    private Iterator<SourceCollector> collectorsIterator;
 
     @Override
-    public ScoreSourceCollector read() {
+    public SourceCollector read() {
         if (collectorsIterator == null) {
             collectorsIterator = collectors.iterator();
         }

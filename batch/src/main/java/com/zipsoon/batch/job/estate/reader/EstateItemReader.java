@@ -1,8 +1,8 @@
-package com.zipsoon.batch.estate.job.reader;
+package com.zipsoon.batch.job.estate.reader;
 
 import com.zipsoon.batch.domain.estate.DongCode;
 import com.zipsoon.batch.infrastructure.external.naver.vo.NaverLandResponseVO;
-import com.zipsoon.batch.estate.service.DongCodeService;
+import com.zipsoon.batch.application.service.estate.DongCodeService;
 import com.zipsoon.batch.infrastructure.external.naver.NaverLandClient;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

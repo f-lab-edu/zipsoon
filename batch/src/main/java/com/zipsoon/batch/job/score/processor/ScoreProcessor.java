@@ -1,6 +1,6 @@
-package com.zipsoon.batch.score.job.processor;
+package com.zipsoon.batch.job.score.processor;
 
-import com.zipsoon.batch.infrastructure.whichname.score.ScoreCalculator;
+import com.zipsoon.batch.application.service.score.calculator.ScoreCalculator;
 import com.zipsoon.common.domain.Estate;
 import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;

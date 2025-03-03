@@ -1,4 +1,4 @@
-package com.zipsoon.batch;
+package com.zipsoon.batch.job.source;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ScoreSourceJobRunner {
+public class SourceJobRunner {
     private final JobLauncher jobLauncher;
     private final Job sourceJob;
 

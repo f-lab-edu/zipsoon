@@ -1,4 +1,4 @@
-package com.zipsoon.batch.score.job.writer;
+package com.zipsoon.batch.job.score.writer;
 
 import com.zipsoon.batch.infrastructure.repository.score.ScoreRepository;
 import com.zipsoon.common.domain.EstateScore;

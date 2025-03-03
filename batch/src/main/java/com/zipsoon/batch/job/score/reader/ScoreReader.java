@@ -1,4 +1,4 @@
-package com.zipsoon.batch.score.job.reader;
+package com.zipsoon.batch.job.score.reader;
 
 import com.zipsoon.batch.infrastructure.repository.estate.BatchEstateRepository;
 import com.zipsoon.common.domain.Estate;

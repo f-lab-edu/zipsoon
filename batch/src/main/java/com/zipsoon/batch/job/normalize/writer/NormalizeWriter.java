@@ -1,7 +1,7 @@
-package com.zipsoon.batch.normalize.job.writer;
+package com.zipsoon.batch.job.normalize.writer;
 
 import com.zipsoon.batch.infrastructure.repository.normalize.NormalizeRepository;
-import com.zipsoon.batch.infrastructure.whichname.score.ScoreCalculator;
+import com.zipsoon.batch.application.service.score.calculator.ScoreCalculator;
 import com.zipsoon.batch.domain.score.ScoreType;
 import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;

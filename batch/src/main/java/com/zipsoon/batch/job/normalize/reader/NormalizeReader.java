@@ -1,4 +1,4 @@
-package com.zipsoon.batch.normalize.job.reader;
+package com.zipsoon.batch.job.normalize.reader;
 
 import com.zipsoon.batch.infrastructure.repository.normalize.NormalizeRepository;
 import com.zipsoon.batch.domain.score.ScoreType;
