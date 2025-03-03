@@ -1,8 +1,8 @@
 package com.zipsoon.batch;
 
-import com.zipsoon.batch.score.calculator.ParkScoreCalculator;
-import com.zipsoon.batch.score.domain.Park;
-import com.zipsoon.batch.score.repository.ParkRepository;
+import com.zipsoon.batch.domain.source.Park;
+import com.zipsoon.batch.infrastructure.processor.score.calculator.ParkScoreCalculator;
+import com.zipsoon.batch.infrastructure.repository.score.ParkScoreRepository;
 import com.zipsoon.common.domain.Estate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,15 +25,15 @@ class ParkScoreCalculatorTest {
     private static final double PARK_LONGITUDE = 126.9616546;
     private static final double PARK_LATITUDE = 37.572146;
 
-    private ParkRepository parkRepository;
+    private ParkScoreRepository parkScoreRepository;
     private ParkScoreCalculator parkScoreCalculator;
     private GeometryFactory geometryFactory;
 
     @BeforeEach
     void setUp() {
-        parkRepository = mock(ParkRepository.class);
+        parkScoreRepository = mock(ParkScoreRepository.class);
         geometryFactory = new GeometryFactory();
-        parkScoreCalculator = new ParkScoreCalculator(parkRepository);
+        parkScoreCalculator = new ParkScoreCalculator(parkScoreRepository);
     }
 
     @Test
@@ -41,7 +41,7 @@ class ParkScoreCalculatorTest {
     void shouldReturnZeroScoreWhenNoParkNearby() {
         // given
         Estate estate = createEstate(ESTATE_LONGITUDE, ESTATE_LATITUDE);
-        when(parkRepository.findParksWithin(any(Point.class), eq(300.0)))
+        when(parkScoreRepository.findParksWithin(any(Point.class), eq(300.0)))
             .thenReturn(List.of());
 
         // when
@@ -62,7 +62,7 @@ class ParkScoreCalculatorTest {
             createPark("park2", "공원2", PARK_LONGITUDE, PARK_LATITUDE, 2000.0)
         );
 
-        when(parkRepository.findParksWithin(any(Point.class), eq(600.0)))
+        when(parkScoreRepository.findParksWithin(any(Point.class), eq(600.0)))
             .thenReturn(nearbyParks);
 
         // when

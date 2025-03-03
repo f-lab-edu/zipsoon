@@ -1,5 +1,8 @@
 package com.zipsoon.common.domain;
 
+import lombok.Getter;
+
+@Getter
 public enum PlatformType {
     네이버("네이버"),
     직방("직방");
@@ -8,10 +11,6 @@ public enum PlatformType {
 
     PlatformType(String koreanName) {
         this.koreanName = koreanName;
-    }
-
-    public String getKoreanName() {
-        return koreanName;
     }
 
     public static PlatformType of(String koreanName) {

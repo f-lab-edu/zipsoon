@@ -1,10 +1,10 @@
 package com.zipsoon.batch;
 
-import com.zipsoon.batch.normalize.job.writer.NormalizeWriter;
-import com.zipsoon.batch.normalize.normalizer.ScoreNormalizer;
-import com.zipsoon.batch.normalize.repository.NormalizeRepository;
-import com.zipsoon.batch.score.calculator.ScoreCalculator;
-import com.zipsoon.batch.score.model.ScoreType;
+import com.zipsoon.batch.job.normalize.writer.NormalizeWriter;
+import com.zipsoon.batch.application.service.normalize.normalizer.ScoreNormalizer;
+import com.zipsoon.batch.infrastructure.repository.normalize.NormalizeRepository;
+import com.zipsoon.batch.application.service.score.calculator.ScoreCalculator;
+import com.zipsoon.batch.domain.score.ScoreType;
 import com.zipsoon.common.domain.EstateScore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.batch.item.Chunk;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class NormalizeServiceTest {
@@ -61,10 +58,6 @@ class NormalizeServiceTest {
         normalizeWriter.write(new Chunk<>(List.of(scoreType)));
 
         // then
-        Map<Long, Double> expectedUpdates = new HashMap<>();
-        expectedUpdates.put(1L, 2.5);
-        expectedUpdates.put(2L, 8.5);
-
         verify(normalizeRepository).updateNormalizedScores(eq(1L), argThat(map -> map.size() == 2));
     }
 

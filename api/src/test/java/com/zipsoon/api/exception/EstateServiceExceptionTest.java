@@ -1,8 +1,8 @@
 package com.zipsoon.api.exception;
 
-import com.zipsoon.api.estate.service.EstateService;
-import com.zipsoon.api.exception.custom.ServiceException;
-import com.zipsoon.api.exception.model.ErrorCode;
+import com.zipsoon.api.application.estate.EstateService;
+import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
+import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
