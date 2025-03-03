@@ -1,8 +1,8 @@
-package com.zipsoon.batch.source.job.config;
+package com.zipsoon.batch.job.source;
 
-import com.zipsoon.batch.infrastructure.whichname.source.ScoreSourceCollector;
-import com.zipsoon.batch.source.job.processor.ScoreSourceProcessor;
-import com.zipsoon.batch.source.job.reader.ScoreSourceReader;
+import com.zipsoon.batch.application.service.source.collector.SourceCollector;
+import com.zipsoon.batch.job.source.processor.SourceProcessor;
+import com.zipsoon.batch.job.source.reader.SourceReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -15,28 +15,28 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class ScoreSourceJobConfig {
+public class SourceJobConfig {
     private static final String JOB_NAME = "sourceJob";
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
 
-    private final ScoreSourceReader scoreSourceReader;
-    private final ScoreSourceProcessor scoreSourceProcessor;
+    private final SourceReader sourceReader;
+    private final SourceProcessor sourceProcessor;
 
     @Bean(name = JOB_NAME)
     public Job sourceJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
-            .start(sourceStep())
+            .start(sourceProcessingStep())
             .build();
     }
 
     @Bean
-    public Step sourceStep() {
-        return new StepBuilder("sourceStep", jobRepository)
-            .<ScoreSourceCollector, ScoreSourceCollector>chunk(1, transactionManager)
-            .reader(scoreSourceReader)
-            .processor(scoreSourceProcessor)
+    public Step sourceProcessingStep() {
+        return new StepBuilder("sourceProcessingStep", jobRepository)
+            .<SourceCollector, SourceCollector>chunk(1, transactionManager)
+            .reader(sourceReader)
+            .processor(sourceProcessor)
             .writer(chunk -> {})    // writer 없음
             .build();
     }

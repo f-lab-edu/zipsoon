@@ -1,9 +1,9 @@
-package com.zipsoon.batch.estate.job.config;
+package com.zipsoon.batch.job.estate;
 
 import com.zipsoon.batch.domain.estate.DongCode;
-import com.zipsoon.batch.estate.job.processor.EstateItemProcessor;
-import com.zipsoon.batch.estate.job.writer.EstateItemWriter;
-import com.zipsoon.batch.estate.service.DongCodeService;
+import com.zipsoon.batch.job.estate.processor.EstateItemProcessor;
+import com.zipsoon.batch.job.estate.writer.EstateItemWriter;
+import com.zipsoon.batch.application.service.estate.DongCodeService;
 import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.List;
 
+/**
+ * Estate 관련 배치 작업 설정
+ * 새 데이터 수집 및 저장 처리 (스냅샷 작업은 별도 DatabaseMigrationJob에서 처리)
+ */
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
@@ -35,12 +39,13 @@ public class EstateJobConfig {
     @Bean(name = JOB_NAME)
     public Job estateScoreJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
-            .start(estateStep())
+            .start(estateBatchStep())
             .build();
     }
+    
     @Bean
-    public Step estateStep() {
-        return new StepBuilder("estateStep", jobRepository)
+    public Step estateBatchStep() {
+        return new StepBuilder("estateBatchStep", jobRepository)
             .<String, List<Estate>>chunk(1, transactionManager)
             .reader(dongCodeReader())
             .processor(estateItemProcessor)
@@ -54,5 +59,4 @@ public class EstateJobConfig {
             .map(DongCode::code)
             .toList());
     }
-
 }

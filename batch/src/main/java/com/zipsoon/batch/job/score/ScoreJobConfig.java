@@ -1,8 +1,8 @@
-package com.zipsoon.batch.score.job.config;
+package com.zipsoon.batch.job.score;
 
-import com.zipsoon.batch.score.job.processor.ScoreProcessor;
-import com.zipsoon.batch.score.job.reader.ScoreReader;
-import com.zipsoon.batch.score.job.writer.ScoreWriter;
+import com.zipsoon.batch.job.score.processor.ScoreProcessor;
+import com.zipsoon.batch.job.score.reader.ScoreReader;
+import com.zipsoon.batch.job.score.writer.ScoreWriter;
 import com.zipsoon.common.domain.Estate;
 import com.zipsoon.common.domain.EstateScore;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +29,15 @@ public class ScoreJobConfig {
     private final ScoreWriter scoreWriter;
 
     @Bean(name = JOB_NAME)
-    public Job estateScoreJob() {
+    public Job scoreJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
-            .start(estateScoreStep())
+            .start(scoreProcessingStep())
             .build();
     }
 
     @Bean
-    public Step estateScoreStep() {
-        return new StepBuilder("estateScoreStep", jobRepository)
+    public Step scoreProcessingStep() {
+        return new StepBuilder("scoreProcessingStep", jobRepository)
             .<Estate, List<EstateScore>>chunk(100, transactionManager)
             .reader(scoreReader)
             .processor(scoreProcessor)

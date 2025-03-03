@@ -1,8 +1,8 @@
-package com.zipsoon.batch.normalize.job.config;
+package com.zipsoon.batch.job.normalize;
 
-import com.zipsoon.batch.normalize.job.processor.NormalizeProcessor;
-import com.zipsoon.batch.normalize.job.reader.NormalizeReader;
-import com.zipsoon.batch.normalize.job.writer.NormalizeWriter;
+import com.zipsoon.batch.job.normalize.processor.NormalizeProcessor;
+import com.zipsoon.batch.job.normalize.reader.NormalizeReader;
+import com.zipsoon.batch.job.normalize.writer.NormalizeWriter;
 import com.zipsoon.batch.domain.score.ScoreType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +31,13 @@ public class NormalizeJobConfig {
     @Bean(name = JOB_NAME)
     public Job normalizeJob() {
         return new JobBuilder(JOB_NAME, jobRepository)
-            .start(normalizeScoresStep())
+            .start(normalizeProcessingStep())
             .build();
     }
 
     @Bean
-    public Step normalizeScoresStep() {
-        return new StepBuilder("normalizeStep", jobRepository)
+    public Step normalizeProcessingStep() {
+        return new StepBuilder("normalizeProcessingStep", jobRepository)
             .<ScoreType, ScoreType>chunk(1, transactionManager)
             .reader(normalizeReader)
             .processor(normalizeProcessor)
