@@ -2,13 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zipsoon.batch.infrastructure.mapper.estate.DongCodeMapper">
 
-    <resultMap id="dongCodeResultMap" type="com.zipsoon.batch.domain.estate.DongCode">
-        <id property="code" column="법정동코드" />
-        <result property="name" column="법정동명" />
-        <result property="isExist" column="is_exist" />
-    </resultMap>
-
-    <select id="findAll" resultMap="dongCodeResultMap">
+    <select id="findAll" resultType="com.zipsoon.batch.domain.estate.DongCode">
         SELECT
             법정동코드,
             법정동명
