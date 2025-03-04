@@ -42,13 +42,9 @@ public class DatabaseMigrationTasklet implements Tasklet {
                 "SELECT * FROM estate"
             );
             
-            // 3. 외래키를 가진 자식 테이블(estate_score)부터 먼저 삭제 
-            log.info("Truncating estate_score table (child table with foreign key)");
-            jdbcTemplate.execute("TRUNCATE TABLE estate_score");
-            
-            // 4. 그 후 부모 테이블(estate) 삭제
+            // 3. estate, 그리고 관련된 모든 테이블 truncate
             log.info("Truncating estate table (parent table)");
-            jdbcTemplate.execute("TRUNCATE TABLE estate");
+            jdbcTemplate.execute("TRUNCATE TABLE estate CASCADE");
             
             log.info("Tables truncated successfully");
             

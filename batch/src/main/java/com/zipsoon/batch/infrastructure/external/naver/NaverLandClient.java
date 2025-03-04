@@ -64,11 +64,21 @@ public class NaverLandClient {
     }
 
     private String buildUrl(String cortarNo, int page) {
+        // 조회하고자 하는 매물 쿼리 파라미터. (네이버페이 부동산 기준)
+        // APT: 아파트     PRE: 분양권             ABYG: 아파트분양권
+        // JGC: 재건축     VL: 빌라/연립/다세대      DDDGG: 단독/다가구
+        // JWJT: 전원주택   SGJT: 상가주택          HOJT: 한옥주택
+        // OPST: 오피스텔   OBYG: 오피스텔분양권      GM: 고시원
+        // OR: 원룸
+        final String ESTATE_TYPE_PARAM_KEY = "a";
+        final String ESTATE_TYPE_PARAM_VALUE = "APT:PRE:ABYG:JGC:VL:DDDGG:JWJT:SGJT:HOJT:OPST:OBYG:GM:OR";
+
         return UriComponentsBuilder
               .fromUriString(baseUrl + "/articles")
               .queryParam("cortarNo", cortarNo)
               .queryParam("page", page)
               .queryParam("sameAddressGroup", true)
+              .queryParam(ESTATE_TYPE_PARAM_KEY, ESTATE_TYPE_PARAM_VALUE)
               .build()
               .toUriString();
     }

@@ -4,7 +4,7 @@
  */
 const SQL_QUERIES = {
   findAllInViewport: {
-    query: `SELECT * FROM estate_snapshot
+    query: `SELECT * FROM estate
 WHERE ST_Intersects(
     location,
     ST_MakeEnvelope(
@@ -101,7 +101,7 @@ LIMIT {limit}`,
     },
 
     // 영향 받는 테이블 목록
-    affectedTables: ['estate_snapshot']
+    affectedTables: ['estate']
   },
 
   save: {
@@ -111,8 +111,6 @@ LIMIT {limit}`,
   image_url,
   email_verified,
   role,
-  provider,
-  provider_id,
   created_at,
   updated_at
 ) VALUES (
@@ -121,8 +119,6 @@ LIMIT {limit}`,
   {imageUrl},
   {emailVerified},
   {role},
-  {provider},
-  {providerId},
   NOW(),
   NOW()
 ) RETURNING id`,
@@ -133,9 +129,7 @@ LIMIT {limit}`,
       name: `'${userData.name}'`,
       imageUrl: `NULL`,
       emailVerified: `TRUE`,
-      role: `'USER'`,
-      provider: `'local'`,
-      providerId: `NULL`
+      role: `'USER'`
     }),
 
     // 쿼리 결과 포맷팅
@@ -182,8 +176,6 @@ LIMIT {limit}`,
   image_url,
   email_verified,
   role,
-  provider,
-  provider_id,
   created_at,
   updated_at
 FROM
@@ -215,7 +207,6 @@ WHERE
                `email       | ${data.email || 'N/A'}\n` +
                `name        | ${data.name || 'N/A'}\n` +
                `role        | ${data.role || 'USER'}\n` +
-               `provider    | ${data.provider || 'local'}\n` +
                `created_at  | ${data.createdAt || new Date().toISOString()}\n\n` +
                `[Authentication successful]`;
       } else {
@@ -240,7 +231,7 @@ FROM
 JOIN
   score_type st ON es.score_type_id = st.id
 WHERE
-  es.estate_snapshot_id = {estateId} <!-- n번 반복 -->
+  es.estate_id = {estateId} <!-- n번 반복 -->
 ORDER BY
   es.normalized_score DESC`,
 

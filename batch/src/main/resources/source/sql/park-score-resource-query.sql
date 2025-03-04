@@ -18,4 +18,5 @@ CREATE TABLE IF NOT EXISTS public.parks (
 	데이터기준일자 date NULL,
 	제공기관코드 varchar(50) NULL,
 	제공기관명 varchar(255) NULL
+--	location geometry(Point, 4326) NULL     // ParkSourceCollector.preprocess()에 의해 추가 생성
 );

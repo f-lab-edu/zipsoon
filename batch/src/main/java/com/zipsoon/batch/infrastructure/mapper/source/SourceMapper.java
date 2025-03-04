@@ -15,6 +15,6 @@ public interface SourceMapper {
     @Update("UPDATE ${tableName} SET location = ST_SetSRID(ST_Point(경도, 위도), 4326) WHERE 위도 IS NOT NULL AND 경도 IS NOT NULL")
     int updateLocationCoordinates(@Param("tableName") String tableName);
 
-    @Update("TRUNCATE TABLE ${tableName}")
-    void truncateTable(@Param("tableName") String tableName);
+    @Update("DROP TABLE IF EXISTS ${tableName}")
+    void dropTable(@Param("tableName") String tableName);
 }
