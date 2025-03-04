@@ -21,7 +21,7 @@ public class SourceRepository {
         return sourceMapper.updateLocationCoordinates(tableName);
     }
 
-    public void truncateTable(String tableName) {
-        sourceMapper.truncateTable(tableName);
+    public void dropTable(String tableName) {
+        sourceMapper.dropTable(tableName);
     }
 }
