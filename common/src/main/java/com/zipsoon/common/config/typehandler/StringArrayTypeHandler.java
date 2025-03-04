@@ -21,19 +21,31 @@ public class StringArrayTypeHandler extends BaseTypeHandler<List<String>> {
 
     @Override
     public List<String> getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        String[] array = (String[]) rs.getArray(columnName).getArray();
+        java.sql.Array sqlArray = rs.getArray(columnName);
+        if (sqlArray == null) {
+            return null;
+        }
+        String[] array = (String[]) sqlArray.getArray();
         return Arrays.asList(array);
     }
 
     @Override
     public List<String> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        String[] array = (String[]) rs.getArray(columnIndex).getArray();
+        java.sql.Array sqlArray = rs.getArray(columnIndex);
+        if (sqlArray == null) {
+            return null;
+        }
+        String[] array = (String[]) sqlArray.getArray();
         return Arrays.asList(array);
     }
 
     @Override
     public List<String> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        String[] array = (String[]) cs.getArray(columnIndex).getArray();
+        java.sql.Array sqlArray = cs.getArray(columnIndex);
+        if (sqlArray == null) {
+            return null;
+        }
+        String[] array = (String[]) sqlArray.getArray();
         return Arrays.asList(array);
     }
 }

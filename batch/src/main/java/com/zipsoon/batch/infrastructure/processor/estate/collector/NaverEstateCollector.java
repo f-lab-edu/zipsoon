@@ -72,7 +72,7 @@ public class NaverEstateCollector implements EstateCollector {
                     .location(createPoint(article.longitude(), article.latitude()))
                     .address(article.detailAddress())
                     .tags(Arrays.asList(article.tagList()))
-                    .imageUrls(List.of(NAVER_PREFIX_URL + article.representativeImgUrl()))
+                    .imageUrls(article.representativeImgUrl() != null && !article.representativeImgUrl().equals("null") ? List.of(NAVER_PREFIX_URL + article.representativeImgUrl()) : null)
                     .dongCode(dongCode)
                     .createdAt(LocalDateTime.now())
                     .build();

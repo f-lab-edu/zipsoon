@@ -15,14 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EstateItemProcessor implements ItemProcessor<String, List<Estate>> {
     private final NaverEstateCollector estateCollector;
-    private static final int MAX_PAGE = 50;
 
     @Override
     public List<Estate> process(String dongCode) {
         List<Estate> snapshots = new ArrayList<>();
         int page = 1;
 
-        while (page <= MAX_PAGE && estateCollector.hasMoreData(dongCode, page)) {
+        while (estateCollector.hasMoreData(dongCode, page)) {
             snapshots.addAll(estateCollector.collect(dongCode, page));
             page++;
         }
