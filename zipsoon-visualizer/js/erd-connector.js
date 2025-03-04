@@ -49,8 +49,16 @@ class ERDConnector {
           console.log('ID에서 추출한 테이블명:', tableName);
         }
         
-        // 원래 테이블명 저장 (app_user, estate_snapshot 등)
-        const originalTableNames = ['app_user', 'estate_snapshot', 'score_type', 'estate_score'];
+        // 원래 테이블명 저장 (모든 테이블 포함)
+        const originalTableNames = [
+          'app_user', 
+          'estate', 
+          'estate_snapshot', 
+          'score_type', 
+          'estate_score', 
+          'estate_score_snapshot',
+          'parks'
+        ];
         
         // 각 원래 테이블명에 대해 현재 엔티티가 해당 테이블을 나타내는지 확인
         for (const origName of originalTableNames) {
