@@ -77,6 +77,23 @@ $(() => {
             timestamp created_at
         }
 
+        score_type {
+            int id PK
+            varchar name
+            text description
+            boolean active
+            timestamp created_at
+        }
+
+        estate_score {
+            bigint id PK
+            bigint estate_id FK
+            int score_type_id FK
+            numeric raw_score
+            numeric normalized_score
+            timestamp created_at
+        }
+
         estate_snapshot {
             bigint id PK
             varchar platform_type
@@ -97,23 +114,6 @@ $(() => {
             timestamp created_at
         }
 
-        score_type {
-            int id PK
-            varchar name
-            text description
-            boolean active
-            timestamp created_at
-        }
-
-        estate_score {
-            bigint id PK
-            bigint estate_id FK
-            int score_type_id FK
-            numeric raw_score
-            numeric normalized_score
-            timestamp created_at
-        }
-
         estate_score_snapshot {
             bigint id PK
             bigint estate_snapshot_id FK
@@ -124,25 +124,25 @@ $(() => {
         }
 
         parks {
-            varchar 관리번호
-            varchar 공원명
-            varchar 공원구분
-            varchar 소재지도로명주소
-            varchar 소재지지번주소
-            float 위도
-            float 경도
-            float 공원면적
-            text 공원보유시설_운동시설
-            text 공원보유시설_유희시설
-            text 공원보유시설_편익시설
-            text 공원보유시설_교양시설
-            text 공원보유시설_기타시설
-            date 지정고시일
-            varchar 관리기관명
-            varchar 전화번호
-            date 데이터기준일자
-            varchar 제공기관코드
-            varchar 제공기관명
+            varchar management_id PK
+            varchar park_name
+            varchar park_type
+            varchar road_address
+            varchar jibun_address
+            float latitude
+            float longitude
+            float park_area
+            text sports_facilities
+            text amusement_facilities
+            text convenience_facilities
+            text cultural_facilities
+            text other_facilities
+            date designation_date
+            varchar management_org
+            varchar phone_number
+            date data_standard_date
+            varchar provider_code
+            varchar provider_nam
             geometry location
         }
 
