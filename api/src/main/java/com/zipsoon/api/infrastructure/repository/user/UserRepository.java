@@ -4,7 +4,6 @@ package com.zipsoon.api.infrastructure.repository.user;
 import com.zipsoon.api.domain.user.User;
 import com.zipsoon.api.interfaces.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
