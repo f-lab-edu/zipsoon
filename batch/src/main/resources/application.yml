@@ -3,7 +3,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   batch:
     job:
-      enabled: true
+      enabled: false  # 자동 실행 비활성화 (JobRunner에서 수동으로 실행)
     jdbc:
       initialize-schema: always
 
