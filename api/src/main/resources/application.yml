@@ -9,7 +9,8 @@ mybatis:
   type-handlers-package: com.zipsoon.common.config.typehandler
   configuration:
     map-underscore-to-camel-case: true
-  type-aliases-package: com.zipsoon.common.domain,com.zipsoon.api.estate.dto
+  type-aliases-package: com.zipsoon.common.domain,com.zipsoon.api.interfaces.api.estate.dto
+  mapper-scan-packages: com.zipsoon.api.interfaces.mapper,com.zipsoon.api.infrastructure.repository,com.zipsoon.common.mapper
 
 logging:
   pattern:
