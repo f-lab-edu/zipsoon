@@ -12,23 +12,23 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * 데이터베이스 마이그레이션 작업 실행기
- * 배치 작업 시작 전에 호출되어 estate와 estate_score 테이블의 스냅샷 작업을 수행
+ * 데이터베이스 초기화 작업 실행기
+ * DatabaseInitTasklet과 DatabaseMigrationTasklet 실행
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DatabaseMigrationJobRunner {
+public class DatabaseInitJobRunner {
     private final JobLauncher jobLauncher;
-    private final Job databaseMigrationJob;
+    private final Job databaseInitJob;
 
     public void run() throws Exception {
         JobParameters params = new JobParametersBuilder()
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting database migration job with parameters: {}", params);
-        JobExecution execution = jobLauncher.run(databaseMigrationJob, params);
-        log.info("Database migration job finished with status: {}", execution.getStatus());
+        log.info("Starting database init job with parameters: {}", params);
+        JobExecution execution = jobLauncher.run(databaseInitJob, params);
+        log.info("Database init job finished with status: {}", execution.getStatus());
     }
 }

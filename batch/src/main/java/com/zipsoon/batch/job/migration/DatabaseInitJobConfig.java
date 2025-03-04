@@ -53,9 +53,8 @@ public class DatabaseInitJobConfig {
             try {
                 log.info("Starting dongcodes table initialization using DongCodeSourceCollector");
                 
-                // DongCodeSourceCollector의 create와 collect 메소드 사용
-                dongCodeSourceCollector.create(); // 테이블 드롭 및 생성
-                dongCodeSourceCollector.collect(); // 데이터 로드
+                dongCodeSourceCollector.create();
+                dongCodeSourceCollector.collect();
                 
                 log.info("Dongcodes table initialization completed successfully");
                 return RepeatStatus.FINISHED;

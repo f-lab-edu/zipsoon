@@ -1,7 +1,7 @@
 package com.zipsoon.batch.application.pipeline;
 
 import com.zipsoon.batch.application.pipeline.step.*;
-import com.zipsoon.batch.job.migration.DatabaseMigrationJobRunner;
+import com.zipsoon.batch.job.migration.DatabaseInitJobRunner;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class DataPipelineService {
-    private final DatabaseMigrationJobRunner databaseMigrationJobRunner;
+    private final DatabaseInitJobRunner databaseInitJobRunner;
     private final EstateCollectionStep estateCollectionStep;
     private final SourceCollectionStep sourceCollectionStep;
     private final ScoreCalculationStep scoreCalculationStep;
@@ -46,8 +46,8 @@ public class DataPipelineService {
         log.info("Starting full data pipeline execution");
         
         try {
-            log.info("Running database migration job first");
-            databaseMigrationJobRunner.run();
+            log.info("Running database init job first");
+            databaseInitJobRunner.run();
             
             runPipelineSteps(stepMap.values());
             

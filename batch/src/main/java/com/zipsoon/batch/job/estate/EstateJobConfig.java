@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * Estate 관련 배치 작업 설정
- * 새 데이터 수집 및 저장 처리 (스냅샷 작업은 별도 DatabaseMigrationJob에서 처리)
+ * 새 데이터 수집 및 저장 처리 (스냅샷 작업은 별도 DatabaseInitJob에서 처리)
  */
 @Configuration
 @RequiredArgsConstructor

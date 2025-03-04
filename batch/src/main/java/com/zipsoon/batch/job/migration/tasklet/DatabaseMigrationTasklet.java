@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 중요 테이블 초기화 및 마이그레이션 Tasklet
- * 2. estate와 estate_score 테이블의 데이터를 스냅샷 테이블로 이동
- * 3. estate와 estate_score 비우기
+ * 데이터베이스 스냅샷 이동 및 테이블 비우기 Tasklet
+ * 이 Tasklet은 estate와 estate_score 테이블의 데이터를 스냅샷 테이블로 이동하고
+ * 기존 테이블을 비우는 작업을 수행합니다.
  */
 @Slf4j
 @Component
