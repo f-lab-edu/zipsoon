@@ -563,8 +563,8 @@ class InteractionModule {
             </div>
           `;
           
-          // 마커 추가
-          const marker = window.mapModule.addMarker([lat, lng]);
+          // 마커 추가 (매물 데이터 포함)
+          const marker = window.mapModule.addMarker([lat, lng], estate);
           marker.bindTooltip(tooltipContent, { 
             permanent: false,
             direction: 'top'

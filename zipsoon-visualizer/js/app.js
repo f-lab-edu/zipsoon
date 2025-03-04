@@ -21,6 +21,10 @@ $(() => {
     // 인터랙션 모듈 초기화
     window.interactionModule = interactionModule;
     interactionModule.loadInteractions(INTERACTIONS);
+    
+    // 상세 페이지 컴포넌트 초기화
+    window.estateDetailComponent = estateDetailComponent;
+    estateDetailComponent.initialize();
 
     // viewportChanged 이벤트 구독 (다른 컴포넌트에서 사용할 수 있음)
     document.addEventListener('viewportChanged', (e) => {
@@ -29,6 +33,11 @@ $(() => {
 
         // 현재는 콘솔에서 직접 맵모듈에 접근하여 뷰포트 정보 확인 가능
         // console.log(mapModule.getViewportInfo());
+    });
+    
+    // 매물 마커 클릭 이벤트 구독
+    document.addEventListener('estateMarkerClicked', (e) => {
+        console.log('매물 마커 클릭:', e.detail);
     });
 
     // 디버깅을 위해 전역 접근 추가

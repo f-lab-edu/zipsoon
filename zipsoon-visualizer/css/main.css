@@ -9,3 +9,204 @@ body {
     color: #333;
     line-height: 1.6;
 }
+
+/* 상세 페이지 컴포넌트 스타일 */
+.estate-detail-container {
+    display: none; /* 초기에는 숨김 */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 80%;
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+    transform: translateY(100%);
+}
+
+.estate-detail-container.active {
+    display: block;
+    transform: translateY(0);
+}
+
+.estate-detail-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+.estate-detail-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.estate-detail-score {
+    display: flex;
+    align-items: center;
+}
+
+.score-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    position: relative;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.estate-detail-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+}
+
+.estate-detail-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.estate-detail-type-badges {
+    display: flex;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.estate-type-badge {
+    padding: 5px 10px;
+    margin-right: 5px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.badge-naver {
+    background-color: #03C75A;
+}
+
+.badge-jikbang {
+    background-color: #F44336;
+}
+
+.badge-apt {
+    background-color: #9C27B0;
+}
+
+.badge-officetel {
+    background-color: #3F51B5;
+}
+
+.badge-oneroom {
+    background-color: #009688;
+}
+
+.badge-rent {
+    background-color: #2196F3;
+}
+
+.badge-sale {
+    background-color: #FF9800;
+}
+
+.estate-detail-content {
+    padding: 15px 20px;
+}
+
+.estate-images {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.estate-image {
+    width: 150px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.score-details {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.score-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.score-item-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-item-content {
+    flex-grow: 1;
+}
+
+.score-item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.score-item-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.score-item-value {
+    display: flex;
+    align-items: center;
+}
+
+.score-circle-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.score-empty {
+    background-color: #e0e0e0;
+    color: #999;
+}
+
+.score-item-description {
+    font-size: 12px;
+    color: #666;
+}
