@@ -35,15 +35,27 @@ class EstateDetailComponent {
             <div class="estate-detail-header">
                 <button class="estate-detail-close">&times;</button>
                 <div class="estate-detail-score">
-                    <div class="score-circle" style="background-color: #4CAF50;">
-                        <span class="score-value">0.0</span>
+                    <div class="score-circle" style="
+                        background-color: #4CAF50;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        text-align: center;
+                    ">
+                        <span style="font-size: 0.7rem; margin-bottom: -2px; color: white;">총점</span>
+                        <span class="score-value" style="font-size: 1.2rem; font-weight: bold; color: white;">0.0</span>
                     </div>
-                    <div>
+                    <div class="estate-detail-info">
                         <h2 class="estate-detail-title">매물 정보</h2>
                         <p class="estate-detail-subtitle">로딩 중...</p>
+                        <div class="estate-detail-type-badges" style="margin-top: 10px;"></div>
                     </div>
                 </div>
-                <div class="estate-detail-type-badges"></div>
             </div>
             <div class="estate-detail-content">
                 <div class="estate-images"></div>
@@ -69,7 +81,7 @@ class EstateDetailComponent {
      * 마커 클릭 이벤트 핸들러
      * @param {CustomEvent} event - 마커 클릭 이벤트 (detail에 매물 정보 포함)
      */
-    handleMarkerClick(event) {
+    async handleMarkerClick(event) {
         // 컴포넌트가 초기화되지 않았다면 초기화
         if (!this.initialized) {
             this.initialize();
@@ -81,16 +93,81 @@ class EstateDetailComponent {
             return;
         }
         
-        console.log('매물 상세 정보 표시:', estateData);
+        console.log('매물 상세 정보 불러오기 시작:', estateData.id);
         
-        // 현재 매물 정보 저장
+        // 기본 정보를 현재 매물로 저장하고 로딩 상태로 UI 업데이트
         this.currentEstate = estateData;
         
-        // 상세 페이지 내용 업데이트
+        // 일단 기본 정보로 UI 표시 (로딩 중 표시)
         this.updateContent(estateData);
         
         // 상세 페이지 표시
         this.show();
+        
+        try {
+            // 로그인 상태 확인
+            if (window.authTokens && window.authTokens.isLoggedIn) {
+                // 인터랙션 모듈을 통해 매물 상세 조회 트리거
+                if (window.interactionModule) {
+                    // estateDetail 인터랙션 호출
+                    const detailData = await window.interactionModule.triggerInteraction('estateDetail', { id: estateData.id });
+                    console.log('매물 상세 정보 로드 완료:', detailData);
+                    
+                    // 커스텀 이벤트 발생 - 매물 상세 정보 로드 완료
+                    const estateDetailEvent = new CustomEvent('estateDetailLoaded', { 
+                        detail: { 
+                            id: estateData.id,
+                            data: detailData
+                        } 
+                    });
+                    document.dispatchEvent(estateDetailEvent);
+                    
+                    // 현재 매물 정보 갱신
+                    if (detailData) {
+                        this.currentEstate = detailData;
+                        
+                        // 상세 페이지 내용 업데이트
+                        this.updateContent(detailData);
+                    }
+                } else {
+                    // API 엔드포인트 직접 호출 (fallback)
+                    console.log('인터랙션 모듈이 없음, 직접 API 호출');
+                    const endpoint = API_ENDPOINTS['/api/v1/estates/:id'];
+                    const apiBaseUrl = 'http://localhost:8080';
+                    
+                    // URL 템플릿 변수 처리
+                    const urlPath = endpoint.url.replace('{id}', estateData.id);
+                    const url = `${apiBaseUrl}${urlPath}`;
+                    
+                    const options = {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${window.authTokens.accessToken}`
+                        }
+                    };
+                    
+                    console.log(`상세 정보 API 직접 호출: ${url}`);
+                    
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`API 요청 실패: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const detailData = await response.json();
+                    const formattedData = endpoint.responseFormatter ? endpoint.responseFormatter(detailData) : detailData;
+                    
+                    this.currentEstate = formattedData;
+                    this.updateContent(formattedData);
+                }
+            } else {
+                console.log('로그인 필요: 기본 매물 정보만 표시합니다.');
+            }
+        } catch (error) {
+            console.error('상세 정보 로드 실패:', error);
+            // 에러 메시지를 UI에 표시할 수 있음
+        }
     }
     
     /**
@@ -121,8 +198,24 @@ class EstateDetailComponent {
             scoreColor = '#FF5722'; // 주황 (낮은 점수)
         }
         
+        // 스타일 설정 (HTML 초기화 시 설정한 스타일과 일치하게 유지)
         scoreCircle.style.backgroundColor = scoreColor;
+        scoreCircle.style.display = 'flex';
+        scoreCircle.style.flexDirection = 'column';
+        scoreCircle.style.alignItems = 'center';
+        scoreCircle.style.justifyContent = 'center';
+        scoreCircle.style.width = '60px';
+        scoreCircle.style.height = '60px';
+        scoreCircle.style.borderRadius = '50%';
+        scoreCircle.style.marginRight = '15px';
+        scoreCircle.style.textAlign = 'center';
+        
+        // 점수 값 업데이트 (HTML 구조가 변경되면 이 부분도 수정 필요)
+        // '총점' 라벨이 이미 있으므로 점수 값만 업데이트
         scoreValue.textContent = totalScore ? totalScore.toFixed(1) : '?';
+        scoreValue.style.fontSize = '1.2rem';
+        scoreValue.style.fontWeight = 'bold';
+        scoreValue.style.color = 'white';
         
         // 제목 및 부제목 업데이트
         const title = this.container.querySelector('.estate-detail-title');
@@ -146,52 +239,103 @@ class EstateDetailComponent {
         // 매물 유형 뱃지 업데이트
         const badgesContainer = this.container.querySelector('.estate-detail-type-badges');
         badgesContainer.innerHTML = '';
+        badgesContainer.style.display = 'flex';
+        badgesContainer.style.gap = '8px';
+        badgesContainer.style.marginTop = '10px';
+        badgesContainer.style.marginBottom = '15px';
+        badgesContainer.style.flexWrap = 'wrap';
         
-        // 플랫폼 뱃지 추가
-        if (estateData.platformType) {
-            const platformBadge = document.createElement('div');
-            platformBadge.className = `estate-type-badge badge-${estateData.platformType.toLowerCase()}`;
-            platformBadge.textContent = this.getPlatformName(estateData.platformType);
-            badgesContainer.appendChild(platformBadge);
-        }
+        // 플랫폼 뱃지 추가 (네이버로 하드코딩)
+        const platformBadge = document.createElement('div');
+        platformBadge.className = 'estate-badge platform-badge';
+        platformBadge.textContent = '네이버';
+        platformBadge.style.backgroundColor = '#03C75A';
+        platformBadge.style.color = 'white';
+        platformBadge.style.padding = '3px 8px';
+        platformBadge.style.borderRadius = '4px';
+        platformBadge.style.fontSize = '0.8rem';
+        platformBadge.style.fontWeight = 'bold';
+        badgesContainer.appendChild(platformBadge);
         
         // 매물 유형 뱃지 추가
         if (estateData.type) {
             const typeBadge = document.createElement('div');
-            typeBadge.className = `estate-type-badge badge-${estateData.type.toLowerCase()}`;
+            typeBadge.className = 'estate-badge type-badge';
             typeBadge.textContent = this.getEstateTypeName(estateData.type);
+            typeBadge.style.backgroundColor = '#4361EE';
+            typeBadge.style.color = 'white';
+            typeBadge.style.padding = '3px 8px';
+            typeBadge.style.borderRadius = '4px';
+            typeBadge.style.fontSize = '0.8rem';
+            typeBadge.style.fontWeight = 'bold';
             badgesContainer.appendChild(typeBadge);
         }
         
         // 거래 유형 뱃지 추가
         if (estateData.tradeType) {
             const tradeBadge = document.createElement('div');
-            tradeBadge.className = `estate-type-badge badge-${estateData.tradeType.toLowerCase()}`;
+            tradeBadge.className = 'estate-badge trade-badge';
             tradeBadge.textContent = this.getTradeTypeName(estateData.tradeType);
+            
+            // 거래 유형에 따라 다른 색상 부여
+            let bgColor = '#FF9F1C'; // 기본 색상
+            if (estateData.tradeType === '전세') {
+                bgColor = '#2EC4B6'; // 전세
+            } else if (estateData.tradeType === '매매') {
+                bgColor = '#E71D36'; // 매매
+            }
+            
+            tradeBadge.style.backgroundColor = bgColor;
+            tradeBadge.style.color = 'white';
+            tradeBadge.style.padding = '3px 8px';
+            tradeBadge.style.borderRadius = '4px';
+            tradeBadge.style.fontSize = '0.8rem';
+            tradeBadge.style.fontWeight = 'bold';
             badgesContainer.appendChild(tradeBadge);
         }
         
         // 이미지 갤러리 업데이트
         const imagesContainer = this.container.querySelector('.estate-images');
         imagesContainer.innerHTML = '';
+
+        const hasValidImages = estateData.images &&
+                              Array.isArray(estateData.images) &&
+                              estateData.images.length > 0;
         
-        if (estateData.imageUrls && estateData.imageUrls.length > 0) {
-            estateData.imageUrls.forEach(imageUrl => {
+        if (hasValidImages) {
+            // 이미지가 있는 경우 이미지 갤러리 생성
+            estateData.images.forEach(imageUrl => {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'estate-image';
+                imgContainer.style.display = 'flex';
+                imgContainer.style.alignItems = 'center';
+                imgContainer.style.justifyContent = 'center';
+                
                 const img = document.createElement('img');
-                img.className = 'estate-image';
                 img.src = imageUrl;
                 img.alt = estateData.name || '매물 이미지';
-                imagesContainer.appendChild(img);
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '100%';
+                img.style.objectFit = 'contain';
+                
+                // 이미지 로드 오류 처리
+                img.onerror = () => {
+                    imgContainer.textContent = '이미지 로드 실패';
+                    imgContainer.style.backgroundColor = '#f5f5f5';
+                };
+                
+                imgContainer.appendChild(img);
+                imagesContainer.appendChild(imgContainer);
             });
         } else {
-            // 이미지가 없는 경우 기본 이미지 표시
+            // 이미지가 없는 경우 기본 메시지 표시
             const noImg = document.createElement('div');
             noImg.className = 'estate-image';
             noImg.style.backgroundColor = '#f5f5f5';
             noImg.style.display = 'flex';
             noImg.style.alignItems = 'center';
             noImg.style.justifyContent = 'center';
-            noImg.textContent = '이미지 없음';
+            noImg.textContent = '이미지가 없습니다';
             imagesContainer.appendChild(noImg);
         }
         
@@ -199,14 +343,27 @@ class EstateDetailComponent {
         const scoreDetailsContainer = this.container.querySelector('.score-details');
         scoreDetailsContainer.innerHTML = '';
         
-        // 샘플 점수 항목 추가 (상세 점수 정보가 있다면 실제 데이터로 대체)
-        this.addScoreItem(scoreDetailsContainer, '역세권', 8.5, '역, 정류장이 가까운 정도');
-        this.addScoreItem(scoreDetailsContainer, '병원', 7.5, '의마나 병원이 많은지');
-        this.addScoreItem(scoreDetailsContainer, '편의점', 6.5, '의마나 편의점이 많은지');
-        this.addScoreItem(scoreDetailsContainer, '평탄한 지형', null, '주변 지형 경사 정도');
-        this.addScoreItem(scoreDetailsContainer, '공원', null, '의마나 공원이 많은지');
-        this.addScoreItem(scoreDetailsContainer, '사전 정의된 옵션1', null, '서버에서 사전 세팅');
-        this.addScoreItem(scoreDetailsContainer, '사전 정의된 옵션2', null, '서버에서 사전 세팅');
+        // 실제 점수 데이터 렌더링
+        if (estateData.score && estateData.score.factors && estateData.score.factors.length > 0) {
+            // 각 점수 요소 추가
+            estateData.score.factors.forEach(factor => {
+                // score_type.description, score_type.name 매핑
+                const name = factor.name;
+                const description = factor.description;
+                
+                // estate_score.normalized_score 또는 estate_score.raw_score 사용
+                // normalized_score가 없으면 raw_score 사용
+                const score = factor.score; // 프론트엔드에서는 이미 normalized_score로 받아짐
+                
+                this.addScoreItem(scoreDetailsContainer, name, score, description);
+            });
+        } else {
+            // 점수 데이터가 없는 경우 안내 메시지 표시
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'score-no-data';
+            noDataDiv.textContent = '점수 데이터가 없습니다.';
+            scoreDetailsContainer.appendChild(noDataDiv);
+        }
     }
     
     /**
@@ -223,7 +380,7 @@ class EstateDetailComponent {
         // 아이콘 (실제 아이콘은 나중에 추가해도 됨)
         const icon = document.createElement('div');
         icon.className = 'score-item-icon';
-        icon.textContent = '#';
+        icon.textContent = 'img';
         
         // 내용
         const content = document.createElement('div');
@@ -257,10 +414,34 @@ class EstateDetailComponent {
                 scoreColor = '#FF5722';
             }
             
+            // 작은 원형 스타일링
             scoreCircle.style.backgroundColor = scoreColor;
+            scoreCircle.style.display = 'flex';
+            scoreCircle.style.alignItems = 'center';
+            scoreCircle.style.justifyContent = 'center';
+            scoreCircle.style.width = '30px';
+            scoreCircle.style.height = '30px';
+            scoreCircle.style.borderRadius = '50%';
+            scoreCircle.style.color = 'white';
+            scoreCircle.style.fontWeight = 'bold';
+            scoreCircle.style.fontSize = '0.9rem';
+            
             scoreCircle.textContent = value.toFixed(1);
         } else {
             scoreCircle.className = 'score-circle-small score-empty';
+            
+            // 빈 원형 스타일링 (색상만 다르게)
+            scoreCircle.style.backgroundColor = '#e0e0e0';
+            scoreCircle.style.display = 'flex';
+            scoreCircle.style.alignItems = 'center';
+            scoreCircle.style.justifyContent = 'center';
+            scoreCircle.style.width = '30px';
+            scoreCircle.style.height = '30px';
+            scoreCircle.style.borderRadius = '50%';
+            scoreCircle.style.color = 'white';
+            scoreCircle.style.fontWeight = 'bold';
+            scoreCircle.style.fontSize = '0.9rem';
+            
             scoreCircle.textContent = '?';
         }
         

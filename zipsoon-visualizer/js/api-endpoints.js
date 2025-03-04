@@ -66,6 +66,42 @@ const API_ENDPOINTS = {
       };
     }
   },
+  '/api/v1/estates/:id': {
+    url: '/api/v1/estates/{id}',  // 템플릿 형식의 URL
+    method: 'GET',
+    description: '매물 상세 정보 조회',
+
+    // 요청 데이터 포맷팅 (ID는 URL에 추가)
+    requestFormatter: (id) => {
+      return {}; // GET 요청이라 body가 필요 없음
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return {
+        id: data.id,
+        name: data.name,
+        type: data.type,
+        tradeType: data.tradeType,
+        price: data.price,
+        rentPrice: data.rentPrice,
+        areaMeter: data.areaMeter,
+        areaPyeong: data.areaPyeong,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        address: data.address,
+        tags: data.tags || [],
+        imageUrls: data.images || [],
+        platformType: data.platformType,
+        score: data.score || {
+          total: 0,
+          description: '점수 정보가 없습니다',
+          factors: []
+        },
+        rawData: data.rawData
+      };
+    }
+  },
   '/api/v1/auth/signup': {
     url: '/api/v1/auth/signup',
     method: 'POST',
