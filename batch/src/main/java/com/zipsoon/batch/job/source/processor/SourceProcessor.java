@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 public class SourceProcessor implements ItemProcessor<SourceCollector, SourceCollector> {
     @Override
     public SourceCollector process(SourceCollector collector) {
-        log.info("Processing source data collection");
-        collector.create();
+        log.info("Source data not been changed; skipping data collection...");
         if (!collector.wasUpdated()) {
             return collector;
         }
-        
+        log.info("Processing source data collection");
+        collector.create();
         collector.collect();
         collector.preprocess();
         return collector;
