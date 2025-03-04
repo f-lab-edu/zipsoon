@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 public class AuthenticationProvider {
 
     private final JwtProvider jwtProvider;
-//    private final OauthProvider oauthProvider;
-//    private final UserProvider userProvider;
 
     public Authentication authenticate(HttpServletRequest request) {
         String token = jwtProvider.extractToken(request);
@@ -20,16 +18,6 @@ public class AuthenticationProvider {
         if (token != null && jwtProvider.validateToken(token)) {
             return jwtProvider.getAuthentication(token);
         }
-
-//        String oauthToken = oauthProvider.extractToken(request);
-//        if (oauthToken != null && oauthProvider.validateToken(oauthToken)) {
-//            return oauthProvider.getAuthentication(oauthToken);
-//        }
-
-//        String email = request.getHeader("email");
-//        if (email != null) {
-//            return userProvider.authenticateWithEmail(email);
-//        }
 
         throw new AuthenticationException("Authentication failed") {};
     }

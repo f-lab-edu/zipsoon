@@ -1,7 +1,6 @@
 package com.zipsoon.api.domain.user;
 
 import com.zipsoon.api.domain.auth.Role;
-import com.zipsoon.api.application.auth.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,8 +15,6 @@ public class User {
     private String name;
     private String imageUrl;
     private Role role;
-    private AuthProvider provider;
-    private String providerId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

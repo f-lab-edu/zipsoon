@@ -45,23 +45,6 @@ CREATE TABLE estate_snapshot (
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 레코드 생성 시간
 );
 
--- 사용자 정보 테이블: 앱 사용자 관리
-CREATE TABLE app_user (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- 고유 식별자
-    email VARCHAR(255) NOT NULL UNIQUE,                  -- 이메일 (로그인 ID)
-    email_verified BOOLEAN NOT NULL DEFAULT false,       -- 이메일 인증 여부
-    name VARCHAR(255) NOT NULL,                          -- 사용자 이름
-    image_url VARCHAR(2048),                             -- 프로필 이미지 URL
-    role VARCHAR(20) NOT NULL,                           -- 역할 (USER, ADMIN 등)
-    provider VARCHAR(20),                                -- OAuth 제공자 (GOOGLE, KAKAO 등)
-    provider_id VARCHAR(255),                            -- OAuth 제공자에서의 ID
-    created_at TIMESTAMP NOT NULL,                       -- 계정 생성 시간
-    updated_at TIMESTAMP NOT NULL                        -- 계정 정보 수정 시간
-);
-
-CREATE INDEX idx_provider_provider_id ON app_user (provider, provider_id);  -- OAuth 로그인 검색 인덱스
-CREATE UNIQUE INDEX uk_provider_provider_id ON app_user (provider, provider_id);  -- OAuth 계정 중복 방지
-
 -- 점수 유형 테이블: 매물 평가 기준 정의
 CREATE TABLE score_type (
     id serial PRIMARY KEY,                               -- 고유 식별자
@@ -71,6 +54,7 @@ CREATE TABLE score_type (
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 생성 시간
 );
 
+-- 점수 유형 예제: 공원 접근성
 INSERT INTO score_type (name, description) VALUES
 ('공원', '공원의 개수와 규모를 점수화합니다');
 
@@ -80,16 +64,16 @@ CREATE TABLE estate_score (
     estate_id bigint NOT NULL,                          -- estate 테이블 참조
     score_type_id int NOT NULL,                         -- score_type 테이블 참조
     raw_score numeric(5,2) NOT NULL,                    -- 원시 점수 (계산된 실제 값)
-    normalized_score numeric(5,2),                      -- 정규화된 점수 (0-10 척도)
+    normalized_score numeric(5,2),                      -- 정규화된 점수 (0-10 점)
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- 생성 시간
 
     FOREIGN KEY (estate_id) REFERENCES estate(id),      -- estate 테이블 외래키
     FOREIGN KEY (score_type_id) REFERENCES score_type(id)  -- score_type 테이블 외래키
 );
 
-CREATE INDEX idx_estate_score_estate_id ON estate_score(estate_id);  -- 매물 기준 점수 조회 인덱스
-CREATE INDEX idx_estate_score_type_id ON estate_score(score_type_id);  -- 점수 유형 기준 조회 인덱스
-CREATE UNIQUE INDEX uk_estate_score_estate_type ON estate_score(estate_id, score_type_id);  -- 매물-점수유형 조합 유니크 제약조건
+CREATE INDEX idx_estate_score_estate_id ON estate_score(estate_id);  -- 매물 조회 인덱스
+CREATE INDEX idx_estate_score_type_id ON estate_score(score_type_id);  -- 점수 조회 인덱스
+CREATE UNIQUE INDEX uk_estate_score_estate_type ON estate_score(estate_id, score_type_id);  -- 매물-점수 제약조건
 
 -- 과거 부동산 점수 스냅샷 테이블: 매물 점수 이력 관리용
 CREATE TABLE estate_score_snapshot (
@@ -101,8 +85,14 @@ CREATE TABLE estate_score_snapshot (
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 생성 시간
 );
 
--- 히스토리 조회용 인덱스
-CREATE INDEX idx_estate_snapshot_created_at ON estate_snapshot(created_at);
-CREATE INDEX idx_estate_score_snapshot_created_at ON estate_score_snapshot(created_at);
-CREATE INDEX idx_estate_score_snapshot_estate_id ON estate_score_snapshot(estate_snapshot_id);
-CREATE INDEX idx_estate_score_snapshot_type_id ON estate_score_snapshot(score_type_id);
+-- 사용자 정보 테이블: 앱 사용자 관리
+CREATE TABLE app_user (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- 고유 식별자
+    email VARCHAR(255) NOT NULL UNIQUE,                  -- 이메일 (로그인 ID)
+    email_verified BOOLEAN NOT NULL DEFAULT false,       -- 이메일 인증 여부
+    name VARCHAR(255) NOT NULL,                          -- 사용자 이름
+    image_url VARCHAR(2048),                             -- 프로필 이미지 URL
+    role VARCHAR(20) NOT NULL,                           -- 역할 (USER, ADMIN 등)
+    created_at TIMESTAMP NOT NULL,                       -- 계정 생성 시간
+    updated_at TIMESTAMP NOT NULL                        -- 계정 정보 수정 시간
+);
