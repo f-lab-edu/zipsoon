@@ -6,13 +6,16 @@ import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.interfaces.api.estate.dto.*;
 import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.zipsoon.api.infrastructure.exception.model.ErrorCode.ESTATE_NOT_FOUND;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EstateService {
@@ -31,9 +34,15 @@ public class EstateService {
 
         return estates.stream()
             .map(estate -> {
-                ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId());
-                return EstateResponse.from(estate, scoreSummary);
+                try {
+                    ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId());
+                    return EstateResponse.from(estate, scoreSummary);
+                } catch (Exception e) {
+                    log.error("Error processing estate ID {}: {}", estate.getId(), e.getMessage());
+                    return null;
+                }
             })
+            .filter(Objects::nonNull)
             .toList();
     }
 
@@ -42,8 +51,14 @@ public class EstateService {
         Estate estate = apiEstateRepository.findById(id)
             .orElseThrow(() -> new ServiceException(ESTATE_NOT_FOUND));
 
-        ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId());
-        return EstateDetailResponse.from(estate, scoreDetails);
+        try {
+            ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId());
+            return EstateDetailResponse.from(estate, scoreDetails);
+        } catch (Exception e) {
+            log.error("Error processing estate detail ID {}: {}", id, e.getMessage());
+            ScoreDetails emptyScoreDetails = new ScoreDetails(0.0, "점수 정보가 없습니다", List.of());
+            return EstateDetailResponse.from(estate, emptyScoreDetails);
+        }
     }
 
     private int calculateLimit(int zoom) {

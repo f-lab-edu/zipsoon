@@ -64,6 +64,7 @@ public class ScoreService {
     
     private double calculateTotalScore(List<ScoreDto> factors) {
         return factors.stream()
+            .filter(factor -> factor.getNormalizedScore() != null)
             .mapToDouble(ScoreDto::getNormalizedScore)
             .average()
             .orElse(0.0);
