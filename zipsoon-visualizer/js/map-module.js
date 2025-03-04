@@ -464,11 +464,23 @@ class MapModule {
     /**
      * 마커 추가
      * @param {Array} position - [위도, 경도] 형식의 배열
+     * @param {Object} estateData - 매물 데이터
      * @param {Object} options - 마커 옵션
      * @returns {Object} 생성된 마커 객체
      */
-    addMarker(position, options = {}) {
+    addMarker(position, estateData = {}, options = {}) {
         const marker = L.marker(position, options).addTo(this.map);
+        marker.estateData = estateData;
+        
+        // 마커 클릭 이벤트 추가
+        marker.on('click', (e) => {
+            // 커스텀 이벤트 발생 - 매물 클릭
+            const event = new CustomEvent('estateMarkerClicked', {
+                detail: estateData
+            });
+            document.dispatchEvent(event);
+        });
+        
         this.markers.push(marker);
         return marker;
     }

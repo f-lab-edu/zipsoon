@@ -4,17 +4,23 @@ import com.zipsoon.batch.application.pipeline.DataPipelineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
  * 통합 배치 작업 실행기
  * 애플리케이션 시작 시 자동으로 실행되며, 전체 데이터 파이프라인 진행
+ * 모든 작업이 완료되면 애플리케이션 자동 종료
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JobRunner implements CommandLineRunner {
+public class JobRunner implements CommandLineRunner, ExitCodeGenerator {
     private final DataPipelineService pipelineService;
+    private final ConfigurableApplicationContext context;
+    private int exitCode = 0;
     
     @Override
     public void run(String... args) {
@@ -33,6 +39,11 @@ public class JobRunner implements CommandLineRunner {
             log.info("Batch job pipeline execution completed successfully");
         } catch (Exception e) {
             log.error("Error during batch job pipeline execution", e);
+            exitCode = 1;
+        } finally {
+            // 애플리케이션 종료
+            log.info("Exiting application with exit code: {}", exitCode);
+            SpringApplication.exit(context, () -> exitCode);
         }
     }
     
@@ -62,6 +73,12 @@ public class JobRunner implements CommandLineRunner {
             }
         } catch (Exception e) {
             log.error("Error during batch job pipeline execution from {}", startPoint, e);
+            exitCode = 1;
         }
+    }
+    
+    @Override
+    public int getExitCode() {
+        return exitCode;
     }
 }

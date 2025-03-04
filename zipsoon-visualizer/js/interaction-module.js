@@ -15,6 +15,8 @@ class InteractionModule {
 
     // 이벤트 리스너 등록
     document.addEventListener('viewportChanged', this.handleMapInteraction.bind(this));
+    document.addEventListener('estateMarkerClicked', this.handleMarkerClick.bind(this));
+    document.addEventListener('estateDetailLoaded', this.handleEstateDetailLoaded.bind(this));
 
     // API 베이스 URL 설정
     this.apiBaseUrl = 'http://localhost:8080';
@@ -85,6 +87,118 @@ class InteractionModule {
         const uniqueTables = [...new Set(affectedTables)];
         window.erdConnector.highlightTables(uniqueTables);
       }
+    }
+  }
+  
+  // 매물 마커 클릭 인터랙션 처리
+  handleMarkerClick(event) {
+    const estateData = event.detail;
+    if (!estateData || !estateData.id) {
+      console.error('매물 정보가 없거나 ID가 없습니다.');
+      return;
+    }
+    
+    console.log('매물 마커 클릭 감지:', estateData.id);
+    
+    // 인터랙션 정보 가져오기
+    const interaction = this.interactions['estateDetail'];
+    if (!interaction) {
+      console.error('estateDetail 인터랙션을 찾을 수 없음');
+      return;
+    }
+    
+    const endpoint = API_ENDPOINTS[interaction.endpoint];
+    
+    // sqlQuery는 문자열 또는 배열
+    const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+      ? interaction.sqlQuery 
+      : [interaction.sqlQuery];
+    
+    // 첫 번째 SQL 쿼리 가져오기
+    const sqlQuery = SQL_QUERIES[sqlQueryNames[0]];
+    
+    if (!endpoint || !sqlQuery) {
+      console.error('estateDetail 인터랙션에 필요한 엔드포인트/SQL 쿼리 정의를 찾을 수 없음');
+      return;
+    }
+    
+    // 매물 ID 기반으로 클라이언트->앱 요청 정보 업데이트
+    const requestData = { id: estateData.id };
+    this.updateClientToAppContent(endpoint, requestData);
+    
+    // 앱->DB 쿼리 정보 업데이트
+    this.updateAppToDBContent(sqlQuery, requestData);
+    
+    // 로그인 상태에서만 실제 API 요청은 EstateDetailComponent에서 처리
+    // 여기서는 UI만 미리 업데이트
+    if (!window.authTokens || !window.authTokens.isLoggedIn) {
+      console.log('매물 상세 조회 - 로그인 필요: API 요청은 생략');
+      // 로그인 필요 UI 표시
+      this.appToClientElement.textContent = '로그인이 필요합니다.\nAPI 요청은 전송되지 않았습니다.';
+      this.dbToAppElement.textContent = '로그인이 필요합니다.\nDB 응답이 없습니다.';
+    }
+    
+    // ERD 테이블 강조 표시 - estateDetail 인터랙션의 모든 테이블
+    const affectedTables = [];
+    sqlQueryNames.forEach(queryName => {
+      const query = SQL_QUERIES[queryName];
+      if (query && query.affectedTables) {
+        affectedTables.push(...query.affectedTables);
+      }
+    });
+    
+    if (affectedTables.length > 0 && window.erdConnector) {
+      // 중복 제거
+      const uniqueTables = [...new Set(affectedTables)];
+      window.erdConnector.highlightTables(uniqueTables);
+    }
+  }
+  
+  // 매물 상세 정보 로드 완료 인터랙션 처리
+  handleEstateDetailLoaded(event) {
+    const { id, data } = event.detail;
+    
+    if (!id || !data) {
+      console.error('매물 상세 정보 로드 결과가 없습니다.');
+      return;
+    }
+    
+    console.log('매물 상세 정보 로드 완료 이벤트:', id);
+    
+    // 인터랙션 정보 가져오기
+    const interaction = this.interactions['estateDetail'];
+    if (!interaction) {
+      console.error('estateDetail 인터랙션을 찾을 수 없음');
+      return;
+    }
+    
+    const endpoint = API_ENDPOINTS[interaction.endpoint];
+    
+    // sqlQuery는 문자열 또는 배열 - 상세 점수 정보 쿼리 가져오기 (두 번째 쿼리)
+    const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+      ? interaction.sqlQuery 
+      : [interaction.sqlQuery];
+    
+    // 두 번째 SQL 쿼리 (상세 점수 정보) 가져오기
+    const scoreQuery = sqlQueryNames.length > 1 ? SQL_QUERIES[sqlQueryNames[1]] : null;
+    
+    if (!endpoint) {
+      console.error('estateDetail 인터랙션에 필요한 엔드포인트 정의를 찾을 수 없음');
+      return;
+    }
+    
+    // 앱->클라이언트 응답 정보 업데이트
+    if (endpoint.responseFormatter) {
+      const formattedResponse = endpoint.responseFormatter(data);
+      this.appToClientElement.textContent = JSON.stringify(formattedResponse, null, 4);
+    } else {
+      this.appToClientElement.textContent = JSON.stringify(data, null, 4);
+    }
+    
+    // DB->앱 응답 정보 업데이트 (상세 점수 정보)
+    if (scoreQuery && scoreQuery.resultFormatter) {
+      const resultText = scoreQuery.resultFormatter(data);
+      this.dbToAppElement.textContent = resultText;
     }
   }
 
@@ -171,6 +285,32 @@ class InteractionModule {
     });
   }
 
+  // URL 템플릿 문자열에서 실제 URL을 생성하는 헬퍼 함수
+  processUrlTemplate(urlTemplate, data) {
+    // {id}와 같은 템플릿 변수를 찾아 데이터에서 값을 가져와 치환
+    let processedUrl = urlTemplate;
+    
+    // 템플릿 변수 패턴을 찾습니다. 예: {id}, {userId} 등
+    const templateVarPattern = /{([^{}]+)}/g;
+    let match;
+    
+    // 모든 템플릿 변수를 치환
+    while ((match = templateVarPattern.exec(urlTemplate)) !== null) {
+      const placeholder = match[0]; // 예: {id}
+      const varName = match[1];     // 예: id
+      
+      // data 객체에서 값을 가져옴
+      const value = data[varName];
+      if (value !== undefined) {
+        processedUrl = processedUrl.replace(placeholder, value);
+      } else {
+        console.warn(`템플릿 변수 ${varName}에 대한 값이 없습니다.`);
+      }
+    }
+    
+    return processedUrl;
+  }
+
   // 실제 API 호출
   async fetchAPI(endpoint, data) {
     console.log('API 호출 시작', {
@@ -188,7 +328,10 @@ class InteractionModule {
       const requestParams = endpoint.requestFormatter(data);
       console.log('요청 파라미터 생성 완료:', requestParams);
       
-      let url = `${this.apiBaseUrl}${endpoint.url}`;
+      // URL 템플릿 처리 - {id}와 같은 변수를 실제 값으로 치환
+      let urlPath = this.processUrlTemplate(endpoint.url, data);
+      let url = `${this.apiBaseUrl}${urlPath}`;
+      
       let options = {
         method: endpoint.method,
         headers: {
@@ -563,8 +706,8 @@ class InteractionModule {
             </div>
           `;
           
-          // 마커 추가
-          const marker = window.mapModule.addMarker([lat, lng]);
+          // 마커 추가 (매물 데이터 포함)
+          const marker = window.mapModule.addMarker([lat, lng], estate);
           marker.bindTooltip(tooltipContent, { 
             permanent: false,
             direction: 'top'

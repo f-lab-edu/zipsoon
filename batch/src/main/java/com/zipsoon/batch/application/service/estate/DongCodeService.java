@@ -16,7 +16,7 @@ public class DongCodeService {
     public List<DongCode> getAllDongCodes() {
 //        List<DongCode> dongCodes = dongCodeRepository.findAll();
         List<DongCode> dongCodes = List.of(
-            new DongCode("1111018000", "서울특별시 종로구 교북동")
+            new DongCode("1111000000", "서울특별시 종로구")
         );
 
         log.info("Retrieved {} dong codes", dongCodes.size());

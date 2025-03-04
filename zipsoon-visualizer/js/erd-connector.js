@@ -30,8 +30,7 @@ class ERDConnector {
 
     entities.forEach(entity => {
       // 엔티티 ID 확인 (디버깅)
-      console.log('발견된 엔티티 ID:', entity.id);
-      
+
       // ID에서 테이블 이름 추출 (entity-TABLE-uuid 형식)
       const match = entity.id.match(/entity-(.*?)-[\w\d-]+$/);
       if (match) {
@@ -42,7 +41,6 @@ class ERDConnector {
         if (textElements.length > 0) {
           // 첫 번째 텍스트 요소가 테이블 이름을 가지고 있음
           tableName = textElements[0].textContent.trim();
-          console.log('텍스트 요소에서 찾은 테이블명:', tableName);
         } else {
           // 텍스트 요소를 찾지 못한 경우 ID에서 가져온 이름 사용
           tableName = match[1];
@@ -67,7 +65,6 @@ class ERDConnector {
           if (match[1].toLowerCase() === noUnderscoreName.toLowerCase()) {
             this.tableElements[origName] = entity;
             this.entityIdMap[origName] = entity.id;
-            console.log(`테이블 매핑 완료: ${origName} -> ${entity.id}`);
             break;
           }
         }

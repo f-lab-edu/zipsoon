@@ -6,7 +6,7 @@ public record ScoreSummary(
     Double total,
     List<TopFactor> topFactors
 ) {
-    public record TopFactor(
+public record TopFactor(
         Long id,
         String name,
         Double score

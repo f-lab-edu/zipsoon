@@ -96,3 +96,10 @@ CREATE TABLE app_user (
     created_at TIMESTAMP NOT NULL,                       -- 계정 생성 시간
     updated_at TIMESTAMP NOT NULL                        -- 계정 정보 수정 시간
 );
+
+-- 법정동 코드 테이블: 시/군/구/동 코드 정보
+CREATE TABLE dongcodes (
+    법정동코드 varchar(255) PRIMARY KEY,
+    법정동명 varchar(255) NOT NULL,
+    폐지여부 varchar(50) NOT NULL
+);

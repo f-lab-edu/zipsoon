@@ -297,6 +297,100 @@ ORDER BY
 
     // 영향 받는 테이블 목록
     affectedTables: ['estate_score', 'score_type']
+  },
+
+  findById: {
+    query: `SELECT * FROM estate WHERE id = {id}`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (estateData) => {
+      return {
+        id: estateData.id || 1 
+      };
+    },
+
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      let result = '';
+      
+      if (!data || data.error) {
+        return "Estate not found or error occurred.";
+      }
+      
+      result += `--- Estate Details ---\n`;
+      result += `id          | ${data.id}\n`;
+      result += `name        | ${data.name || 'N/A'}\n`;
+      result += `type        | ${data.type || 'N/A'}\n`;
+      result += `trade_type  | ${data.tradeType || 'N/A'}\n`;
+      result += `price       | ${data.price || 'N/A'}\n`;
+      result += `rent_price  | ${data.rentPrice || 'N/A'}\n`;
+      result += `area_meter  | ${data.areaMeter || 'N/A'}\n`;
+      result += `area_pyeong | ${data.areaPyeong || 'N/A'}\n`;
+      result += `address     | ${data.address || 'N/A'}\n`;
+      result += `lat, lng    | ${data.latitude}, ${data.longitude}\n`;
+      
+      if (data.tags && Array.isArray(data.tags)) {
+        result += `tags        | ${data.tags.join(', ') || 'N/A'}\n`;
+      }
+      
+      return result;
+    },
+
+    // 영향 받는 테이블 목록
+    affectedTables: ['estate']
+  },
+
+  findScoresByEstateId: {
+    query: `SELECT
+  es.id as score_id,
+  st.id as score_type_id,
+  st.name as score_type_name,
+  st.description,
+  es.raw_score,
+  es.normalized_score
+FROM
+  estate_score es
+JOIN
+  score_type st ON es.score_type_id = st.id
+WHERE
+  es.estate_id = {id}
+ORDER BY
+  es.normalized_score DESC`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (estateData) => {
+      return {
+        id: estateData.id || 1
+      };
+    },
+
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      let result = '';
+      
+      if (!data || !data.score || !data.score.factors) {
+        return "No score details available for this property.";
+      }
+      
+      result += `--- Score Details ---\n`;
+      result += `Total Score | ${data.score.total || 0}\n`;
+      result += `Description | ${data.score.description || 'N/A'}\n\n`;
+      
+      if (data.score.factors && Array.isArray(data.score.factors)) {
+        data.score.factors.forEach((factor, index) => {
+          result += `--- Factor ${index + 1} ---\n`;
+          result += `ID          | ${factor.id || 'N/A'}\n`;
+          result += `Name        | ${factor.name || 'N/A'}\n`;
+          result += `Description | ${factor.description || 'N/A'}\n`;
+          result += `Score       | ${factor.score || 0}\n\n`;
+        });
+      }
+      
+      return result;
+    },
+
+    // 영향 받는 테이블 목록
+    affectedTables: ['estate_score', 'score_type']
   }
 
 };
