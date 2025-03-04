@@ -33,8 +33,14 @@ public class EstateItemWriter implements ItemWriter<List<Estate>> {
             
             // 새로운 매물 정보 저장
             log.info("Saving new estates data: {} items", estates.size());
+            
+            // 빈 리스트인 경우 저장 작업 생략
+            if (estates.isEmpty()) {
+                log.info("No estates to save, skipping database operation");
+                return;
+            }
+            
             batchEstateRepository.saveAllEstates(estates);
-
             log.info("Estate data saved successfully: {} estates", estates.size());
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("Failed to save estates due to data integrity violation: " + e.getMessage(), e);

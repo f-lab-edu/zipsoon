@@ -14,6 +14,10 @@ public class BatchEstateRepository {
 
     // 새로운 estate 테이블 관련 메서드
     public void saveAllEstates(List<Estate> estates) {
+        if (estates == null || estates.isEmpty()) {
+            // 빈 리스트인 경우 저장하지 않고 로그만 남김
+            return;
+        }
         batchEstateMapper.insertEstates(estates);
     }
     
