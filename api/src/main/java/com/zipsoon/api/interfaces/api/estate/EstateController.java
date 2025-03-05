@@ -35,8 +35,7 @@ public class EstateController {
         @Valid ViewportRequest request,
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        // 인증된 사용자인 경우 userId 전달, 아니면 null
-        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         
         return ResponseEntity.ok(
             estateService.findEstatesInViewport(request, userId)
@@ -56,8 +55,7 @@ public class EstateController {
         @PathVariable Long id,
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        // 인증된 사용자인 경우 userId 전달, 아니면 null
-        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         
         return ResponseEntity.ok(
             estateService.findEstateDetail(id, userId)
@@ -75,8 +73,7 @@ public class EstateController {
     public ResponseEntity<List<ScoreTypeResponse>> getScoreTypes(
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        // 인증된 사용자인 경우 userId 전달, 아니면 null
-        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         
         return ResponseEntity.ok(
             scoreService.getAllScoreTypes(userId)
@@ -95,7 +92,7 @@ public class EstateController {
         @PathVariable Integer scoreTypeId,
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        scoreService.disableScoreType(userPrincipal.getUserId(), scoreTypeId);
+        scoreService.disableScoreType(userPrincipal.getId(), scoreTypeId);
         return ResponseEntity.ok().build();
     }
     
@@ -111,7 +108,7 @@ public class EstateController {
         @PathVariable Integer scoreTypeId,
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        scoreService.enableScoreType(userPrincipal.getUserId(), scoreTypeId);
+        scoreService.enableScoreType(userPrincipal.getId(), scoreTypeId);
         return ResponseEntity.ok().build();
     }
 }
