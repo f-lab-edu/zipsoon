@@ -33,6 +33,7 @@ $(() => {
 
     // 디버깅을 위해 전역 접근 추가
     window.mapModule = mapModule;
+    window.settingsComponent = settingsComponent;
 
     console.log('지도 초기화가 완료되었습니다.');
     console.log('콘솔에서 확인: 지도를 움직이면 ViewportInfo가 자동으로 출력됩니다.');
@@ -197,6 +198,11 @@ $(() => {
             handleLogout();
             // 토글 라벨 업데이트
             $('.toggle-label').text('로그인 OFF');
+            
+            // 프로필 정보 업데이트 (항상 최신 상태 유지)
+            if (window.settingsComponent) {
+                window.settingsComponent.updateContent();
+            }
         }
     });
     
@@ -250,9 +256,15 @@ $(() => {
             window.authTokens.accessToken = loginData.accessToken;
             window.authTokens.refreshToken = loginData.refreshToken;
             window.authTokens.expiresAt = loginData.expiresAt;
+            window.authTokens.userId = userName; // 사용자 이름 저장
             window.authTokens.isLoggedIn = true;
             
             console.log('로그인 성공:', window.authTokens);
+            
+            // 설정 컴포넌트가 있다면 프로필 정보 업데이트
+            if (window.settingsComponent) {
+                window.settingsComponent.updateContent();
+            }
         })
         .catch(error => {
             console.error('로그인 프로세스 오류:', error);
@@ -275,5 +287,10 @@ $(() => {
         window.authTokens.isLoggedIn = false;
         
         console.log('로그아웃 완료');
+        
+        // 설정 컴포넌트가 있다면 프로필 정보 업데이트
+        if (window.settingsComponent) {
+            window.settingsComponent.updateContent();
+        }
     }
 });
