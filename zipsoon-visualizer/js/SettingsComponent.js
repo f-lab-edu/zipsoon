@@ -143,26 +143,26 @@ class SettingsComponent {
             <div class="settings-content">
                 <div class="settings-section">
                     <div class="settings-item">
-                        <div class="settings-item-label">필터 설정</div>
+                        <div class="settings-item-label">내 지역</div>
                         <div class="settings-item-value">
                             <button class="settings-button">수정</button>
                         </div>
                     </div>
-                    
+
                     <div class="settings-item">
-                        <div class="settings-item-label">내 지역 설정</div>
+                        <div class="settings-item-label">내 점수 목록</div>
                         <div class="settings-item-value">
                             <button class="settings-button">수정</button>
                         </div>
                     </div>
-                    
+
                     <div class="settings-item">
-                        <div class="settings-item-label">찜한 매물 목록</div>
+                        <div class="settings-item-label">내가 찜한 매물 목록</div>
                         <div class="settings-item-value">
                             <button class="settings-button">조회</button>
                         </div>
                     </div>
-                    
+
                     <div class="settings-item">
                         <div class="settings-item-label">회원 탈퇴</div>
                         <div class="settings-item-value">
