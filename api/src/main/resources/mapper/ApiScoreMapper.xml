@@ -19,7 +19,7 @@
             es.normalized_score DESC
     </select>
     
-    <select id="findAllScoreTypes" resultType="java.util.HashMap">
+    <select id="findAllScoreTypes" resultType="java.util.Map">
         SELECT
             id,
             name,
