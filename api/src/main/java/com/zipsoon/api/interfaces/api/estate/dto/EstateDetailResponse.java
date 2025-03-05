@@ -1,7 +1,6 @@
 package com.zipsoon.api.interfaces.api.estate.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.zipsoon.common.domain.Estate;
 import org.locationtech.jts.geom.Point;
 
@@ -21,9 +20,9 @@ public record EstateDetailResponse(
     @JsonProperty("lng") double longitude,
     String address,
     List<String> tags,
-    List<String> images,
+    List<String> imageUrls,
     ScoreDetails score,
-    JsonNode rawData
+    String platformId
 ) {
     public static EstateDetailResponse from(Estate estate, ScoreDetails scoreDetails) {
         return new EstateDetailResponse(
@@ -41,7 +40,7 @@ public record EstateDetailResponse(
             estate.getTags(),
             estate.getImageUrls(),
             scoreDetails,
-            estate.getRawData()
+            estate.getPlatformId()
         );
     }
 }
