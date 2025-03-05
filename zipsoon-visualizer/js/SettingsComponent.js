@@ -143,30 +143,23 @@ class SettingsComponent {
             <div class="settings-content">
                 <div class="settings-section">
                     <div class="settings-item">
-                        <div class="settings-item-label">내 지역</div>
-                        <div class="settings-item-value">
-                            <button class="settings-button">수정</button>
-                        </div>
-                    </div>
-
-                    <div class="settings-item">
                         <div class="settings-item-label">내 점수 목록</div>
                         <div class="settings-item-value">
-                            <button class="settings-button">수정</button>
+                            <button class="settings-button" data-action="edit-score-types">수정</button>
                         </div>
                     </div>
 
                     <div class="settings-item">
                         <div class="settings-item-label">내가 찜한 매물 목록</div>
                         <div class="settings-item-value">
-                            <button class="settings-button">조회</button>
+                            <button class="settings-button" data-action="view-favorites">조회</button>
                         </div>
                     </div>
 
                     <div class="settings-item">
                         <div class="settings-item-label">회원 탈퇴</div>
                         <div class="settings-item-value">
-                            <button class="settings-button danger">탈퇴</button>
+                            <button class="settings-button danger" data-action="delete-account">탈퇴</button>
                         </div>
                     </div>
                 </div>
@@ -295,6 +288,9 @@ class SettingsComponent {
         // 닫기 버튼에 이벤트 리스너 추가
         closeButton.addEventListener('click', this.hide.bind(this));
         
+        // 버튼들에 이벤트 리스너 추가
+        this.addButtonEventListeners();
+        
         // 지도 컨테이너에 설정 페이지 요소 추가
         const mapContainer = document.querySelector('.map-container');
         if (mapContainer) {
@@ -302,6 +298,73 @@ class SettingsComponent {
             this.initialized = true;
         } else {
             console.error('지도 컨테이너를 찾을 수 없어 설정 페이지를 추가할 수 없습니다.');
+        }
+    }
+    
+    /**
+     * 버튼 이벤트 리스너 추가
+     */
+    addButtonEventListeners() {
+        if (!this.container) return;
+        
+        // 모든 설정 버튼 가져오기
+        const buttons = this.container.querySelectorAll('.settings-button');
+        
+        // 각 버튼에 이벤트 리스너 추가
+        buttons.forEach(button => {
+            const action = button.getAttribute('data-action');
+            
+            button.addEventListener('click', () => {
+                switch(action) {
+                    case 'edit-region':
+                        this.handleEditRegion();
+                        break;
+                    case 'edit-score-types':
+                        this.handleEditScoreTypes();
+                        break;
+                    case 'view-favorites':
+                        this.handleViewFavorites();
+                        break;
+                    case 'delete-account':
+                        this.handleDeleteAccount();
+                        break;
+                }
+            });
+        });
+    }
+    
+    /**
+     * 내 점수 목록 수정 처리 - ScoreTypeComponent 표시
+     */
+    handleEditScoreTypes() {
+        console.log('내 점수 목록 수정 클릭');
+        
+        // ScoreTypeComponent가 정의되어 있는지 확인
+        if (typeof scoreTypeComponent !== 'undefined') {
+            this.hide(); // 설정 페이지 숨기기
+            scoreTypeComponent.show(); // 바로 점수 유형 페이지 표시
+        } else {
+            console.error('ScoreTypeComponent를 찾을 수 없습니다.');
+            alert('점수 유형 관리 기능을 로드할 수 없습니다.');
+        }
+    }
+    
+    /**
+     * 내가 찜한 매물 목록 조회 처리
+     */
+    handleViewFavorites() {
+        console.log('내가 찜한 매물 목록 조회 클릭');
+        alert('준비 중인 기능입니다.');
+    }
+    
+    /**
+     * 회원 탈퇴 처리
+     */
+    handleDeleteAccount() {
+        console.log('회원 탈퇴 클릭');
+        
+        if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+            alert('회원 탈퇴 API는 아직 준비 중입니다.');
         }
     }
     

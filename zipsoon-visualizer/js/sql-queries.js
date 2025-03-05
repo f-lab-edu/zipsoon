@@ -3,6 +3,140 @@
  * 각 인터랙션에 대한 SQL 쿼리와 파라미터 처리 방법을 정의합니다.
  */
 const SQL_QUERIES = {
+  findAllScoreTypes: {
+    query: `SELECT
+    id,
+    name,
+    description,
+    active
+FROM
+    score_type
+WHERE
+    active = true
+ORDER BY
+    id`,
+    
+    paramFormatter: () => ({}),
+    
+    resultFormatter: (data) => {
+      if (!data || !Array.isArray(data)) {
+        return "No score types available or unexpected response format.";
+      }
+      
+      let result = '';
+      
+      data.forEach((scoreType, index) => {
+        result += `--- Score Type ${index + 1} ---\n`;
+        result += `ID          | ${scoreType.id}\n`;
+        result += `Name        | ${scoreType.name}\n`;
+        result += `Description | ${scoreType.description}\n`;
+        result += `Active      | ${scoreType.active ? 'Yes' : 'No'}\n`;
+        result += `Enabled     | ${scoreType.enabled ? 'Yes' : 'No'}\n\n`;
+      });
+      
+      return result;
+    },
+    
+    affectedTables: ['score_type']
+  },
+  
+  findDisabledScoreTypeIdsByUserId: {
+    query: `SELECT score_type_id
+FROM user_disabled_score_type
+<!-- 다음은 예시로, userId는 현재 유즈케이스와 다릅니다. -->
+<!-- UserPrincipal에서 추출된 userId를 사용합니다. -->
+WHERE user_id = 1`,
+    
+    paramFormatter: (data) => {
+      const userId = data.userId || 1;
+      
+      return {
+        userId: userId
+      };
+    },
+    
+    resultFormatter: (data) => {
+      if (!data) {
+        return "No disabled score types found for this user.";
+      }
+      
+      let disabledTypes = [];
+      
+      // 응답 데이터에서 비활성화된 점수 유형 ID 추출
+      if (Array.isArray(data)) {
+        // 배열인 경우 각 항목이 정수형 ID거나 score_type_id 속성을 사용
+        disabledTypes = data.map(item => typeof item === 'number' ? item : item.score_type_id);
+      } else if (data.disabledTypes && Array.isArray(data.disabledTypes)) {
+        // { disabledTypes: [...] } 형태인 경우
+        disabledTypes = data.disabledTypes;
+      }
+      
+      let result = '';
+      
+      if (disabledTypes.length > 0) {
+        result += `--- Disabled Score Types ---\n`;
+        disabledTypes.forEach((typeId, index) => {
+          result += `Type ${index + 1}   | ID: ${typeId}\n`;
+        });
+      } else {
+        result = "No score types are disabled for this user.";
+      }
+      
+      return result;
+    },
+    
+    affectedTables: ['user_disabled_score_type']
+  },
+  
+  insert: {
+    query: `INSERT INTO user_disabled_score_type (user_id, score_type_id, created_at)
+<!-- 다음은 예시로, userId는 현재 유즈케이스와 다릅니다. -->
+<!-- UserPrincipal에서 추출된 userId를 사용합니다. -->
+VALUES (1, #{scoreTypeId}, #{createdAt})
+ON CONFLICT (1, score_type_id) DO NOTHING`,
+    
+    paramFormatter: (data) => {
+      return {
+        userId: data.userId || 1,
+        scoreTypeId: data.scoreTypeId || data.id || 1,
+        createdAt: new Date().toISOString()
+      };
+    },
+    
+    resultFormatter: (data) => {
+      return `--- Score Type Disabled ---\n` +
+             `User ID     | ${data.userId || 1}\n` +
+             `Score Type  | ${data.scoreTypeId || data.id || 1}\n` +
+             `Action      | Disabled\n` +
+             `Status      | Success`;
+    },
+    
+    affectedTables: ['user_disabled_score_type']
+  },
+  
+  delete: {
+    query: `DELETE FROM user_disabled_score_type
+<!-- 다음은 예시로, userId는 현재 유즈케이스와 다릅니다. -->
+<!-- UserPrincipal에서 추출된 userId를 사용합니다. -->
+WHERE user_id = 1 AND score_type_id = #{scoreTypeId}`,
+    
+    paramFormatter: (data) => {
+      return {
+        userId: data.userId || 1,
+        scoreTypeId: data.scoreTypeId || data.id || 1
+      };
+    },
+    
+    resultFormatter: (data) => {
+      return `--- Score Type Enabled ---\n` +
+             `User ID     | ${data.userId || 1}\n` +
+             `Score Type  | ${data.scoreTypeId || data.id || 1}\n` +
+             `Action      | Enabled\n` +
+             `Status      | Success`;
+    },
+    
+    affectedTables: ['user_disabled_score_type']
+  },
   findAllInViewport: {
     query: `SELECT * FROM estate
 WHERE ST_Intersects(
@@ -231,7 +365,9 @@ FROM
 JOIN
   score_type st ON es.score_type_id = st.id
 WHERE
-  es.estate_id = {estateId} <!-- n번 반복 -->
+  <!-- 다음은 예시로, estateId는 현재 유즈케이스와 다릅니다. -->
+  <!-- estate_id마다 n번 반복됩니다. -->
+  es.estate_id = {estateId}
 ORDER BY
   es.normalized_score DESC`,
 

@@ -47,16 +47,6 @@ $(() => {
     // Define the ERD diagram using Mermaid syntax
     const erdDiagram = `
     erDiagram
-        app_user {
-            bigint id PK
-            varchar email
-            boolean email_verified
-            varchar name
-            varchar image_url
-            varchar role
-            timestamp created_at
-            timestamp updated_at
-        }
 
         estate {
             bigint id PK
@@ -78,14 +68,6 @@ $(() => {
             timestamp created_at
         }
 
-        score_type {
-            int id PK
-            varchar name
-            text description
-            boolean active
-            timestamp created_at
-        }
-
         estate_score {
             bigint id PK
             bigint estate_id FK
@@ -95,62 +77,38 @@ $(() => {
             timestamp created_at
         }
 
-        estate_snapshot {
-            bigint id PK
-            varchar platform_type
-            varchar platform_id
-            jsonb raw_data
-            varchar estate_name
-            varchar estate_type
-            varchar trade_type
-            numeric price
-            numeric rent_price
-            numeric area_meter
-            numeric area_pyeong
-            geometry location
-            varchar address
-            varchar[] image_urls
-            varchar[] tags
-            varchar dong_code
+
+        score_type {
+            int id PK
+            varchar name
+            text description
+            boolean active
             timestamp created_at
         }
 
-        estate_score_snapshot {
-            bigint id PK
-            bigint estate_snapshot_id FK
-            int score_type_id FK
-            numeric raw_score
-            numeric normalized_score
+
+        user_disabled_score_type {
+            bigint user_id PK,FK
+            int score_type_id PK,FK
             timestamp created_at
         }
 
-        parks {
-            varchar management_id PK
-            varchar park_name
-            varchar park_type
-            varchar road_address
-            varchar jibun_address
-            float latitude
-            float longitude
-            float park_area
-            text sports_facilities
-            text amusement_facilities
-            text convenience_facilities
-            text cultural_facilities
-            text other_facilities
-            date designation_date
-            varchar management_org
-            varchar phone_number
-            date data_standard_date
-            varchar provider_code
-            varchar provider_nam
-            geometry location
+
+        app_user {
+            bigint id PK
+            varchar email
+            boolean email_verified
+            varchar name
+            varchar image_url
+            varchar role
+            timestamp created_at
+            timestamp updated_at
         }
 
         estate ||--o{ estate_score : has
-        estate_snapshot ||--o{ estate_score_snapshot : has
         score_type ||--o{ estate_score : has
-        score_type ||--o{ estate_score_snapshot : has
+        app_user ||--o{ user_disabled_score_type : disables
+        score_type ||--o{ user_disabled_score_type : disabled_by
     `;
 
     // Insert the Mermaid diagram into the ERD container
