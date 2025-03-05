@@ -1,10 +1,11 @@
 package com.zipsoon.api.controller;
 
-import com.zipsoon.api.interfaces.api.estate.EstateController;
-import com.zipsoon.api.interfaces.api.estate.dto.ViewportRequest;
 import com.zipsoon.api.application.estate.EstateService;
+import com.zipsoon.api.application.estate.ScoreService;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
+import com.zipsoon.api.interfaces.api.estate.EstateController;
+import com.zipsoon.api.interfaces.api.estate.dto.ViewportRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,15 @@ class EstateApiTest {
     @MockitoBean
     private EstateService estateService;
 
+    @MockitoBean
+    private ScoreService scoreService;
+
     @Test
     @DisplayName("매물이 없는 좌표 조회 시 404 Not Found 반환")
     void shouldReturnNotFound_When_NoEstatesInViewport() throws Exception {
         ViewportRequest request = new ViewportRequest(180.0, 90.0, 180.0, 90.0, 22);
 
-        when(estateService.findEstatesInViewport(any()))
+        when(estateService.findEstatesInViewport(any(), any()))
             .thenThrow(new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
 
         mockMvc.perform(get("/api/v1/estates/map")

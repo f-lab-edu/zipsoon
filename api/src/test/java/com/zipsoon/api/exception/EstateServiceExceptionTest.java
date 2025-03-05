@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,9 +22,9 @@ class EstateServiceExceptionTest {
     @Test
     @DisplayName("존재하지 않는 매물 ID로 조회하면 ESTATE_NOT_FOUND 예외 발생")
     void shouldThrowEstateNotFound_When_RequestingNonExistentEstateDetail() {
-        when(estateService.findEstateDetail(anyLong()))
+        when(estateService.findEstateDetail(any(), any()))
             .thenThrow(new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
 
-        assertThrows(ServiceException.class, () -> estateService.findEstateDetail(999L));
+        assertThrows(ServiceException.class, () -> estateService.findEstateDetail(9L, 999L));
     }
 }
