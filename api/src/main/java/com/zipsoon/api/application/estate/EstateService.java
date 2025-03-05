@@ -23,8 +23,15 @@ public class EstateService {
     private final ApiEstateRepository apiEstateRepository;
     private static final int MAX_RESULTS_PER_ZOOM = 1000;
 
+    /**
+     * 뷰포트 내의 매물 목록을 조회합니다. 사용자가 로그인한 경우, 사용자별 점수 선호도를 반영합니다.
+     *
+     * @param request 뷰포트 요청 정보
+     * @param userId 사용자 ID (로그인한 경우에만 제공)
+     * @return 매물 응답 목록
+     */
     @Transactional(readOnly = true)
-    public List<EstateResponse> findEstatesInViewport(ViewportRequest request) {
+    public List<EstateResponse> findEstatesInViewport(ViewportRequest request, Long userId) {
         int limit = calculateLimit(request.zoom());
         List<Estate> estates = apiEstateRepository.findAllInViewport(request, limit);
 
@@ -35,7 +42,8 @@ public class EstateService {
         return estates.stream()
             .map(estate -> {
                 try {
-                    ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId());
+                    // 로그인한 사용자인 경우 사용자별 점수 설정 반영
+                    ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
                     return EstateResponse.from(estate, scoreSummary);
                 } catch (Exception e) {
                     log.error("Error processing estate ID {}: {}", estate.getId(), e.getMessage());
@@ -45,14 +53,22 @@ public class EstateService {
             .filter(Objects::nonNull)
             .toList();
     }
-
+    
+    /**
+     * 매물 상세 정보를 조회합니다. 사용자가 로그인한 경우, 사용자별 점수 선호도를 반영합니다.
+     *
+     * @param id 매물 ID
+     * @param userId 사용자 ID (로그인한 경우에만 제공)
+     * @return 매물 상세 응답
+     */
     @Transactional(readOnly = true)
-    public EstateDetailResponse findEstateDetail(Long id) {
+    public EstateDetailResponse findEstateDetail(Long id, Long userId) {
         Estate estate = apiEstateRepository.findById(id)
             .orElseThrow(() -> new ServiceException(ESTATE_NOT_FOUND));
 
         try {
-            ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId());
+            // 로그인한 사용자인 경우 사용자별 점수 설정 반영
+            ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId(), userId);
             return EstateDetailResponse.from(estate, scoreDetails);
         } catch (Exception e) {
             log.error("Error processing estate detail ID {}: {}", id, e.getMessage());
