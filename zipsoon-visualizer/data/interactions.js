@@ -22,5 +22,20 @@ const INTERACTIONS = {
     endpoint: '/api/v1/auth/login',
     sqlQuery: 'findUserByEmail',
     description: '로그인'
+  },
+  scoreTypes: {
+    endpoint: '/api/v1/estates/score-types',
+    sqlQuery: ['findAllScoreTypes', 'findDisabledScoreTypeIdsByUserId'],
+    description: '점수 유형 목록 조회'
+  },
+  enableScoreType: {
+    endpoint: '/api/v1/estates/score-types/:id/enable',
+    sqlQuery: 'delete',
+    description: '점수 유형 활성화'
+  },
+  disableScoreType: {
+    endpoint: '/api/v1/estates/score-types/:id/disable',
+    sqlQuery: 'insert',
+    description: '점수 유형 비활성화'
   }
 };

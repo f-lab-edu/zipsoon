@@ -91,15 +91,68 @@ const API_ENDPOINTS = {
         longitude: data.longitude,
         address: data.address,
         tags: data.tags || [],
-        imageUrls: data.images || [],
+        imageUrls: data.imageUrls || [],
         platformType: data.platformType,
+        platformId: data.platformId,
         score: data.score || {
           total: 0,
           description: '점수 정보가 없습니다',
           factors: []
-        },
-        rawData: data.rawData
+        }
       };
+    }
+  },
+  '/api/v1/estates/score-types': {
+    url: '/api/v1/estates/score-types',
+    method: 'GET',
+    description: '점수 유형 목록 조회',
+
+    // 요청 데이터 포맷팅
+    requestFormatter: () => {
+      return {}; // GET 요청이라 body가 필요 없음
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      if (Array.isArray(data)) {
+        return data.map(type => ({
+          id: type.id,
+          name: type.name,
+          description: type.description,
+          enabled: type.enabled
+        }));
+      }
+      return [];
+    }
+  },
+  '/api/v1/estates/score-types/:id/enable': {
+    url: '/api/v1/estates/score-types/{id}/enable', // 템플릿 형식의 URL
+    method: 'POST',
+    description: '점수 유형 활성화',
+
+    // 요청 데이터 포맷팅
+    requestFormatter: (id) => {
+      return {}; // 바디가 필요 없음, 경로 매개변수로 ID 전달
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return { success: true };
+    }
+  },
+  '/api/v1/estates/score-types/:id/disable': {
+    url: '/api/v1/estates/score-types/{id}/disable', // 템플릿 형식의 URL
+    method: 'POST',
+    description: '점수 유형 비활성화',
+
+    // 요청 데이터 포맷팅
+    requestFormatter: (id) => {
+      return {}; // 바디가 필요 없음, 경로 매개변수로 ID 전달
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return { success: true };
     }
   },
   '/api/v1/auth/signup': {

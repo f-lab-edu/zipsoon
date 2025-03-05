@@ -245,25 +245,46 @@ class EstateDetailComponent {
         badgesContainer.style.marginBottom = '15px';
         badgesContainer.style.flexWrap = 'wrap';
         
-        // 플랫폼 뱃지 추가 (네이버로 하드코딩)
-        const platformBadge = document.createElement('div');
-        platformBadge.className = 'estate-badge platform-badge';
-        platformBadge.textContent = '네이버';
-        platformBadge.style.backgroundColor = '#03C75A';
-        platformBadge.style.color = 'white';
-        platformBadge.style.padding = '3px 8px';
-        platformBadge.style.borderRadius = '4px';
-        platformBadge.style.fontSize = '0.8rem';
-        platformBadge.style.fontWeight = 'bold';
-        badgesContainer.appendChild(platformBadge);
+        // 플랫폼 뱃지 추가 (네이버로 하드코딩하되 링크를 a 태그로 제공)
+        if (estateData.platformId) {
+            // 링크가 있는 경우 a 태그로 생성
+            const platformLink = document.createElement('a');
+            platformLink.href = `https://fin.land.naver.com/articles/${estateData.platformId}`;
+            platformLink.target = '_blank';
+            platformLink.className = 'estate-badge platform-badge';
+            platformLink.textContent = '네이버';
+            platformLink.style.backgroundColor = '#03C75A';
+            platformLink.style.color = 'white';
+            platformLink.style.padding = '3px 8px';
+            platformLink.style.borderRadius = '4px';
+            platformLink.style.fontSize = '0.8rem';
+            platformLink.style.fontWeight = 'bold';
+            platformLink.style.cursor = 'pointer';
+            platformLink.style.textDecoration = 'none';
+            platformLink.style.display = 'inline-block';
+            badgesContainer.appendChild(platformLink);
+        } else {
+            // 링크가 없는 경우 일반 div로 생성
+            const platformBadge = document.createElement('div');
+            platformBadge.className = 'estate-badge platform-badge';
+            platformBadge.textContent = '네이버';
+            platformBadge.style.backgroundColor = '#03C75A';
+            platformBadge.style.color = 'white';
+            platformBadge.style.padding = '3px 8px';
+            platformBadge.style.borderRadius = '4px';
+            platformBadge.style.fontSize = '0.8rem';
+            platformBadge.style.fontWeight = 'bold';
+            badgesContainer.appendChild(platformBadge);
+        }
         
-        // 매물 유형 뱃지 추가
+        // 매물 유형 뱃지 추가 (회색 테두리와 글자)
         if (estateData.type) {
             const typeBadge = document.createElement('div');
             typeBadge.className = 'estate-badge type-badge';
             typeBadge.textContent = this.getEstateTypeName(estateData.type);
-            typeBadge.style.backgroundColor = '#4361EE';
-            typeBadge.style.color = 'white';
+            typeBadge.style.backgroundColor = 'transparent';
+            typeBadge.style.color = '#6c757d';
+            typeBadge.style.border = '1px solid #6c757d';
             typeBadge.style.padding = '3px 8px';
             typeBadge.style.borderRadius = '4px';
             typeBadge.style.fontSize = '0.8rem';
@@ -271,22 +292,14 @@ class EstateDetailComponent {
             badgesContainer.appendChild(typeBadge);
         }
         
-        // 거래 유형 뱃지 추가
+        // 거래 유형 뱃지 추가 (회색 테두리와 글자)
         if (estateData.tradeType) {
             const tradeBadge = document.createElement('div');
             tradeBadge.className = 'estate-badge trade-badge';
             tradeBadge.textContent = this.getTradeTypeName(estateData.tradeType);
-            
-            // 거래 유형에 따라 다른 색상 부여
-            let bgColor = '#FF9F1C'; // 기본 색상
-            if (estateData.tradeType === '전세') {
-                bgColor = '#2EC4B6'; // 전세
-            } else if (estateData.tradeType === '매매') {
-                bgColor = '#E71D36'; // 매매
-            }
-            
-            tradeBadge.style.backgroundColor = bgColor;
-            tradeBadge.style.color = 'white';
+            tradeBadge.style.backgroundColor = 'transparent';
+            tradeBadge.style.color = '#6c757d';
+            tradeBadge.style.border = '1px solid #6c757d';
             tradeBadge.style.padding = '3px 8px';
             tradeBadge.style.borderRadius = '4px';
             tradeBadge.style.fontSize = '0.8rem';
@@ -298,13 +311,13 @@ class EstateDetailComponent {
         const imagesContainer = this.container.querySelector('.estate-images');
         imagesContainer.innerHTML = '';
 
-        const hasValidImages = estateData.images &&
-                              Array.isArray(estateData.images) &&
-                              estateData.images.length > 0;
+        const hasValidImages = estateData.imageUrls &&
+                              Array.isArray(estateData.imageUrls) &&
+                              estateData.imageUrls.length > 0;
         
         if (hasValidImages) {
             // 이미지가 있는 경우 이미지 갤러리 생성
-            estateData.images.forEach(imageUrl => {
+            estateData.imageUrls.forEach(imageUrl => {
                 const imgContainer = document.createElement('div');
                 imgContainer.className = 'estate-image';
                 imgContainer.style.display = 'flex';
@@ -376,11 +389,13 @@ class EstateDetailComponent {
     addScoreItem(container, name, value, description) {
         const item = document.createElement('div');
         item.className = 'score-item';
+        item.style.marginBottom = '15px';
         
         // 아이콘 (실제 아이콘은 나중에 추가해도 됨)
         const icon = document.createElement('div');
         icon.className = 'score-item-icon';
         icon.textContent = 'img';
+        icon.style.marginRight = '10px';
         
         // 내용
         const content = document.createElement('div');
@@ -394,10 +409,24 @@ class EstateDetailComponent {
         const nameSpan = document.createElement('span');
         nameSpan.className = 'score-item-name';
         nameSpan.textContent = name;
+        title.appendChild(nameSpan);
+        
+        // 설명
+        const desc = document.createElement('div');
+        desc.className = 'score-item-description';
+        desc.textContent = description;
         
         // 점수 값
         const valueDiv = document.createElement('div');
         valueDiv.className = 'score-item-value';
+        valueDiv.style.display = 'flex';
+        valueDiv.style.alignItems = 'center';
+        valueDiv.style.justifyContent = 'center';
+        valueDiv.style.position = 'absolute';
+        valueDiv.style.right = '0';
+        valueDiv.style.top = '0';
+        valueDiv.style.bottom = '0';
+        valueDiv.style.height = '100%';
         
         const scoreCircle = document.createElement('div');
         
@@ -447,18 +476,11 @@ class EstateDetailComponent {
         
         valueDiv.appendChild(scoreCircle);
         
-        // 제목 줄 구성
-        title.appendChild(nameSpan);
-        title.appendChild(valueDiv);
-        
-        // 설명
-        const desc = document.createElement('div');
-        desc.className = 'score-item-description';
-        desc.textContent = description;
-        
-        // 내용 구성
+        // 내용 구성 - content에 직접적으로 추가
+        content.style.position = 'relative';  // 점수 원을 배치하기 위한 기준점
         content.appendChild(title);
         content.appendChild(desc);
+        content.appendChild(valueDiv);
         
         // 항목 구성
         item.appendChild(icon);
@@ -546,6 +568,7 @@ class EstateDetailComponent {
             this.container.style.display = 'none';
         }, 300); // CSS transition 시간과 일치시킴
     }
+    
 }
 
 // 싱글톤 인스턴스 생성

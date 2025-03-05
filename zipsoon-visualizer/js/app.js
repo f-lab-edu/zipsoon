@@ -33,6 +33,7 @@ $(() => {
 
     // 디버깅을 위해 전역 접근 추가
     window.mapModule = mapModule;
+    window.settingsComponent = settingsComponent;
 
     console.log('지도 초기화가 완료되었습니다.');
     console.log('콘솔에서 확인: 지도를 움직이면 ViewportInfo가 자동으로 출력됩니다.');
@@ -46,16 +47,6 @@ $(() => {
     // Define the ERD diagram using Mermaid syntax
     const erdDiagram = `
     erDiagram
-        app_user {
-            bigint id PK
-            varchar email
-            boolean email_verified
-            varchar name
-            varchar image_url
-            varchar role
-            timestamp created_at
-            timestamp updated_at
-        }
 
         estate {
             bigint id PK
@@ -77,14 +68,6 @@ $(() => {
             timestamp created_at
         }
 
-        score_type {
-            int id PK
-            varchar name
-            text description
-            boolean active
-            timestamp created_at
-        }
-
         estate_score {
             bigint id PK
             bigint estate_id FK
@@ -94,62 +77,38 @@ $(() => {
             timestamp created_at
         }
 
-        estate_snapshot {
-            bigint id PK
-            varchar platform_type
-            varchar platform_id
-            jsonb raw_data
-            varchar estate_name
-            varchar estate_type
-            varchar trade_type
-            numeric price
-            numeric rent_price
-            numeric area_meter
-            numeric area_pyeong
-            geometry location
-            varchar address
-            varchar[] image_urls
-            varchar[] tags
-            varchar dong_code
+
+        score_type {
+            int id PK
+            varchar name
+            text description
+            boolean active
             timestamp created_at
         }
 
-        estate_score_snapshot {
-            bigint id PK
-            bigint estate_snapshot_id FK
-            int score_type_id FK
-            numeric raw_score
-            numeric normalized_score
+
+        user_disabled_score_type {
+            bigint user_id PK,FK
+            int score_type_id PK,FK
             timestamp created_at
         }
 
-        parks {
-            varchar management_id PK
-            varchar park_name
-            varchar park_type
-            varchar road_address
-            varchar jibun_address
-            float latitude
-            float longitude
-            float park_area
-            text sports_facilities
-            text amusement_facilities
-            text convenience_facilities
-            text cultural_facilities
-            text other_facilities
-            date designation_date
-            varchar management_org
-            varchar phone_number
-            date data_standard_date
-            varchar provider_code
-            varchar provider_nam
-            geometry location
+
+        app_user {
+            bigint id PK
+            varchar email
+            boolean email_verified
+            varchar name
+            varchar image_url
+            varchar role
+            timestamp created_at
+            timestamp updated_at
         }
 
         estate ||--o{ estate_score : has
-        estate_snapshot ||--o{ estate_score_snapshot : has
         score_type ||--o{ estate_score : has
-        score_type ||--o{ estate_score_snapshot : has
+        app_user ||--o{ user_disabled_score_type : disables
+        score_type ||--o{ user_disabled_score_type : disabled_by
     `;
 
     // Insert the Mermaid diagram into the ERD container
@@ -197,6 +156,11 @@ $(() => {
             handleLogout();
             // 토글 라벨 업데이트
             $('.toggle-label').text('로그인 OFF');
+            
+            // 프로필 정보 업데이트 (항상 최신 상태 유지)
+            if (window.settingsComponent) {
+                window.settingsComponent.updateContent();
+            }
         }
     });
     
@@ -250,9 +214,15 @@ $(() => {
             window.authTokens.accessToken = loginData.accessToken;
             window.authTokens.refreshToken = loginData.refreshToken;
             window.authTokens.expiresAt = loginData.expiresAt;
+            window.authTokens.userId = userName; // 사용자 이름 저장
             window.authTokens.isLoggedIn = true;
             
             console.log('로그인 성공:', window.authTokens);
+            
+            // 설정 컴포넌트가 있다면 프로필 정보 업데이트
+            if (window.settingsComponent) {
+                window.settingsComponent.updateContent();
+            }
         })
         .catch(error => {
             console.error('로그인 프로세스 오류:', error);
@@ -275,5 +245,10 @@ $(() => {
         window.authTokens.isLoggedIn = false;
         
         console.log('로그아웃 완료');
+        
+        // 설정 컴포넌트가 있다면 프로필 정보 업데이트
+        if (window.settingsComponent) {
+            window.settingsComponent.updateContent();
+        }
     }
 });

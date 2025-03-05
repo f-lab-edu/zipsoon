@@ -55,7 +55,8 @@ class ERDConnector {
           'score_type', 
           'estate_score', 
           'estate_score_snapshot',
-          'parks'
+          'parks',
+          'user_disabled_score_type'
         ];
         
         // 각 원래 테이블명에 대해 현재 엔티티가 해당 테이블을 나타내는지 확인

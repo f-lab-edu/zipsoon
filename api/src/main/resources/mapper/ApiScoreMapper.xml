@@ -18,4 +18,18 @@
         ORDER BY
             es.normalized_score DESC
     </select>
+    
+    <select id="findAllScoreTypes" resultType="java.util.Map">
+        SELECT
+            id,
+            name,
+            description,
+            active
+        FROM
+            score_type
+        WHERE
+            active = true
+        ORDER BY
+            id
+    </select>
 </mapper>

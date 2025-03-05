@@ -97,6 +97,17 @@ CREATE TABLE app_user (
     updated_at TIMESTAMP NOT NULL                        -- 계정 정보 수정 시간
 );
 
+-- 사용자별 비활성화된 점수 유형 테이블
+CREATE TABLE user_disabled_score_type (
+    user_id BIGINT NOT NULL,                             -- 사용자 ID (외래 키)
+    score_type_id INT NOT NULL,                          -- 점수 유형 ID (외래 키)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 생성 시간
+    
+    PRIMARY KEY (user_id, score_type_id),                -- 복합 기본 키
+    FOREIGN KEY (user_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    FOREIGN KEY (score_type_id) REFERENCES score_type(id) ON DELETE CASCADE
+);
+
 -- 법정동 코드 테이블: 시/군/구/동 코드 정보
 CREATE TABLE dongcodes (
     법정동코드 varchar(255) PRIMARY KEY,
