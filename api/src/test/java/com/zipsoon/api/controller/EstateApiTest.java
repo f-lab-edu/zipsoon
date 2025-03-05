@@ -187,7 +187,7 @@ class EstateApiTest {
         void shouldReturnAllScoreTypes_When_UserIsNotAuthenticated() throws Exception {
             // given
             List<ScoreTypeResponse> mockResponse = createScoreTypes(true, true);
-            when(scoreService.getAllScoreTypes(isNull())).thenReturn(mockResponse);
+            when(scoreService.getAllScoreTypes(null)).thenReturn(mockResponse);
 
             // when & then
             mockMvc.perform(get("/api/v1/estates/score-types"))
@@ -199,7 +199,7 @@ class EstateApiTest {
                 .andExpect(jsonPath("$[0].enabled").value(true));
 
             // verify
-            verify(scoreService).getAllScoreTypes(isNull());
+            verify(scoreService).getAllScoreTypes(null);
         }
 
         @Test
@@ -267,7 +267,7 @@ class EstateApiTest {
             ScoreDetails mockScoreDetails = createScoreDetails(7.5, "총 3개 요소의 평균 점수입니다", 3);
             EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails);
 
-            when(estateService.findEstateDetail(eq(estateId), isNull())).thenReturn(mockResponse);
+            when(estateService.findEstateDetail(estateId, null)).thenReturn(mockResponse);
 
             // when & then
             mockMvc.perform(get("/api/v1/estates/{id}", estateId))
@@ -277,7 +277,7 @@ class EstateApiTest {
                 .andExpect(jsonPath("$.score.factors.length()").value(3));
 
             // verify
-            verify(estateService).findEstateDetail(eq(estateId), isNull());
+            verify(estateService).findEstateDetail(estateId, null);
         }
 
         @Test
