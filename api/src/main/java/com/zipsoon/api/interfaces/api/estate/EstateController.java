@@ -1,16 +1,17 @@
 package com.zipsoon.api.interfaces.api.estate;
 
+import com.zipsoon.api.domain.auth.UserPrincipal;
 import com.zipsoon.api.interfaces.api.estate.dto.EstateDetailResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.EstateResponse;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreTypeResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.ViewportRequest;
 import com.zipsoon.api.application.estate.EstateService;
+import com.zipsoon.api.application.estate.ScoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,22 +20,98 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EstateController {
     private final EstateService estateService;
+    private final ScoreService scoreService;
 
+    /**
+     * 뷰포트 내의 매물 목록을 조회합니다.
+     * 인증된 사용자의 경우 개인화된 점수 필터링을 적용합니다.
+     *
+     * @param request 뷰포트 요청 정보
+     * @param userPrincipal 현재 로그인한 사용자 정보 (없으면 null)
+     * @return 매물 목록 응답
+     */
     @GetMapping("/map")
     public ResponseEntity<List<EstateResponse>> getEstatesInViewport(
-        @Valid ViewportRequest request
+        @Valid ViewportRequest request,
+        @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
+        // 인증된 사용자인 경우 userId 전달, 아니면 null
+        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
+        
         return ResponseEntity.ok(
-            estateService.findEstatesInViewport(request)
+            estateService.findEstatesInViewport(request, userId)
         );
     }
 
+    /**
+     * 매물 상세 정보를 조회합니다.
+     * 인증된 사용자의 경우 개인화된 점수 필터링을 적용합니다.
+     *
+     * @param id 매물 ID
+     * @param userPrincipal 현재 로그인한 사용자 정보 (없으면 null)
+     * @return 매물 상세 정보 응답
+     */
     @GetMapping("/{id}")
     public ResponseEntity<EstateDetailResponse> getEstateDetail(
-        @PathVariable Long id
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
+        // 인증된 사용자인 경우 userId 전달, 아니면 null
+        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
+        
         return ResponseEntity.ok(
-            estateService.findEstateDetail(id)
+            estateService.findEstateDetail(id, userId)
         );
+    }
+    
+    /**
+     * 점수 유형 목록을 조회합니다.
+     * 인증된 사용자는 개인화된 활성화 상태가 반영됩니다.
+     *
+     * @param userPrincipal 현재 로그인한 사용자 정보 (없으면 null)
+     * @return 점수 유형 목록 응답
+     */
+    @GetMapping("/score-types")
+    public ResponseEntity<List<ScoreTypeResponse>> getScoreTypes(
+        @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        // 인증된 사용자인 경우 userId 전달, 아니면 null
+        Long userId = userPrincipal != null ? userPrincipal.getUserId() : null;
+        
+        return ResponseEntity.ok(
+            scoreService.getAllScoreTypes(userId)
+        );
+    }
+    
+    /**
+     * 점수 유형을 비활성화합니다. 인증 필요.
+     *
+     * @param scoreTypeId 점수 유형 ID
+     * @param userPrincipal 로그인한 사용자 정보
+     * @return 성공 응답
+     */
+    @PostMapping("/score-types/{scoreTypeId}/disable")
+    public ResponseEntity<Void> disableScoreType(
+        @PathVariable Integer scoreTypeId,
+        @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        scoreService.disableScoreType(userPrincipal.getUserId(), scoreTypeId);
+        return ResponseEntity.ok().build();
+    }
+    
+    /**
+     * 점수 유형을 활성화합니다. 인증 필요.
+     *
+     * @param scoreTypeId 점수 유형 ID
+     * @param userPrincipal 로그인한 사용자 정보
+     * @return 성공 응답
+     */
+    @PostMapping("/score-types/{scoreTypeId}/enable")
+    public ResponseEntity<Void> enableScoreType(
+        @PathVariable Integer scoreTypeId,
+        @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        scoreService.enableScoreType(userPrincipal.getUserId(), scoreTypeId);
+        return ResponseEntity.ok().build();
     }
 }
