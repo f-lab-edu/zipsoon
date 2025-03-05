@@ -91,14 +91,14 @@ const API_ENDPOINTS = {
         longitude: data.longitude,
         address: data.address,
         tags: data.tags || [],
-        imageUrls: data.images || [],
+        imageUrls: data.imageUrls || [],
         platformType: data.platformType,
+        platformId: data.platformId,
         score: data.score || {
           total: 0,
           description: '점수 정보가 없습니다',
           factors: []
-        },
-        rawData: data.rawData
+        }
       };
     }
   },

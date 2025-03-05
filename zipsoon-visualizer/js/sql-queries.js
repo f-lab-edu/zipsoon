@@ -328,6 +328,7 @@ ORDER BY
       result += `area_pyeong | ${data.areaPyeong || 'N/A'}\n`;
       result += `address     | ${data.address || 'N/A'}\n`;
       result += `lat, lng    | ${data.latitude}, ${data.longitude}\n`;
+      result += `platform_id | ${data.platformId || 'N/A'}\n`;
       
       if (data.tags && Array.isArray(data.tags)) {
         result += `tags        | ${data.tags.join(', ') || 'N/A'}\n`;
