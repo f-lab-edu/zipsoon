@@ -90,16 +90,22 @@ public class EstateService {
                 log.warn("Estate not found with id: {}", id);
                 return new ServiceException(ErrorCode.ESTATE_NOT_FOUND);
             });
+            
+        // 찜 상태 확인
+        boolean isFavorite = false;
+        if (userId != null) {
+            isFavorite = userFavoriteEstateRepository.existsByUserIdAndEstateId(userId, id);
+        }
 
         // 매물 점수 정보 추가하여 응답 생성
         try {
             ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId(), userId);
-            return EstateDetailResponse.from(estate, scoreDetails);
+            return EstateDetailResponse.from(estate, scoreDetails, isFavorite);
         } catch (Exception e) {
             log.error("Error calculating detailed scores for estate {}: {}", estate.getId(), e.getMessage());
             // 점수 정보 없이 기본 상세 정보 반환
             ScoreDetails emptyScoreDetails = new ScoreDetails(0.0, "점수 정보를 조회할 수 없습니다", List.of());
-            return EstateDetailResponse.from(estate, emptyScoreDetails);
+            return EstateDetailResponse.from(estate, emptyScoreDetails, isFavorite);
         }
     }
 
@@ -131,8 +137,8 @@ public class EstateService {
 
     @Transactional(readOnly = true)
     public PageResponse<EstateResponse> findFavoriteEstates(Long userId, int page, int size) {
-        // 페이지네이션 계산
-        int offset = page * size;
+        // 페이지네이션 계산 (page는 1부터 시작)
+        int offset = (page - 1) * size;
 
         // 찜한 매물 목록 조회
         List<Estate> favorites = userFavoriteEstateRepository.findFavoriteEstatesByUserId(userId, offset, size);

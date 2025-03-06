@@ -22,9 +22,10 @@ public record EstateDetailResponse(
     List<String> tags,
     List<String> imageUrls,
     ScoreDetails score,
-    String platformId
+    String platformId,
+    boolean isFavorite
 ) {
-    public static EstateDetailResponse from(Estate estate, ScoreDetails scoreDetails) {
+    public static EstateDetailResponse from(Estate estate, ScoreDetails scoreDetails, boolean isFavorite) {
         return new EstateDetailResponse(
             estate.getId(),
             estate.getEstateName(),
@@ -40,7 +41,8 @@ public record EstateDetailResponse(
             estate.getTags(),
             estate.getImageUrls(),
             scoreDetails,
-            estate.getPlatformId()
+            estate.getPlatformId(),
+            isFavorite
         );
     }
 }
