@@ -5,6 +5,7 @@ import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.infrastructure.exception.model.ErrorDetail;
 import com.zipsoon.api.infrastructure.exception.model.ErrorResponse;
 import com.zipsoon.api.infrastructure.exception.model.ErrorResponseFactory;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -32,6 +34,25 @@ public class GlobalExceptionHandler {
             .body(ErrorResponseFactory.from(
                 ErrorCode.BAD_REQUEST,
                 e.getBindingResult().getFieldErrors()
+            ));
+    }
+    
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
+        List<ErrorDetail> details = e.getConstraintViolations().stream()
+            .map(violation -> new ErrorDetail(
+                violation.getPropertyPath().toString(),
+                violation.getMessage(),
+                ErrorCode.CONSTRAINT_VIOLATION.getCode()
+            ))
+            .collect(Collectors.toList());
+        
+        return ResponseEntity
+            .status(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
+            .body(ErrorResponseFactory.from(
+                ErrorCode.CONSTRAINT_VIOLATION,
+                details,
+                ErrorCode.CONSTRAINT_VIOLATION.getMessage()
             ));
     }
 
