@@ -17,6 +17,7 @@ class InteractionModule {
     document.addEventListener('viewportChanged', this.handleMapInteraction.bind(this));
     document.addEventListener('estateMarkerClicked', this.handleMarkerClick.bind(this));
     document.addEventListener('estateDetailLoaded', this.handleEstateDetailLoaded.bind(this));
+    document.addEventListener('estateFavoriteChanged', this.handleFavoriteChanged.bind(this));
 
     // API 베이스 URL 설정
     this.apiBaseUrl = 'http://localhost:8080';
@@ -155,6 +156,65 @@ class InteractionModule {
   }
   
   // 매물 상세 정보 로드 완료 인터랙션 처리
+  // 찜하기 상태 변경 이벤트 처리
+  handleFavoriteChanged(event) {
+    const { id, isFavorite } = event.detail;
+    
+    if (!id) {
+      console.error('찜하기 상태 변경 이벤트에 매물 ID가 없습니다.');
+      return;
+    }
+    
+    console.log('찜하기 상태 변경 이벤트:', id, isFavorite);
+    
+    // 인터랙션 ID 결정 - 찜하기 또는 찜하기 취소
+    const interactionId = isFavorite ? 'addFavorite' : 'removeFavorite';
+    
+    // 인터랙션 정보 가져오기
+    const interaction = this.interactions[interactionId];
+    if (!interaction) {
+      console.error(`${interactionId} 인터랙션을 찾을 수 없음`);
+      return;
+    }
+    
+    const endpoint = API_ENDPOINTS[interaction.endpoint];
+    
+    // sqlQuery는 문자열 또는 배열
+    const sqlQueryNames = Array.isArray(interaction.sqlQuery) 
+      ? interaction.sqlQuery 
+      : [interaction.sqlQuery];
+    
+    // 첫 번째 SQL 쿼리 가져오기
+    const sqlQuery = SQL_QUERIES[sqlQueryNames[0]];
+    
+    if (!endpoint || !sqlQuery) {
+      console.error(`${interactionId} 인터랙션에 필요한 엔드포인트/SQL 쿼리 정의를 찾을 수 없음`);
+      return;
+    }
+    
+    // 요청 파라미터 생성
+    const requestData = { id };
+    
+    // UI 업데이트
+    this.updateClientToAppContent(endpoint, requestData);
+    this.updateAppToDBContent(sqlQuery, requestData);
+    
+    // ERD 테이블 강조 표시
+    const affectedTables = [];
+    sqlQueryNames.forEach(queryName => {
+      const query = SQL_QUERIES[queryName];
+      if (query && query.affectedTables) {
+        affectedTables.push(...query.affectedTables);
+      }
+    });
+    
+    if (affectedTables.length > 0 && window.erdConnector) {
+      // 중복 제거
+      const uniqueTables = [...new Set(affectedTables)];
+      window.erdConnector.highlightTables(uniqueTables);
+    }
+  }
+  
   handleEstateDetailLoaded(event) {
     const { id, data } = event.detail;
     
@@ -382,8 +442,36 @@ class InteractionModule {
       const response = await fetch(url, options);
       console.log('API 응답 상태:', response.status, response.statusText);
       
-      // 응답을 JSON으로 파싱
-      const jsonResponse = await response.json();
+      // 응답 클론 생성 (response.clone()은 response.text()와 함께 사용할 때 필요)
+      const responseClone = response.clone();
+      
+      // 먼저 응답 본문을 텍스트로 가져와서 비어있는지 확인
+      const text = await responseClone.text();
+      let jsonResponse;
+      
+      if (text.trim() === '') {
+        // 본문이 비어있는 경우 성공 응답 생성
+        console.log('빈 응답 본문 처리: 기본 성공 객체 반환');
+        jsonResponse = {
+          success: true,
+          _httpStatus: response.status,
+          _httpStatusText: response.statusText
+        };
+      } else {
+        // 본문이 있는 경우 JSON 파싱 시도
+        try {
+          jsonResponse = JSON.parse(text);
+        } catch (parseError) {
+          console.warn('JSON 파싱 실패, 원본 텍스트 반환:', text);
+          jsonResponse = {
+            success: response.ok,
+            _httpStatus: response.status,
+            _httpStatusText: response.statusText,
+            rawContent: text
+          };
+        }
+      }
+      
       console.log('API 응답 데이터:', jsonResponse);
       
       // 비록 HTTP 오류 상태코드라도 응답을 반환하여 처리할 수 있게 함
