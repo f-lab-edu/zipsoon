@@ -34,8 +34,7 @@ import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -359,4 +358,56 @@ class EstateApiTest {
             verify(estateService).findEstatesInViewport(any(ViewportRequest.class), eq(TEST_USER_ID));
         }
     }
+
+    @Nested
+    @DisplayName("찜하기 기능 테스트")
+    class FavoriteTests {
+
+        @Test
+        @DisplayName("인증된 사용자가 매물을 찜할 수 있다")
+        void shouldAddFavorite_When_AuthenticatedUserRequestsFavorite() throws Exception {
+            // given
+            Long estateId = 1L;
+            doNothing().when(estateService).addFavorite(eq(estateId), eq(TEST_USER_ID));
+
+            // when & then
+            mockMvc.perform(post("/api/v1/estates/{id}/favorite", estateId)
+                    .with(withUserPrincipal()))
+                .andExpect(status().isCreated());
+
+            // verify
+            verify(estateService).addFavorite(estateId, TEST_USER_ID);
+        }
+
+        @Test
+        @DisplayName("인증된 사용자가 매물 찜하기를 취소할 수 있다")
+        void shouldRemoveFavorite_When_AuthenticatedUserRequestsUnfavorite() throws Exception {
+            // given
+            Long estateId = 1L;
+            doNothing().when(estateService).removeFavorite(eq(estateId), eq(TEST_USER_ID));
+
+            // when & then
+            mockMvc.perform(delete("/api/v1/estates/{id}/favorite", estateId)
+                    .with(withUserPrincipal()))
+                .andExpect(status().isNoContent());
+
+            // verify
+            verify(estateService).removeFavorite(estateId, TEST_USER_ID);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 매물 ID로 찜하기 요청하면 404 응답을 반환한다")
+        void shouldReturnNotFound_When_RequestingNonExistentEstateFavorite() throws Exception {
+            // given
+            Long nonExistentEstateId = 999L;
+            doThrow(new ServiceException(ErrorCode.ESTATE_NOT_FOUND))
+                .when(estateService).addFavorite(eq(nonExistentEstateId), any());
+
+            // when & then
+            mockMvc.perform(post("/api/v1/estates/{id}/favorite", nonExistentEstateId)
+                    .with(withUserPrincipal()))
+                .andExpect(status().isNotFound());
+        }
+    }
 }
+

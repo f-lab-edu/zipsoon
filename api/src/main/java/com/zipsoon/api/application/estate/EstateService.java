@@ -1,8 +1,11 @@
 package com.zipsoon.api.application.estate;
 
+import com.zipsoon.api.domain.user.UserFavoriteEstate;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.infrastructure.repository.estate.ApiEstateRepository;
+import com.zipsoon.api.infrastructure.repository.user.UserFavoriteEstateRepository;
+import com.zipsoon.api.interfaces.api.common.dto.PageResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.*;
 import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import java.util.Objects;
 public class EstateService {
     private final ScoreService scoreService;
     private final ApiEstateRepository apiEstateRepository;
+    private final UserFavoriteEstateRepository userFavoriteEstateRepository;
     private static final int MAX_RESULTS_PER_ZOOM = 1000;
     private static final int MAX_RESULTS_HIGH_ZOOM = 500;
 
@@ -97,6 +101,54 @@ public class EstateService {
             ScoreDetails emptyScoreDetails = new ScoreDetails(0.0, "점수 정보를 조회할 수 없습니다", List.of());
             return EstateDetailResponse.from(estate, emptyScoreDetails);
         }
+    }
+
+    @Transactional
+    public void addFavorite(Long estateId, Long userId) {
+        // 매물 존재 여부 확인
+        apiEstateRepository.findById(estateId)
+            .orElseThrow(() -> new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
+
+        // 이미 찜한 매물인지 확인
+        if (userFavoriteEstateRepository.existsByUserIdAndEstateId(userId, estateId)) {
+            return; // 이미 찜한 경우 아무 작업 없이 반환
+        }
+
+        // 찜하기 추가
+        UserFavoriteEstate favorite = UserFavoriteEstate.create(userId, estateId);
+        userFavoriteEstateRepository.addFavorite(favorite);
+    }
+
+    @Transactional
+    public void removeFavorite(Long estateId, Long userId) {
+        // 매물 존재 여부 확인
+        apiEstateRepository.findById(estateId)
+            .orElseThrow(() -> new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
+
+        // 찜하기 삭제
+        userFavoriteEstateRepository.removeFavorite(userId, estateId);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<EstateResponse> findFavoriteEstates(Long userId, int page, int size) {
+        // 페이지네이션 계산
+        int offset = page * size;
+
+        // 찜한 매물 목록 조회
+        List<Estate> favorites = userFavoriteEstateRepository.findFavoriteEstatesByUserId(userId, offset, size);
+
+        // 총 개수 조회
+        int total = userFavoriteEstateRepository.countByUserId(userId);
+
+        // 응답 데이터 변환 (점수 정보 포함)
+        List<EstateResponse> responseList = favorites.stream()
+            .map(estate -> {
+                ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
+                return EstateResponse.from(estate, scoreSummary);
+            })
+            .toList();
+
+        return new PageResponse<>(responseList, page, size, total);
     }
 
     /**
