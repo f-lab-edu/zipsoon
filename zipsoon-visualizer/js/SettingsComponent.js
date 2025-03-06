@@ -354,7 +354,17 @@ class SettingsComponent {
      */
     handleViewFavorites() {
         console.log('내가 찜한 매물 목록 조회 클릭');
-        alert('준비 중인 기능입니다.');
+        
+        // 설정 페이지 숨기기
+        this.hide();
+        
+        // 찜한 매물 목록 컴포넌트 표시
+        if (typeof favoriteEstatesComponent !== 'undefined') {
+            favoriteEstatesComponent.show();
+        } else {
+            console.error('FavoriteEstatesComponent를 찾을 수 없습니다.');
+            alert('찜한 매물 목록 기능을 로드할 수 없습니다.');
+        }
     }
     
     /**
