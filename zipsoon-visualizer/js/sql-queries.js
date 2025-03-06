@@ -255,7 +255,7 @@ LIMIT {limit}`,
   {role},
   NOW(),
   NOW()
-) RETURNING id`,
+)`,
 
     // 쿼리 파라미터 변환
     paramFormatter: (userData) => ({
