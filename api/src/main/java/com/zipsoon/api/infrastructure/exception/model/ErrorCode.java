@@ -26,6 +26,7 @@ public enum ErrorCode {
 
     // common request
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "400_001", "잘못된 요청입니다"),
+    CONSTRAINT_VIOLATION(HttpStatus.BAD_REQUEST, "400_002", "입력값 검증에 실패했습니다"),
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "403_001", "접근 권한이 없습니다"),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "500_001", "알 수 없는 오류가 발생했습니다");
 

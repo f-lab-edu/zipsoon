@@ -125,7 +125,7 @@ public class ScoreService {
 
         // 비활성화된 점수 유형 필터링
         List<ScoreDto> filteredFactors = scoreFactors.stream()
-            .filter(factor -> !disabledScoreTypeIds.contains(factor.getScoreTypeId()))
+            .filter(factor -> !disabledScoreTypeIds.contains(factor.getScoreTypeId().intValue()))
             .toList();
 
         log.debug("Filtered score factors: original={}, filtered={}, disabled={}",

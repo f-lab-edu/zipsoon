@@ -10,7 +10,7 @@ const INTERACTIONS = {
   },
   estateDetail: {
     endpoint: '/api/v1/estates/:id',
-    sqlQuery: ['findById', 'findScoresByEstateId'],
+    sqlQuery: ['findById', 'findScoresByEstateId', 'existsByUserIdAndEstateId'],
     description: '매물 상세 정보 조회'
   },
   signup: {
@@ -37,5 +37,25 @@ const INTERACTIONS = {
     endpoint: '/api/v1/estates/score-types/:id/disable',
     sqlQuery: 'insert',
     description: '점수 유형 비활성화'
+  },
+  favoriteEstates: {
+    endpoint: '/api/v1/users/me/favorites',
+    sqlQuery: 'findFavoriteEstates',
+    description: '내가 찜한 매물 목록 조회'
+  },
+  userFavorites: {
+    endpoint: '/api/v1/users/me/favorites',
+    sqlQuery: 'findFavoriteEstates',
+    description: '사용자 찜 목록 조회'
+  },
+  addFavorite: {
+    endpoint: '/api/v1/estates/:id/favorite',
+    sqlQuery: 'insertFavoriteEstate',
+    description: '매물 찜하기'
+  },
+  removeFavorite: {
+    endpoint: '/api/v1/estates/:id/favorite/delete',
+    sqlQuery: 'deleteFavoriteEstate',
+    description: '매물 찜하기 취소'
   }
 };

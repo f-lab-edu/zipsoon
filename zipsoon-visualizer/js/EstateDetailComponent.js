@@ -7,6 +7,7 @@ class EstateDetailComponent {
         this.container = null;
         this.currentEstate = null;
         this.initialized = false;
+        this.isFavorite = false;
         
         // 이벤트 리스너 등록
         document.addEventListener('estateMarkerClicked', this.handleMarkerClick.bind(this));
@@ -51,7 +52,14 @@ class EstateDetailComponent {
                         <span class="score-value" style="font-size: 1.2rem; font-weight: bold; color: white;">0.0</span>
                     </div>
                     <div class="estate-detail-info">
-                        <h2 class="estate-detail-title">매물 정보</h2>
+                        <div style="display: flex; align-items: center;">
+                            <button class="favorite-btn" style="background: none; border: none; cursor: pointer; margin-right: 10px; padding: 0;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                            <h2 class="estate-detail-title">매물 정보</h2>
+                        </div>
                         <p class="estate-detail-subtitle">로딩 중...</p>
                         <div class="estate-detail-type-badges" style="margin-top: 10px;"></div>
                     </div>
@@ -67,6 +75,10 @@ class EstateDetailComponent {
         const closeButton = this.container.querySelector('.estate-detail-close');
         closeButton.addEventListener('click', this.hide.bind(this));
         
+        // 찜하기 버튼에 이벤트 리스너 추가
+        const favoriteButton = this.container.querySelector('.favorite-btn');
+        favoriteButton.addEventListener('click', this.toggleFavorite.bind(this));
+        
         // 지도 컨테이너에 상세 페이지 요소 추가
         const mapContainer = document.querySelector('.map-container');
         if (mapContainer) {
@@ -81,6 +93,56 @@ class EstateDetailComponent {
      * 마커 클릭 이벤트 핸들러
      * @param {CustomEvent} event - 마커 클릭 이벤트 (detail에 매물 정보 포함)
      */
+    /**
+     * 매물 상세 정보 로드
+     * @param {Number} estateId - 매물 ID
+     */
+    async loadEstateDetails(estateId) {
+        if (!this.initialized) {
+            this.initialize();
+        }
+        
+        console.log('매물 상세 정보 로드 시작:', estateId);
+        
+        try {
+            // 로그인 상태 확인
+            if (window.authTokens && window.authTokens.isLoggedIn) {
+                // 인터랙션 모듈을 통해 매물 상세 조회 트리거
+                if (window.interactionModule) {
+                    const detailData = await window.interactionModule.triggerInteraction('estateDetail', { id: estateId });
+                    console.log('매물 상세 정보 로드 완료:', detailData);
+                    
+                    // 현재 매물 정보 갱신
+                    if (detailData) {
+                        this.currentEstate = detailData;
+                        
+                        // 찜하기 상태 설정 (API에서 가져온 상태 사용)
+                        this.isFavorite = detailData.isFavorite;
+                        
+                        // 상세 페이지 내용 업데이트
+                        this.updateContent(detailData);
+                        
+                        // 찜하기 버튼 상태 업데이트
+                        this.updateFavoriteButton();
+                        
+                        // 지도를 해당 매물 위치로 이동
+                        this.moveMapToEstate(detailData);
+                        
+                        // 상세 페이지 표시
+                        this.show();
+                    }
+                } else {
+                    // fallback 처리
+                    console.error('인터랙션 모듈이 없습니다');
+                }
+            } else {
+                console.log('로그인 필요: 기본 매물 정보만 표시합니다.');
+            }
+        } catch (error) {
+            console.error('상세 정보 로드 실패:', error);
+        }
+    }
+    
     async handleMarkerClick(event) {
         // 컴포넌트가 초기화되지 않았다면 초기화
         if (!this.initialized) {
@@ -126,8 +188,17 @@ class EstateDetailComponent {
                     if (detailData) {
                         this.currentEstate = detailData;
                         
+                        // 찜하기 상태 설정 (API에서 가져온 상태 사용)
+                        this.isFavorite = detailData.isFavorite;
+                        
                         // 상세 페이지 내용 업데이트
                         this.updateContent(detailData);
+                        
+                        // 찜하기 버튼 상태 업데이트
+                        this.updateFavoriteButton();
+                        
+                        // 지도를 해당 매물 위치로 이동
+                        // 마커 클릭에서는 이미 지도가 해당 위치에 있으므로 생략
                     }
                 } else {
                     // API 엔드포인트 직접 호출 (fallback)
@@ -159,7 +230,18 @@ class EstateDetailComponent {
                     const formattedData = endpoint.responseFormatter ? endpoint.responseFormatter(detailData) : detailData;
                     
                     this.currentEstate = formattedData;
+                    
+                    // 찜하기 상태 설정 (API에서 가져온 상태 사용)
+                    this.isFavorite = formattedData.isFavorite;
+                    
+                    // 상세 페이지 내용 업데이트
                     this.updateContent(formattedData);
+                    
+                    // 찜하기 버튼 상태 업데이트
+                    this.updateFavoriteButton();
+                    
+                    // 지도를 해당 매물 위치로 이동
+                    this.moveMapToEstate(formattedData);
                 }
             } else {
                 console.log('로그인 필요: 기본 매물 정보만 표시합니다.');
@@ -540,6 +622,64 @@ class EstateDetailComponent {
     }
     
     /**
+     * 지도를 매물 위치로 이동
+     * @param {Object} estateData - 매물 데이터
+     */
+    moveMapToEstate(estateData) {
+        if (!window.mapModule || !window.mapModule.map) return;
+        
+        const latitude = estateData.latitude || estateData.lat;
+        const longitude = estateData.longitude || estateData.lng;
+        
+        if (!latitude || !longitude) {
+            console.error('매물 위치 정보가 없습니다.');
+            return;
+        }
+        
+        // 지도를 해당 위치로 이동 (줌 레벨 16)
+        window.mapModule.map.setView([latitude, longitude], 16);
+        
+        // 해당 매물 강조 표시 (모든 마커 제거 후 해당 매물만 마커 표시)
+        window.mapModule.clearMarkers();
+        
+        // 마커 추가 (매물 정보 포함)
+        const marker = window.mapModule.addMarker([latitude, longitude], estateData);
+        
+        // 포맷팅 함수
+        const formatPrice = (price) => {
+            return price ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+        };
+        
+        // 가격 정보 구성
+        let priceText = '';
+        if (estateData.price) {
+            priceText = formatPrice(estateData.price);
+            if (estateData.rentPrice) {
+                priceText += '/' + formatPrice(estateData.rentPrice);
+            }
+        }
+        
+        // 매물 정보로 마커 툴팁 생성
+        const tooltipContent = `
+            <div class="estate-tooltip">
+                <strong>${estateData.name || ''}</strong><br>
+                ${estateData.type || ''} ${estateData.tradeType || ''}<br>
+                ${priceText}<br>
+                <div class="score">점수: ${estateData.score && estateData.score.total ? estateData.score.total.toFixed(1) : 'N/A'}</div>
+            </div>
+        `;
+        
+        // 툴팁 추가
+        marker.bindTooltip(tooltipContent, { 
+            permanent: false,
+            direction: 'top'
+        });
+        
+        // 툴팁 표시
+        marker.openTooltip();
+    }
+    
+    /**
      * 상세 페이지 표시
      */
     show() {
@@ -569,7 +709,111 @@ class EstateDetailComponent {
         }, 300); // CSS transition 시간과 일치시킴
     }
     
+    
+    /**
+     * 찜하기 버튼 상태 업데이트
+     */
+    updateFavoriteButton() {
+        if (!this.container) return;
+        
+        const favoriteButton = this.container.querySelector('.favorite-btn svg');
+        if (!favoriteButton) return;
+        
+        if (this.isFavorite) {
+            // 찜한 상태: 채워진 하트
+            favoriteButton.setAttribute('fill', '#e91e63');
+            favoriteButton.setAttribute('stroke', '#e91e63');
+        } else {
+            // 찜하지 않은 상태: 빈 하트
+            favoriteButton.setAttribute('fill', 'none');
+            favoriteButton.setAttribute('stroke', 'currentColor');
+        }
+    }
+    
+    /**
+     * 찜하기 상태 토글
+     */
+    async toggleFavorite() {
+        if (!this.currentEstate || !this.currentEstate.id) {
+            console.error('현재 매물 정보가 없습니다.');
+            return;
+        }
+        
+        if (!window.authTokens || !window.authTokens.isLoggedIn) {
+            alert('로그인이 필요한 기능입니다.');
+            return;
+        }
+        
+        try {
+            const estateId = this.currentEstate.id;
+            
+            // 찜하기 상태 토글
+            if (this.isFavorite) {
+                // 찜하기 취소
+                if (window.interactionModule) {
+                    await window.interactionModule.triggerInteraction('removeFavorite', { id: estateId });
+                } else {
+                    const endpoint = API_ENDPOINTS['/api/v1/estates/:id/favorite/delete'];
+                    const apiBaseUrl = 'http://localhost:8080';
+                    const urlPath = endpoint.url.replace('{id}', estateId);
+                    const url = `${apiBaseUrl}${urlPath}`;
+                    
+                    await fetch(url, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${window.authTokens.accessToken}`
+                        }
+                    });
+                }
+                
+                this.isFavorite = false;
+            } else {
+                // 찜하기 추가
+                if (window.interactionModule) {
+                    await window.interactionModule.triggerInteraction('addFavorite', { id: estateId });
+                } else {
+                    const endpoint = API_ENDPOINTS['/api/v1/estates/:id/favorite'];
+                    const apiBaseUrl = 'http://localhost:8080';
+                    const urlPath = endpoint.url.replace('{id}', estateId);
+                    const url = `${apiBaseUrl}${urlPath}`;
+                    
+                    await fetch(url, {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${window.authTokens.accessToken}`
+                        }
+                    });
+                }
+                
+                this.isFavorite = true;
+            }
+            
+            // 버튼 상태 업데이트
+            this.updateFavoriteButton();
+            
+            // 찜하기 상태 변경 이벤트 발생
+            const favoriteEvent = new CustomEvent('estateFavoriteChanged', { 
+                detail: { 
+                    id: estateId,
+                    isFavorite: this.isFavorite
+                } 
+            });
+            document.dispatchEvent(favoriteEvent);
+            
+        } catch (error) {
+            console.error('찜하기 상태 변경 실패:', error);
+            alert('찜하기 상태 변경에 실패했습니다.');
+        }
+    }
+    
 }
 
 // 싱글톤 인스턴스 생성
 const estateDetailComponent = new EstateDetailComponent();
+
+// 전역 변수로 등록
+window.estateDetailComponent = estateDetailComponent;

@@ -98,7 +98,8 @@ const API_ENDPOINTS = {
           total: 0,
           description: '점수 정보가 없습니다',
           factors: []
-        }
+        },
+        isFavorite: data.isFavorite || false
       };
     }
   },
@@ -204,6 +205,77 @@ const API_ENDPOINTS = {
         // UI 표시용 추가 정보
         tokenType: 'Bearer'
       };
+    }
+  },
+  '/api/v1/users/me/favorites': {
+    url: '/api/v1/users/me/favorites',
+    method: 'GET',
+    description: '내가 찜한 매물 목록 조회',
+
+    // 요청 데이터 포맷팅
+    requestFormatter: (data) => {
+      // 서버는 page를 1부터 시작하는 것으로 기대 (기본값 1)
+      return {
+        page: data && data.page !== undefined ? data.page : 1,
+        size: data && data.size !== undefined ? data.size : 10
+      };
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return {
+        content: data.content.map(estate => ({
+          id: estate.id,
+          name: estate.name,
+          type: estate.type,
+          typeName: estate.typeName,
+          tradeType: estate.tradeType,
+          tradeTypeName: estate.tradeTypeName,
+          price: estate.price,
+          rentPrice: estate.rentPrice,
+          area: estate.area,
+          latitude: estate.lat,
+          longitude: estate.lng,
+          score: estate.score || {
+            total: 0,
+            topFactors: []
+          }
+        })),
+        page: data.page,
+        size: data.size,
+        totalElements: data.totalElements,
+        totalPages: data.totalPages
+      };
+    }
+  },
+  '/api/v1/estates/:id/favorite': {
+    url: '/api/v1/estates/{id}/favorite',
+    method: 'POST',
+    description: '매물 찜하기',
+
+    // 요청 데이터 포맷팅 (ID는 URL에 추가)
+    requestFormatter: (id) => {
+      return {}; // POST 요청이지만 body가 필요 없음
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return { success: true };
+    }
+  },
+  '/api/v1/estates/:id/favorite/delete': {
+    url: '/api/v1/estates/{id}/favorite',
+    method: 'DELETE',
+    description: '매물 찜하기 취소',
+
+    // 요청 데이터 포맷팅 (ID는 URL에 추가)
+    requestFormatter: (id) => {
+      return {}; // DELETE 요청이라 body가 필요 없음
+    },
+
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return { success: true };
     }
   }
 };

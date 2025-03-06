@@ -1,14 +1,15 @@
 package com.zipsoon.api.interfaces.api.estate;
 
+import com.zipsoon.api.application.estate.EstateService;
+import com.zipsoon.api.application.estate.ScoreService;
 import com.zipsoon.api.domain.auth.UserPrincipal;
 import com.zipsoon.api.interfaces.api.estate.dto.EstateDetailResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.EstateResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.ScoreTypeResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.ViewportRequest;
-import com.zipsoon.api.application.estate.EstateService;
-import com.zipsoon.api.application.estate.ScoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -110,5 +111,29 @@ public class EstateController {
     ) {
         scoreService.enableScoreType(userPrincipal.getId(), scoreTypeId);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 매물 찜하기
+     */
+    @PostMapping("/{id}/favorite")
+    public ResponseEntity<Void> addFavorite(
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        estateService.addFavorite(id, userPrincipal.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * 매물 찜하기 취소
+     */
+    @DeleteMapping("/{id}/favorite")
+    public ResponseEntity<Void> removeFavorite(
+        @PathVariable Long id,
+        @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        estateService.removeFavorite(id, userPrincipal.getId());
+        return ResponseEntity.noContent().build();
     }
 }

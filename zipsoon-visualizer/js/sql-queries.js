@@ -255,7 +255,7 @@ LIMIT {limit}`,
   {role},
   NOW(),
   NOW()
-) RETURNING id`,
+)`,
 
     // 쿼리 파라미터 변환
     paramFormatter: (userData) => ({
@@ -435,13 +435,40 @@ ORDER BY
     affectedTables: ['estate_score', 'score_type']
   },
 
+  existsByUserIdAndEstateId: {
+    query: `SELECT EXISTS(
+    SELECT 1
+    FROM user_favorite_estate
+    WHERE user_id = {userId} AND estate_id = {estateId}
+) AS exists`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (data) => {
+      return {
+        userId: data.userId || 1,
+        estateId: data.estateId || data.id || 1
+      };
+    },
+    
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      return `--- Favorite Check ---\n` +
+             `User ID     | ${data.userId || 1}\n` +
+             `Estate ID   | ${data.estateId || data.id || 1}\n` +
+             `Is Favorite | ${data.exists ? 'Yes' : 'No'}`;
+    },
+    
+    // 영향 받는 테이블 목록
+    affectedTables: ['user_favorite_estate']
+  },
+  
   findById: {
     query: `SELECT * FROM estate WHERE id = {id}`,
 
     // 쿼리 파라미터 변환
     paramFormatter: (estateData) => {
       return {
-        id: estateData.id || 1 
+        id: estateData.id || 1
       };
     },
 
@@ -474,7 +501,7 @@ ORDER BY
     },
 
     // 영향 받는 테이블 목록
-    affectedTables: ['estate']
+    affectedTables: ['estate', 'user_favorite_estate']
   },
 
   findScoresByEstateId: {
@@ -528,6 +555,114 @@ ORDER BY
 
     // 영향 받는 테이블 목록
     affectedTables: ['estate_score', 'score_type']
+  },
+  
+  findFavoriteEstates: {
+    query: `SELECT 
+  e.*,
+  uf.created_at as favorited_at
+FROM 
+  user_favorite_estate uf
+JOIN 
+  estate e ON uf.estate_id = e.id
+WHERE 
+  uf.user_id = {userId}
+ORDER BY 
+  uf.created_at DESC
+LIMIT {limit} OFFSET {offset}`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (data) => {
+      const page = data && data.page !== undefined ? data.page : 0;
+      const size = data && data.size !== undefined ? data.size : 10;
+      
+      return {
+        userId: data.userId || 1,
+        limit: size,
+        offset: page * size
+      };
+    },
+
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      let result = '';
+      
+      if (!data || !data.content || !Array.isArray(data.content)) {
+        return "No favorite estates found or unexpected response format.";
+      }
+      
+      result += `--- Favorite Estates ---\n`;
+      result += `Page        | ${data.page}\n`;
+      result += `Size        | ${data.size}\n`;
+      result += `Total       | ${data.totalElements}\n`;
+      result += `Total Pages | ${data.totalPages}\n\n`;
+      
+      if (data.content.length > 0) {
+        data.content.forEach((estate, index) => {
+          result += `--- Estate ${index + 1} ---\n`;
+          result += `ID          | ${estate.id}\n`;
+          result += `Name        | ${estate.name || 'N/A'}\n`;
+          result += `Type        | ${estate.type || 'N/A'}\n`;
+          result += `Trade Type  | ${estate.tradeType || 'N/A'}\n`;
+          result += `Price       | ${estate.price || 'N/A'}\n`;
+          result += `Rent Price  | ${estate.rentPrice || 'N/A'}\n`;
+          result += `Area        | ${estate.area || 'N/A'}\n`;
+          result += `Score       | ${estate.score && estate.score.total ? estate.score.total : 'N/A'}\n\n`;
+        });
+      } else {
+        result += "No favorite estates found.";
+      }
+      
+      return result;
+    },
+
+    // 영향 받는 테이블 목록
+    affectedTables: ['user_favorite_estate', 'estate']
+  },
+  
+  insertFavoriteEstate: {
+    query: `INSERT INTO user_favorite_estate (user_id, estate_id, created_at)
+VALUES ({userId}, {estateId}, NOW())
+ON CONFLICT (user_id, estate_id) DO NOTHING`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (data) => {
+      return {
+        userId: data.userId || 1,
+        estateId: data.id
+      };
+    },
+
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      return `--- 매물 찜하기 성공 ---\n` +
+             `Status      | 성공`;
+    },
+
+    // 영향 받는 테이블 목록
+    affectedTables: ['user_favorite_estate']
+  },
+  
+  deleteFavoriteEstate: {
+    query: `DELETE FROM user_favorite_estate
+WHERE user_id = {userId} AND estate_id = {estateId}`,
+
+    // 쿼리 파라미터 변환
+    paramFormatter: (data) => {
+      return {
+        userId: data.userId || 1,
+        estateId: data.id
+      };
+    },
+
+    // 쿼리 결과 포맷팅
+    resultFormatter: (data) => {
+      return `--- 찜하기 취소 성공 ---\n` +
+             `Status      | 성공`;
+    },
+
+    // 영향 받는 테이블 목록
+    affectedTables: ['user_favorite_estate']
   }
 
 };
