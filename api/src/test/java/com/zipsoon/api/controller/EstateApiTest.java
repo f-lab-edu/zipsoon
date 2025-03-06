@@ -133,10 +133,11 @@ class EstateApiTest {
             .build();
     }
 
-    private EstateDetailResponse createEstateDetailResponse(Long id, ScoreDetails scoreDetails) {
+    private EstateDetailResponse createEstateDetailResponse(Long id, ScoreDetails scoreDetails, boolean isFavorite) {
         return EstateDetailResponse.from(
             createEstate(id),
-            scoreDetails
+            scoreDetails,
+            isFavorite
         );
     }
 
@@ -264,7 +265,7 @@ class EstateApiTest {
             // given
             Long estateId = 1L;
             ScoreDetails mockScoreDetails = createScoreDetails(7.5, "총 3개 요소의 평균 점수입니다", 3);
-            EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails);
+            EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails, false);
 
             when(estateService.findEstateDetail(estateId, null)).thenReturn(mockResponse);
 
@@ -286,7 +287,7 @@ class EstateApiTest {
             Long estateId = 1L;
             // 사용자가 '편의시설 점수'를 비활성화했다고 가정 - 2개 요소만 포함
             ScoreDetails mockScoreDetails = createScoreDetails(8.75, "총 2개 요소의 평균 점수입니다", 2);
-            EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails);
+            EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails, false);
 
             when(estateService.findEstateDetail(eq(estateId), eq(TEST_USER_ID))).thenReturn(mockResponse);
 
