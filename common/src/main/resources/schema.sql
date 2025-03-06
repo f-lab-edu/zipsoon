@@ -108,6 +108,17 @@ CREATE TABLE user_disabled_score_type (
     FOREIGN KEY (score_type_id) REFERENCES score_type(id) ON DELETE CASCADE
 );
 
+-- 사용자별 찜한 매물 테이블
+CREATE TABLE user_favorite_estate (
+    user_id BIGINT NOT NULL,                           -- 사용자 ID (외래 키)
+    estate_id BIGINT NOT NULL,                         -- 매물 ID (외래 키)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 찜한 시간
+
+    PRIMARY KEY (user_id, estate_id),                 -- 복합 기본 키
+    FOREIGN KEY (user_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    FOREIGN KEY (estate_id) REFERENCES estate(id) ON DELETE CASCADE
+);
+
 -- 법정동 코드 테이블: 시/군/구/동 코드 정보
 CREATE TABLE dongcodes (
     법정동코드 varchar(255) PRIMARY KEY,
