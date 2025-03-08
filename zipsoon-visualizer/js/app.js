@@ -98,7 +98,6 @@ $(() => {
         app_user {
             bigint id PK
             varchar email
-            boolean email_verified
             varchar name
             varchar image_url
             varchar role

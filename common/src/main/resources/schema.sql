@@ -89,7 +89,6 @@ CREATE TABLE estate_score_snapshot (
 CREATE TABLE app_user (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- 고유 식별자
     email VARCHAR(255) NOT NULL UNIQUE,                  -- 이메일 (로그인 ID)
-    email_verified BOOLEAN NOT NULL DEFAULT false,       -- 이메일 인증 여부
     name VARCHAR(255) NOT NULL,                          -- 사용자 이름
     image_url VARCHAR(2048),                             -- 프로필 이미지 URL
     role VARCHAR(20) NOT NULL,                           -- 역할 (USER, ADMIN 등)
