@@ -12,9 +12,8 @@ public record Area(BigDecimal squareMeters) {
     private static final int SCALE = 2;
     
     public Area {
-        Objects.requireNonNull(squareMeters, "면적은 null일 수 없습니다");
-        if (squareMeters.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("면적은 양수여야 합니다");
+        if (squareMeters == null || squareMeters.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("면적은 null이 아닌 양수여야 합니다");
         }
     }
     
