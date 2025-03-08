@@ -34,7 +34,6 @@ public class ScoreService {
     public ScoreSummaryResponse getScoreSummary(Long estateId, Long userId) {
         log.debug("[SVC:IN] getScoreSummary(estateId={}, userId={})", estateId, userId != null ? userId : "guest");
 
-        // 기본 점수 정보 조회
         var scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
         if (scoreFactors.isEmpty()) {
             log.debug("[SVC:RESULT] 매물 {}에 대한 점수 정보 없음", estateId);
@@ -44,7 +43,6 @@ public class ScoreService {
 
         log.debug("[SVC:PARAM] 매물 {}의 점수 요소 {}개 검색됨", estateId, scoreFactors.size());
 
-        // 사용자 설정에 따라 필터링된 요소 목록 준비
         var filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
         if (filteredFactors.isEmpty()) {
             log.info("[SVC:RESULT] 사용자 {}가 모든 점수 유형을 비활성화함", userId);
@@ -52,10 +50,8 @@ public class ScoreService {
             return new ScoreSummaryResponse(0.0, List.of());
         }
 
-        // 총점 계산
         var totalScore = calculateTotalScore(filteredFactors);
 
-        // 상위 3개 요소 추출
         var topFactors = filteredFactors.stream()
             .sorted((f1, f2) -> Double.compare(f2.normalizedScore(), f1.normalizedScore()))
             .limit(3)
@@ -68,6 +64,7 @@ public class ScoreService {
 
         log.debug("[SVC:RESULT] 매물 {} 총점: {}, 상위 요소 {}개", estateId, totalScore, topFactors.size());
         log.debug("[SVC:OUT] getScoreSummary() 완료");
+        
         return new ScoreSummaryResponse(totalScore, topFactors);
     }
 
@@ -82,7 +79,6 @@ public class ScoreService {
     public ScoreDetailsResponse getScoreDetails(Long estateId, Long userId) {
         log.debug("[SVC:IN] getScoreDetails(estateId={}, userId={})", estateId, userId != null ? userId : "guest");
 
-        // 기본 점수 정보 조회
         var scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
         if (scoreFactors.isEmpty()) {
             log.debug("[SVC:RESULT] 매물 {}에 대한 점수 정보 없음", estateId);
@@ -92,7 +88,6 @@ public class ScoreService {
 
         log.debug("[SVC:PARAM] 매물 {}의 점수 요소 {}개 검색됨", estateId, scoreFactors.size());
 
-        // 사용자 설정에 따라 필터링된 요소 목록 준비
         var filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
         if (filteredFactors.isEmpty()) {
             log.info("[SVC:RESULT] 사용자 {}가 모든 점수 유형을 비활성화함", userId);
@@ -100,10 +95,8 @@ public class ScoreService {
             return new ScoreDetailsResponse(0.0, "모든 점수 유형이 비활성화되었습니다", List.of());
         }
 
-        // 총점 계산
         var totalScore = calculateTotalScore(filteredFactors);
 
-        // 모든 요소의 상세 정보 매핑
         var factors = filteredFactors.stream()
             .map(factor -> new ScoreDetailsResponse.ScoreFactorResponse(
                 factor.scoreTypeId(),
@@ -250,6 +243,10 @@ public class ScoreService {
      * 점수 목록의 평균 점수를 계산합니다.
      */
     private double calculateTotalScore(List<ScoreResponse> factors) {
+        if (factors == null || factors.isEmpty()) {
+            return 0.0;
+        }
+        
         return factors.stream()
             .filter(factor -> factor.normalizedScore() != null)
             .mapToDouble(ScoreResponse::normalizedScore)
