@@ -44,7 +44,6 @@ class AuthServiceTest {
             .email("test@example.com")
             .name("Test User")
             .role(Role.USER)
-            .emailVerified(false)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();

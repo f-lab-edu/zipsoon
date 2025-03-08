@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.api.application.auth.AuthService;
 import com.zipsoon.api.domain.auth.Role;
 import com.zipsoon.api.domain.user.User;
-import com.zipsoon.api.infrastructure.exception.custom.JwtAuthenticationException;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.interfaces.api.auth.AuthController;
@@ -61,7 +60,6 @@ class AuthApiTest {
             .email("test@example.com")
             .name("Test User")
             .role(Role.USER)
-            .emailVerified(false)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
