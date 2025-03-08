@@ -34,7 +34,7 @@ public class AuthService {
             throw new ServiceException(USER_DUPLICATE);
         }
 
-        User newUser = User.builder()
+        var newUser = User.builder()
                         .email(request.email())
                         .name(request.name())
                         .role(Role.USER)
@@ -43,16 +43,16 @@ public class AuthService {
                         .build();
         userRepository.save(newUser);
 
-        AuthenticationResult authResult = authenticate(newUser);
+        var authResult = authenticate(newUser);
         return createAuthToken(authResult);
     }
 
     @Transactional(readOnly = true)
     public AuthToken login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        var user = userRepository.findByEmail(request.email())
             .orElseThrow(() -> new JwtAuthenticationException(USER_NOT_FOUND));
 
-        AuthenticationResult authResult = authenticate(user);
+        var authResult = authenticate(user);
         return createAuthToken(authResult);
     }
 
@@ -69,8 +69,8 @@ public class AuthService {
     }
 
     private AuthenticationResult authenticate(User user) {
-        UserPrincipal principal = UserPrincipal.create(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
+        var principal = UserPrincipal.create(user);
+        var authentication = new UsernamePasswordAuthenticationToken(
             principal,
             null,
             principal.getAuthorities()

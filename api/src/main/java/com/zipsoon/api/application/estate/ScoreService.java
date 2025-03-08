@@ -36,24 +36,24 @@ public class ScoreService {
         log.debug("Getting score summary for estate: {} (userId: {})", estateId, userId != null ? userId : "guest");
 
         // 기본 점수 정보 조회
-        List<ScoreDto> scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
+        var scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
         if (scoreFactors.isEmpty()) {
             log.debug("No score factors found for estate: {}", estateId);
             return new ScoreSummary(0.0, List.of());
         }
 
         // 사용자 설정에 따라 필터링된 요소 목록 준비
-        List<ScoreDto> filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
+        var filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
         if (filteredFactors.isEmpty()) {
             log.info("All score types are disabled by user: {}", userId);
             return new ScoreSummary(0.0, List.of());
         }
 
         // 총점 계산
-        double totalScore = calculateTotalScore(filteredFactors);
+        var totalScore = calculateTotalScore(filteredFactors);
 
         // 상위 3개 요소 추출
-        List<ScoreSummary.TopFactor> topFactors = filteredFactors.stream()
+        var topFactors = filteredFactors.stream()
             .sorted((f1, f2) -> Double.compare(f2.getNormalizedScore(), f1.getNormalizedScore()))
             .limit(3)
             .map(factor -> new ScoreSummary.TopFactor(
@@ -78,24 +78,24 @@ public class ScoreService {
         log.debug("Getting score details for estate: {} (userId: {})", estateId, userId != null ? userId : "guest");
 
         // 기본 점수 정보 조회
-        List<ScoreDto> scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
+        var scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
         if (scoreFactors.isEmpty()) {
             log.debug("No score factors found for estate: {}", estateId);
             return new ScoreDetails(0.0, "점수 정보가 없습니다", List.of());
         }
 
         // 사용자 설정에 따라 필터링된 요소 목록 준비
-        List<ScoreDto> filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
+        var filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
         if (filteredFactors.isEmpty()) {
             log.info("All score types are disabled by user: {}", userId);
             return new ScoreDetails(0.0, "모든 점수 유형이 비활성화되었습니다", List.of());
         }
 
         // 총점 계산
-        double totalScore = calculateTotalScore(filteredFactors);
+        var totalScore = calculateTotalScore(filteredFactors);
 
         // 모든 요소의 상세 정보 매핑
-        List<ScoreDetails.ScoreFactor> factors = filteredFactors.stream()
+        var factors = filteredFactors.stream()
             .map(factor -> new ScoreDetails.ScoreFactor(
                 factor.getScoreTypeId(),
                 factor.getScoreTypeName(),
@@ -104,7 +104,7 @@ public class ScoreService {
             ))
             .toList();
 
-        String description = String.format("총 %d개 요소의 평균 점수입니다", factors.size());
+        var description = String.format("총 %d개 요소의 평균 점수입니다", factors.size());
         return new ScoreDetails(totalScore, description, factors);
     }
 
@@ -142,7 +142,7 @@ public class ScoreService {
             return Collections.emptySet();
         }
 
-        List<Integer> disabledScoreTypeIds = userDisabledScoreTypeRepository.findDisabledScoreTypeIdsByUserId(userId);
+        var disabledScoreTypeIds = userDisabledScoreTypeRepository.findDisabledScoreTypeIdsByUserId(userId);
         log.debug("Disabled score types for user {}: {}", userId, disabledScoreTypeIds);
         return Set.copyOf(disabledScoreTypeIds);
     }
@@ -153,7 +153,7 @@ public class ScoreService {
     @Transactional
     public void disableScoreType(Long userId, Integer scoreTypeId) {
         log.info("Disabling score type: {} for user: {}", scoreTypeId, userId);
-        UserDisabledScoreType disabledScoreType = UserDisabledScoreType.create(userId, scoreTypeId);
+        var disabledScoreType = UserDisabledScoreType.create(userId, scoreTypeId);
         userDisabledScoreTypeRepository.insert(disabledScoreType);
     }
 
@@ -174,20 +174,20 @@ public class ScoreService {
         log.debug("Getting all score types for user: {}", userId != null ? userId : "guest");
 
         // 모든 점수 유형 조회
-        List<Map<String, Object>> scoreTypes = apiScoreRepository.findAllScoreTypes();
+        var scoreTypes = apiScoreRepository.findAllScoreTypes();
 
         // 비활성화된 점수 유형 ID 조회
-        Set<Integer> disabledScoreTypeIds = getDisabledScoreTypeIds(userId);
+        var disabledScoreTypeIds = getDisabledScoreTypeIds(userId);
 
         // 사용자별 활성화 상태가 반영된 점수 유형 응답 생성
         return scoreTypes.stream()
             .map(scoreType -> {
-                Integer id = (Integer) scoreType.get("id");
-                String name = (String) scoreType.get("name");
-                String description = (String) scoreType.get("description");
+                var id = (Integer) scoreType.get("id");
+                var name = (String) scoreType.get("name");
+                var description = (String) scoreType.get("description");
 
                 // 비활성화 목록에 있으면 enabled=false, 없으면 enabled=true
-                boolean enabled = !disabledScoreTypeIds.contains(id);
+                var enabled = !disabledScoreTypeIds.contains(id);
 
                 return ScoreTypeResponse.of(id, name, description, enabled);
             })
