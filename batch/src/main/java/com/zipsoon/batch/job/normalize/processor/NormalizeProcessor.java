@@ -1,6 +1,6 @@
 package com.zipsoon.batch.job.normalize.processor;
 
-import com.zipsoon.batch.domain.score.ScoreType;
+import com.zipsoon.common.domain.score.ScoreType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;

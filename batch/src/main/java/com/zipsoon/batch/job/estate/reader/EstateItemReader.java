@@ -1,6 +1,6 @@
 package com.zipsoon.batch.job.estate.reader;
 
-import com.zipsoon.batch.domain.estate.DongCode;
+import com.zipsoon.common.domain.estate.DongCode;
 import com.zipsoon.batch.application.service.estate.DongCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
