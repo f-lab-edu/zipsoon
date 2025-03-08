@@ -31,7 +31,10 @@ public class StepExecutionLoggingListener implements StepExecutionListener {
                 stepExecution.getRollbackCount());
         
         // 타이밍 정보 추가
-        long executionTime = stepExecution.getEndTime().getTime() - stepExecution.getStartTime().getTime();
+        long executionTime = 0;
+        if (stepExecution.getStartTime() != null && stepExecution.getEndTime() != null) {
+            executionTime = stepExecution.getEndTime().getTime() - stepExecution.getStartTime().getTime();
+        }
         log.info("[BATCH:JOB-STEP-STATS] {} - 실행 시간: {}ms", 
                 stepExecution.getStepName(), executionTime);
                 
