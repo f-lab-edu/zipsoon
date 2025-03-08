@@ -76,8 +76,8 @@ public class Estate {
             TradeType tradeType,
             BigDecimal price,
             BigDecimal rentPrice,
-            BigDecimal area1, // 평방미터
-            BigDecimal area2, // 평
+            BigDecimal area1,
+            BigDecimal area2,
             Geometry location,
             String address,
             String dongCode,
@@ -104,6 +104,7 @@ public class Estate {
         } else if (area2 != null && area2.compareTo(BigDecimal.ZERO) > 0) {
             area = Area.ofPyeong(area2);
         } else {
+            // 면적 정보가 없을 경우 기본값 - 생성자에서 처리
             area = Area.defaultArea();
         }
 

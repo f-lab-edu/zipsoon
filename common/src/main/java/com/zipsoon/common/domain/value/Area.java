@@ -2,7 +2,6 @@ package com.zipsoon.common.domain.value;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 
 /**
  * 면적을 나타내는 값 객체
@@ -10,10 +9,12 @@ import java.util.Objects;
 public record Area(BigDecimal squareMeters) {
     private static final BigDecimal PYEONG_CONVERSION_FACTOR = new BigDecimal("0.3025");
     private static final int SCALE = 2;
+    private static final BigDecimal DEFAULT_VALUE = new BigDecimal("0.01");
     
     public Area {
+        // 생성자에서 기본값 처리 (null이나 0 이하면 기본값 사용)
         if (squareMeters == null || squareMeters.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("면적은 null이 아닌 양수여야 합니다");
+            squareMeters = DEFAULT_VALUE;
         }
     }
     
@@ -24,7 +25,7 @@ public record Area(BigDecimal squareMeters) {
      */
     public BigDecimal toPyeong() {
         return squareMeters.multiply(PYEONG_CONVERSION_FACTOR)
-                         .setScale(SCALE, RoundingMode.HALF_UP);
+                        .setScale(SCALE, RoundingMode.HALF_UP);
     }
     
     /**
@@ -34,20 +35,14 @@ public record Area(BigDecimal squareMeters) {
      * @return Area 객체
      */
     public static Area ofSquareMeters(BigDecimal squareMeters) {
-        if (squareMeters == null || squareMeters.compareTo(BigDecimal.ZERO) <= 0) {
-            return defaultArea();
-        }
-        return new Area(squareMeters);
+        return new Area(squareMeters); // 생성자에서 null/0 체크함
     }
     
     /**
      * 제곱미터 단위로 면적 객체 생성 (double 값)
      */
     public static Area ofSquareMeters(double squareMeters) {
-        if (squareMeters <= 0) {
-            return defaultArea();
-        }
-        return new Area(BigDecimal.valueOf(squareMeters));
+        return new Area(BigDecimal.valueOf(squareMeters)); // 생성자에서 0 체크함
     }
     
     /**
@@ -58,12 +53,12 @@ public record Area(BigDecimal squareMeters) {
      */
     public static Area ofPyeong(BigDecimal pyeong) {
         if (pyeong == null || pyeong.compareTo(BigDecimal.ZERO) <= 0) {
-            return defaultArea();
+            return new Area(null); // 생성자에서 기본값 사용
         }
-        return new Area(
-            pyeong.divide(PYEONG_CONVERSION_FACTOR, SCALE + 2, RoundingMode.HALF_UP)
-                .setScale(SCALE, RoundingMode.HALF_UP)
-        );
+        
+        BigDecimal sqMeters = pyeong.divide(PYEONG_CONVERSION_FACTOR, SCALE + 2, RoundingMode.HALF_UP)
+                                 .setScale(SCALE, RoundingMode.HALF_UP);
+        return new Area(sqMeters);
     }
     
     /**
@@ -71,7 +66,7 @@ public record Area(BigDecimal squareMeters) {
      */
     public static Area ofPyeong(double pyeong) {
         if (pyeong <= 0) {
-            return defaultArea();
+            return new Area(null); // 생성자에서 기본값 사용
         }
         return ofPyeong(BigDecimal.valueOf(pyeong));
     }
@@ -80,7 +75,7 @@ public record Area(BigDecimal squareMeters) {
      * 기본 면적 (0.01㎡) 반환
      */
     public static Area defaultArea() {
-        // 0은 유효하지 않으므로 최소값 0.01 사용
-        return new Area(new BigDecimal("0.01"));
+        return new Area(null); // 생성자에서 기본값 사용
     }
+}
 }
