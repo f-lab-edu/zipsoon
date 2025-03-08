@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
                 violation.getMessage(),
                 ErrorCode.CONSTRAINT_VIOLATION.getCode()
             ))
-            .collect(Collectors.toList());
+            .toList();
         
         return ResponseEntity
             .status(ErrorCode.CONSTRAINT_VIOLATION.getHttpStatus())
