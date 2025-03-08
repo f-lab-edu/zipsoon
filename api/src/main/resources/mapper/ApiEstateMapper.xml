@@ -6,6 +6,9 @@
         <result column="estate_type" property="estateType" typeHandler="com.zipsoon.common.config.typehandler.EstateTypeHandler"/>
         <result column="trade_type" property="tradeType" typeHandler="com.zipsoon.common.config.typehandler.TradeTypeHandler"/>
         <result column="location" property="location" typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"/>
+        <result column="price" property="price" typeHandler="com.zipsoon.common.config.typehandler.PriceTypeHandler"/>
+        <result column="rent_price" property="rentPrice" typeHandler="com.zipsoon.common.config.typehandler.PriceTypeHandler"/>
+        <result column="area_meter" property="area" typeHandler="com.zipsoon.common.config.typehandler.AreaTypeHandler"/>
     </resultMap>
 
     <select id="selectAllInViewport" resultMap="estateResultMap">

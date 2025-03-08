@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -34,7 +33,7 @@ public class ControllerLoggingAspect {
             log.debug("[API:PARAM] {}.{}() - 파라미터: {}", className, methodName, 
                      Arrays.stream(args)
                          .filter(arg -> !(arg instanceof UserPrincipal)) // Filter security info
-                         .collect(Collectors.toList()));
+                         .toList());
         }
         
         // Method execution and timing
