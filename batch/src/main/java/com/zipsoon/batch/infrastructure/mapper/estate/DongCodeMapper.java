@@ -7,5 +7,5 @@ import java.util.List;
 
 @Mapper
 public interface DongCodeMapper {
-    List<DongCode> findAll();
+    List<DongCode> selectAll();
 }

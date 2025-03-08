@@ -18,17 +18,7 @@ public class BatchEstateRepository {
         }
         mapper.insertAll(estates);
     }
-    
-    // 모든 데이터 스냅샷으로 이동
-    public void migrateToSnapshot() {
-        mapper.migrateToSnapshot();
-    }
-    
-    // estate 테이블 비우기
-    public void truncateEstateTable() {
-        mapper.truncateEstateTable();
-    }
-    
+
     // 최신 부동산 데이터 조회
     public List<Estate> findAll() {
         return mapper.selectAll();

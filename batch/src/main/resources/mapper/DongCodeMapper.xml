@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zipsoon.batch.infrastructure.mapper.estate.DongCodeMapper">
 
-    <select id="findAll" resultType="com.zipsoon.batch.domain.estate.DongCode">
+    <select id="selectAll" resultType="com.zipsoon.batch.domain.estate.DongCode">
         SELECT
             법정동코드,
             법정동명

@@ -19,6 +19,6 @@ public class ScoreRepository {
     
     // 오래된 점수 스냅샷으로 이동
     public void migrateToScoreSnapshot() {
-        mapper.migrateToScoreSnapshot();
+        mapper.insertIntoScoreSnapshot();
     }
 }

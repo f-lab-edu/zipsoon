@@ -14,6 +14,6 @@ public class ParkScoreRepository {
     private final ParkScoreMapper parkScoreMapper;
 
     public List<Park> findParksWithin(Point location, double radiusMeters) {
-        return parkScoreMapper.findParksWithin(location, radiusMeters);
+        return parkScoreMapper.selectParksWithin(location, radiusMeters);
     }
 }

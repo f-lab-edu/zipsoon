@@ -13,6 +13,6 @@ public class DongCodeRepository {
     private final DongCodeMapper dongCodeMapper;
 
     public List<DongCode> findAll() {
-        return dongCodeMapper.findAll();
+        return dongCodeMapper.selectAll();
     }
 }
