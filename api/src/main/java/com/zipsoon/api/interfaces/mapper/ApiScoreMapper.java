@@ -1,6 +1,6 @@
 package com.zipsoon.api.interfaces.mapper;
 
-import com.zipsoon.api.interfaces.api.estate.dto.ScoreDto;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,7 +15,7 @@ public interface ApiScoreMapper {
      * @param estateId 매물 ID
      * @return 점수 목록
      */
-    List<ScoreDto> findScoresByEstateId(@Param("estateId") Long estateId);
+    List<ScoreResponse> findScoresByEstateId(@Param("estateId") Long estateId);
     
     /**
      * 모든 점수 유형을 조회합니다.

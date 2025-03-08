@@ -1,6 +1,6 @@
 package com.zipsoon.api.infrastructure.repository.estate;
 
-import com.zipsoon.api.interfaces.api.estate.dto.ScoreDto;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreResponse;
 import com.zipsoon.api.interfaces.mapper.ApiScoreMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ public class ApiScoreRepository {
      * @param estateId 매물 ID
      * @return 점수 목록
      */
-    public List<ScoreDto> findScoresByEstateId(Long estateId) {
+    public List<ScoreResponse> findScoresByEstateId(Long estateId) {
         return apiScoreMapper.findScoresByEstateId(estateId);
     }
     

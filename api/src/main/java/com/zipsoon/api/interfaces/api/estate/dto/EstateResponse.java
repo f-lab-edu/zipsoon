@@ -20,9 +20,9 @@ public record EstateResponse(
     BigDecimal area,
     @JsonProperty("lat") double latitude,
     @JsonProperty("lng") double longitude,
-    ScoreSummary score
+    ScoreSummaryResponse score
 ) {
-    public static EstateResponse from(Estate estate, ScoreSummary scoreSummary) {
+    public static EstateResponse from(Estate estate, ScoreSummaryResponse scoreSummary) {
         return new EstateResponse(
             estate.getId(),
             estate.getEstateName(),

@@ -1,9 +1,9 @@
 package com.zipsoon.api.interfaces.api.auth;
 
-import com.zipsoon.api.interfaces.api.auth.dto.AuthToken;
+import com.zipsoon.api.application.auth.AuthService;
+import com.zipsoon.api.interfaces.api.auth.dto.AuthTokenResponse;
 import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
 import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
-import com.zipsoon.api.application.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +20,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthToken> signup(@Valid @RequestBody SignupRequest request) {
-        AuthToken token = authService.signup(request);
+    public ResponseEntity<AuthTokenResponse> signup(@Valid @RequestBody SignupRequest request) {
+        AuthTokenResponse token = authService.signup(request);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthToken> login(@Valid @RequestBody LoginRequest request) {
-        AuthToken token = authService.login(request);
+    public ResponseEntity<AuthTokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthTokenResponse token = authService.login(request);
         return ResponseEntity.ok(token);
     }
 

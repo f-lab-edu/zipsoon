@@ -7,7 +7,7 @@ import com.zipsoon.api.domain.auth.UserPrincipal;
 import com.zipsoon.api.domain.user.User;
 import com.zipsoon.api.interfaces.api.common.dto.PageResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.EstateResponse;
-import com.zipsoon.api.interfaces.api.estate.dto.ScoreSummary;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreSummaryResponse;
 import com.zipsoon.api.interfaces.api.user.UserController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -73,9 +73,9 @@ class UserControllerTest {
     // 테스트 데이터 생성 헬퍼 메서드
     private PageResponse<EstateResponse> createMockPageResponse() {
         // 테스트용 점수 정보 생성
-        ScoreSummary scoreSummary = new ScoreSummary(8.5, List.of(
-            new ScoreSummary.TopFactor(1L, "교통", 9.0),
-            new ScoreSummary.TopFactor(2L, "편의시설", 8.0)
+        ScoreSummaryResponse scoreSummary = new ScoreSummaryResponse(8.5, List.of(
+            new ScoreSummaryResponse.TopFactorResponse(1L, "교통", 9.0),
+            new ScoreSummaryResponse.TopFactorResponse(2L, "편의시설", 8.0)
         ));
 
         // 테스트용 매물 응답 생성

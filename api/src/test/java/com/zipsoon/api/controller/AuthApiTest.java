@@ -7,7 +7,7 @@ import com.zipsoon.api.domain.user.User;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.interfaces.api.auth.AuthController;
-import com.zipsoon.api.interfaces.api.auth.dto.AuthToken;
+import com.zipsoon.api.interfaces.api.auth.dto.AuthTokenResponse;
 import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
 import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -45,8 +45,8 @@ class AuthApiTest {
     private AuthService authService;
 
     // 테스트용 토큰 응답 생성
-    private AuthToken createMockToken() {
-        return new AuthToken(
+    private AuthTokenResponse createMockToken() {
+        return new AuthTokenResponse(
             "mock-access-token",
             "mock-refresh-token",
             LocalDateTime.now().plusHours(1)
@@ -74,7 +74,7 @@ class AuthApiTest {
         void shouldSignupSuccessfully_When_ValidEmailAndName() throws Exception {
             // given
             SignupRequest request = new SignupRequest("new@example.com", "New User");
-            AuthToken mockToken = createMockToken();
+            AuthTokenResponse mockToken = createMockToken();
 
             when(authService.signup(any(SignupRequest.class))).thenReturn(mockToken);
 
@@ -164,7 +164,7 @@ class AuthApiTest {
         void shouldLoginSuccessfully_When_ValidEmail() throws Exception {
             // given
             LoginRequest request = new LoginRequest("existing@example.com");
-            AuthToken mockToken = createMockToken();
+            AuthTokenResponse mockToken = createMockToken();
 
             when(authService.login(any(LoginRequest.class))).thenReturn(mockToken);
 

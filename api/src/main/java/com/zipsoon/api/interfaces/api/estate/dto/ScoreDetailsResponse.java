@@ -2,13 +2,15 @@ package com.zipsoon.api.interfaces.api.estate.dto;
 
 import java.util.List;
 
-public record ScoreSummary(
+public record ScoreDetailsResponse(
     Double total,
-    List<TopFactor> topFactors
+    String description,
+    List<ScoreFactorResponse> factors
 ) {
-public record TopFactor(
+    public record ScoreFactorResponse(
         Long id,
         String name,
+        String description,
         Double score
     ) {}
 }

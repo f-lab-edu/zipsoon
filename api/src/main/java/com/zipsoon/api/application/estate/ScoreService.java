@@ -3,9 +3,9 @@ package com.zipsoon.api.application.estate;
 import com.zipsoon.api.domain.user.UserDisabledScoreType;
 import com.zipsoon.api.infrastructure.repository.estate.ApiScoreRepository;
 import com.zipsoon.api.infrastructure.repository.user.UserDisabledScoreTypeRepository;
-import com.zipsoon.api.interfaces.api.estate.dto.ScoreDetails;
-import com.zipsoon.api.interfaces.api.estate.dto.ScoreDto;
-import com.zipsoon.api.interfaces.api.estate.dto.ScoreSummary;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreDetailsResponse;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreResponse;
+import com.zipsoon.api.interfaces.api.estate.dto.ScoreSummaryResponse;
 import com.zipsoon.api.interfaces.api.estate.dto.ScoreTypeResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -32,21 +31,21 @@ public class ScoreService {
      * @return 점수 요약 정보
      */
     @Transactional(readOnly = true)
-    public ScoreSummary getScoreSummary(Long estateId, Long userId) {
+    public ScoreSummaryResponse getScoreSummary(Long estateId, Long userId) {
         log.debug("Getting score summary for estate: {} (userId: {})", estateId, userId != null ? userId : "guest");
 
         // 기본 점수 정보 조회
         var scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
         if (scoreFactors.isEmpty()) {
             log.debug("No score factors found for estate: {}", estateId);
-            return new ScoreSummary(0.0, List.of());
+            return new ScoreSummaryResponse(0.0, List.of());
         }
 
         // 사용자 설정에 따라 필터링된 요소 목록 준비
         var filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
         if (filteredFactors.isEmpty()) {
             log.info("All score types are disabled by user: {}", userId);
-            return new ScoreSummary(0.0, List.of());
+            return new ScoreSummaryResponse(0.0, List.of());
         }
 
         // 총점 계산
@@ -54,16 +53,16 @@ public class ScoreService {
 
         // 상위 3개 요소 추출
         var topFactors = filteredFactors.stream()
-            .sorted((f1, f2) -> Double.compare(f2.getNormalizedScore(), f1.getNormalizedScore()))
+            .sorted((f1, f2) -> Double.compare(f2.normalizedScore(), f1.normalizedScore()))
             .limit(3)
-            .map(factor -> new ScoreSummary.TopFactor(
-                factor.getScoreTypeId(),
-                factor.getScoreTypeName(),
-                factor.getNormalizedScore()
+            .map(factor -> new ScoreSummaryResponse.TopFactorResponse(
+                factor.scoreTypeId(),
+                factor.scoreTypeName(),
+                factor.normalizedScore()
             ))
             .toList();
 
-        return new ScoreSummary(totalScore, topFactors);
+        return new ScoreSummaryResponse(totalScore, topFactors);
     }
 
     /**
@@ -74,21 +73,21 @@ public class ScoreService {
      * @return 상세 점수 정보
      */
     @Transactional(readOnly = true)
-    public ScoreDetails getScoreDetails(Long estateId, Long userId) {
+    public ScoreDetailsResponse getScoreDetails(Long estateId, Long userId) {
         log.debug("Getting score details for estate: {} (userId: {})", estateId, userId != null ? userId : "guest");
 
         // 기본 점수 정보 조회
         var scoreFactors = apiScoreRepository.findScoresByEstateId(estateId);
         if (scoreFactors.isEmpty()) {
             log.debug("No score factors found for estate: {}", estateId);
-            return new ScoreDetails(0.0, "점수 정보가 없습니다", List.of());
+            return new ScoreDetailsResponse(0.0, "점수 정보가 없습니다", List.of());
         }
 
         // 사용자 설정에 따라 필터링된 요소 목록 준비
         var filteredFactors = filterScoreFactorsByUserPreferences(scoreFactors, userId);
         if (filteredFactors.isEmpty()) {
             log.info("All score types are disabled by user: {}", userId);
-            return new ScoreDetails(0.0, "모든 점수 유형이 비활성화되었습니다", List.of());
+            return new ScoreDetailsResponse(0.0, "모든 점수 유형이 비활성화되었습니다", List.of());
         }
 
         // 총점 계산
@@ -96,22 +95,22 @@ public class ScoreService {
 
         // 모든 요소의 상세 정보 매핑
         var factors = filteredFactors.stream()
-            .map(factor -> new ScoreDetails.ScoreFactor(
-                factor.getScoreTypeId(),
-                factor.getScoreTypeName(),
-                factor.getDescription(),
-                factor.getNormalizedScore()
+            .map(factor -> new ScoreDetailsResponse.ScoreFactorResponse(
+                factor.scoreTypeId(),
+                factor.scoreTypeName(),
+                factor.description(),
+                factor.normalizedScore()
             ))
             .toList();
 
         var description = String.format("총 %d개 요소의 평균 점수입니다", factors.size());
-        return new ScoreDetails(totalScore, description, factors);
+        return new ScoreDetailsResponse(totalScore, description, factors);
     }
 
     /**
      * 사용자 설정에 따라 점수 요소를 필터링합니다.
      */
-    private List<ScoreDto> filterScoreFactorsByUserPreferences(List<ScoreDto> scoreFactors, Long userId) {
+    private List<ScoreResponse> filterScoreFactorsByUserPreferences(List<ScoreResponse> scoreFactors, Long userId) {
         // 비인증 사용자는 모든 점수 요소 표시
         if (userId == null) {
             return scoreFactors;
@@ -124,8 +123,8 @@ public class ScoreService {
         }
 
         // 비활성화된 점수 유형 필터링
-        List<ScoreDto> filteredFactors = scoreFactors.stream()
-            .filter(factor -> !disabledScoreTypeIds.contains(factor.getScoreTypeId().intValue()))
+        List<ScoreResponse> filteredFactors = scoreFactors.stream()
+            .filter(factor -> !disabledScoreTypeIds.contains(factor.scoreTypeId().intValue()))
             .toList();
 
         log.debug("Filtered score factors: original={}, filtered={}, disabled={}",
@@ -197,10 +196,10 @@ public class ScoreService {
     /**
      * 점수 목록의 평균 점수를 계산합니다.
      */
-    private double calculateTotalScore(List<ScoreDto> factors) {
+    private double calculateTotalScore(List<ScoreResponse> factors) {
         return factors.stream()
-            .filter(factor -> factor.getNormalizedScore() != null)
-            .mapToDouble(ScoreDto::getNormalizedScore)
+            .filter(factor -> factor.normalizedScore() != null)
+            .mapToDouble(ScoreResponse::normalizedScore)
             .average()
             .orElse(0.0);
     }

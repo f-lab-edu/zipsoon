@@ -61,7 +61,7 @@ public class EstateService {
         return estates.stream()
             .map(estate -> {
                 try {
-                    ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
+                    ScoreSummaryResponse scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
                     return EstateResponse.from(estate, scoreSummary);
                 } catch (Exception e) {
                     log.error("Error calculating scores for estate {}: {}", estate.getId(), e.getMessage());
@@ -104,7 +104,7 @@ public class EstateService {
         } catch (Exception e) {
             log.error("Error calculating detailed scores for estate {}: {}", estate.getId(), e.getMessage());
             // 점수 정보 없이 기본 상세 정보 반환
-            var emptyScoreDetails = new ScoreDetails(0.0, "점수 정보를 조회할 수 없습니다", List.of());
+            var emptyScoreDetails = new ScoreDetailsResponse(0.0, "점수 정보를 조회할 수 없습니다", List.of());
             return EstateDetailResponse.from(estate, emptyScoreDetails, isFavorite);
         }
     }
