@@ -7,7 +7,6 @@
         <result property="email" column="email"/>
         <result property="name" column="name"/>
         <result property="imageUrl" column="image_url"/>
-        <result property="emailVerified" column="email_verified"/>
         <result property="role" column="role"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -39,7 +38,6 @@
             email,
             name,
             image_url,
-            email_verified,
             role,
             created_at,
             updated_at
@@ -47,7 +45,6 @@
             #{email},
             #{name},
             #{imageUrl},
-            #{emailVerified},
             #{role},
             #{createdAt},
             #{updatedAt}

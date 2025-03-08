@@ -5,6 +5,7 @@ import com.zipsoon.api.interfaces.api.auth.dto.AuthToken;
 import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
 import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
 import com.zipsoon.api.domain.auth.UserPrincipal;
+import com.zipsoon.api.infrastructure.exception.custom.JwtAuthenticationException;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.jwt.JwtProvider;
 import com.zipsoon.api.domain.auth.Role;
@@ -49,7 +50,7 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AuthToken login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-            .orElseThrow(() -> new ServiceException(USER_NOT_FOUND));
+            .orElseThrow(() -> new JwtAuthenticationException(USER_NOT_FOUND));
 
         AuthenticationResult authResult = authenticate(user);
         return createAuthToken(authResult);
@@ -57,7 +58,7 @@ public class AuthService {
 
     private AuthToken createAuthToken(AuthenticationResult authResult) {
         if (!authResult.isValid()) {
-            throw new ServiceException(INVALID_CREDENTIALS);
+            throw new JwtAuthenticationException(INVALID_CREDENTIALS);
         }
 
         return new AuthToken(
