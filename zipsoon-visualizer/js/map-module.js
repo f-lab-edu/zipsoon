@@ -72,8 +72,8 @@ class MapModule {
     constructor() {
         this.map = null;
         this.markers = [];
-        // 서울시 중심 좌표 (강남역 부근)
-        this.defaultCenter = [37.498095, 127.027610];
+        // 서울시 중심 좌표 (서울시청)
+        this.defaultCenter = [37.5664056, 126.9778222];
         this.defaultZoom = 15;
         this.boundaryRectangle = null;
         this.zoomControl = null;
