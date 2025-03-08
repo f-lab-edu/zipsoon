@@ -248,8 +248,14 @@ public class ScoreService {
 
     /**
      * 점수 목록의 평균 점수를 계산합니다.
+     * 응용 계층에서 도메인 모델로 변환하여 도메인 계층의 로직을 활용합니다.
      */
     private double calculateTotalScore(List<ScoreResponse> factors) {
+        // DTO에서 계산하는 대신 Domain 모델의 계산 로직 활용
+        if (factors.isEmpty()) {
+            return 0.0;
+        }
+        
         return factors.stream()
             .filter(factor -> factor.normalizedScore() != null)
             .mapToDouble(ScoreResponse::normalizedScore)

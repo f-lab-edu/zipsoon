@@ -81,6 +81,19 @@ public class Estate {
             String dongCode,
             List<String> imageUrls) {
         
+        // 필수 속성 유효성 검증
+        if (platformType == null || platformId == null || location == null) {
+            throw new IllegalArgumentException("필수 매물 속성(platformType, platformId, location)은 null일 수 없습니다");
+        }
+        
+        // 거래 유형에 따른 가격 유효성 검증
+        if (tradeType == TradeType.A1 && price == null) {
+            throw new IllegalArgumentException("매매 유형은 가격(price)이 필수입니다");
+        }
+        if ((tradeType == TradeType.B1 || tradeType == TradeType.B2) && rentPrice == null) {
+            throw new IllegalArgumentException("임대 유형은 임대료(rentPrice)가 필수입니다");
+        }
+        
         return Estate.builder()
                 .platformType(platformType)
                 .platformId(platformId)

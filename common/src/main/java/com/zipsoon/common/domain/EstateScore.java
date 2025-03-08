@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Builder(access = AccessLevel.PUBLIC)
@@ -30,11 +32,52 @@ public class EstateScore {
      * @return 생성된 매물 점수 객체
      */
     public static EstateScore of(Long estateId, Long scoreTypeId, Double rawScore) {
+        // 유효성 검증
+        if (estateId == null || scoreTypeId == null) {
+            throw new IllegalArgumentException("매물 ID와 점수 유형 ID는 null일 수 없습니다");
+        }
+        
         return EstateScore.builder()
                 .estateId(estateId)
                 .scoreTypeId(scoreTypeId)
                 .rawScore(rawScore)
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+    
+    /**
+     * 정규화된 점수를 설정합니다.
+     *
+     * @param normalizedScore 정규화된 점수 (0-10 사이)
+     * @return 정규화된 점수가 설정된 매물 점수 객체
+     */
+    public EstateScore withNormalizedScore(Double normalizedScore) {
+        // 정규화된 점수 유효성 검증
+        if (normalizedScore != null && (normalizedScore < 0 || normalizedScore > 10)) {
+            throw new IllegalArgumentException("정규화된 점수는 0에서 10 사이의 값이어야 합니다");
+        }
+        
+        return EstateScore.builder()
+                .id(this.id)
+                .estateId(this.estateId)
+                .scoreTypeId(this.scoreTypeId)
+                .rawScore(this.rawScore)
+                .normalizedScore(normalizedScore)
+                .createdAt(this.createdAt)
+                .build();
+    }
+    
+    /**
+     * 점수 목록의 평균 점수를 계산합니다.
+     *
+     * @param scores 점수 목록
+     * @return 평균 점수
+     */
+    public static double calculateAverageScore(List<EstateScore> scores) {
+        return scores.stream()
+                .filter(score -> score.getNormalizedScore() != null)
+                .mapToDouble(EstateScore::getNormalizedScore)
+                .average()
+                .orElse(0.0);
     }
 }
