@@ -1,6 +1,8 @@
 package com.zipsoon.common.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.zipsoon.common.domain.value.Area;
+import com.zipsoon.common.domain.value.Price;
 import lombok.*;
 import org.locationtech.jts.geom.Geometry;
 
@@ -28,13 +30,11 @@ public class Estate {
 
     private TradeType tradeType;
 
-    private BigDecimal price;
+    private Price price;
 
-    private BigDecimal rentPrice;
+    private Price rentPrice;
 
-    private BigDecimal areaMeter;
-
-    private BigDecimal areaPyeong;
+    private Area area;
 
     private Geometry location;
 
@@ -81,6 +81,19 @@ public class Estate {
             String dongCode,
             List<String> imageUrls) {
         
+        // 필수 속성 유효성 검증
+        if (platformType == null || platformId == null || location == null) {
+            throw new IllegalArgumentException("필수 매물 속성(platformType, platformId, location)은 null일 수 없습니다");
+        }
+        
+        // 거래 유형에 따른 가격 유효성 검증
+        if (tradeType == TradeType.A1 && price == null) {
+            throw new IllegalArgumentException("매매 유형은 가격(price)이 필수입니다");
+        }
+        if ((tradeType == TradeType.B1 || tradeType == TradeType.B2) && rentPrice == null) {
+            throw new IllegalArgumentException("임대 유형은 임대료(rentPrice)가 필수입니다");
+        }
+        
         return Estate.builder()
                 .platformType(platformType)
                 .platformId(platformId)
@@ -88,15 +101,42 @@ public class Estate {
                 .estateName(estateName)
                 .estateType(estateType)
                 .tradeType(tradeType)
-                .price(price)
-                .rentPrice(rentPrice)
-                .areaMeter(areaMeter)
-                .areaPyeong(areaMeter != null ? areaMeter.multiply(BigDecimal.valueOf(0.3025)) : null)
+                .price(price != null ? Price.of(price) : null)
+                .rentPrice(rentPrice != null ? Price.of(rentPrice) : null)
+                .area(areaMeter != null ? Area.ofSquareMeters(areaMeter) : null)
                 .location(location)
                 .address(address)
                 .dongCode(dongCode)
                 .imageUrls(imageUrls)
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+    
+    /**
+     * 가격 원시값 반환 (호환성)
+     */
+    public BigDecimal getPrice() {
+        return price != null ? price.amount() : null;
+    }
+    
+    /**
+     * 임대료 원시값 반환 (호환성)
+     */
+    public BigDecimal getRentPrice() {
+        return rentPrice != null ? rentPrice.amount() : null;
+    }
+    
+    /**
+     * 면적(제곱미터) 원시값 반환 (호환성)
+     */
+    public BigDecimal getAreaMeter() {
+        return area != null ? area.squareMeters() : null;
+    }
+    
+    /**
+     * 면적(평) 원시값 반환 (호환성)
+     */
+    public BigDecimal getAreaPyeong() {
+        return area != null ? area.toPyeong() : null;
     }
 }
