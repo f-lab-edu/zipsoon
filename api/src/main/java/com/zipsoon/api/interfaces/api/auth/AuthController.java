@@ -21,13 +21,13 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<AuthToken> signup(@Valid @RequestBody SignupRequest request) {
-        var token = authService.signup(request);
+        AuthToken token = authService.signup(request);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthToken> login(@Valid @RequestBody LoginRequest request) {
-        var token = authService.login(request);
+        AuthToken token = authService.login(request);
         return ResponseEntity.ok(token);
     }
 

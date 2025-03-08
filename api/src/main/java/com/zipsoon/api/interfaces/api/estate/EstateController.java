@@ -36,7 +36,7 @@ public class EstateController {
         @Valid ViewportRequest request,
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        var userId = userPrincipal != null ? userPrincipal.getId() : null;
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         
         return ResponseEntity.ok(
             estateService.findEstatesInViewport(request, userId)
@@ -56,7 +56,7 @@ public class EstateController {
         @PathVariable Long id,
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        var userId = userPrincipal != null ? userPrincipal.getId() : null;
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         
         return ResponseEntity.ok(
             estateService.findEstateDetail(id, userId)
@@ -74,7 +74,7 @@ public class EstateController {
     public ResponseEntity<List<ScoreTypeResponse>> getScoreTypes(
         @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        var userId = userPrincipal != null ? userPrincipal.getId() : null;
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         
         return ResponseEntity.ok(
             scoreService.getAllScoreTypes(userId)
