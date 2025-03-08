@@ -1,6 +1,7 @@
 package com.zipsoon.batch.job.migration;
 
 import com.zipsoon.batch.infrastructure.processor.source.collector.DongCodeSourceCollector;
+import com.zipsoon.batch.job.listener.StepExecutionLoggingListener;
 import com.zipsoon.batch.job.migration.tasklet.DatabaseMigrationTasklet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class DatabaseInitJobConfig {
 
     @Bean(name = JOB_NAME)
     public Job databaseInitJob() {
+        log.info("[BATCH:JOB-CONFIG] 데이터베이스 초기화 작업(databaseInitJob) 구성");
         return new JobBuilder(JOB_NAME, jobRepository)
             .start(dongcodesInitStep())
             .next(databaseMigrationStep())
@@ -42,8 +44,10 @@ public class DatabaseInitJobConfig {
     
     @Bean
     public Step dongcodesInitStep() {
+        log.info("[BATCH:STEP-CONFIG] 법정동코드 초기화 단계(dongcodesInitStep) 구성");
         return new StepBuilder("dongcodesInitStep", jobRepository)
             .tasklet(dongcodesInitTasklet(), transactionManager)
+            .listener(new StepExecutionLoggingListener())
             .build();
     }
     
@@ -51,15 +55,15 @@ public class DatabaseInitJobConfig {
     public Tasklet dongcodesInitTasklet() {
         return (contribution, chunkContext) -> {
             try {
-                log.info("Starting dongcodes table initialization using DongCodeSourceCollector");
+                log.info("[BATCH:TASKLET-START] 법정동코드 테이블 초기화 시작");
                 
                 dongCodeSourceCollector.create();
                 dongCodeSourceCollector.collect();
                 
-                log.info("Dongcodes table initialization completed successfully");
+                log.info("[BATCH:TASKLET-END] 법정동코드 테이블 초기화 완료");
                 return RepeatStatus.FINISHED;
             } catch (Exception e) {
-                log.error("Failed to initialize dongcodes table: {}", e.getMessage(), e);
+                log.error("[BATCH:TASKLET-ERR] 법정동코드 테이블 초기화 실패: {}", e.getMessage(), e);
                 throw e;
             }
         };
@@ -67,8 +71,10 @@ public class DatabaseInitJobConfig {
     
     @Bean
     public Step databaseMigrationStep() {
+        log.info("[BATCH:STEP-CONFIG] 데이터베이스 마이그레이션 단계(databaseMigrationStep) 구성");
         return new StepBuilder("databaseMigrationStep", jobRepository)
             .tasklet(databaseMigrationTasklet, transactionManager)
+            .listener(new StepExecutionLoggingListener())
             .build();
     }
 }

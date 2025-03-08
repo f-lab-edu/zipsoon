@@ -3,6 +3,7 @@ package com.zipsoon.batch.job.estate;
 import com.zipsoon.batch.job.estate.processor.EstateItemProcessor;
 import com.zipsoon.batch.job.estate.reader.EstateItemReader;
 import com.zipsoon.batch.job.estate.writer.EstateItemWriter;
+import com.zipsoon.batch.job.listener.StepExecutionLoggingListener;
 import com.zipsoon.common.domain.Estate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class EstateJobConfig {
 
     @Bean(name = JOB_NAME)
     public Job estateScoreJob() {
+        log.info("[BATCH:JOB-CONFIG] 매물 수집 작업(estateJob) 구성");
         return new JobBuilder(JOB_NAME, jobRepository)
             .start(estateBatchStep())
             .build();
@@ -42,11 +44,13 @@ public class EstateJobConfig {
     
     @Bean
     public Step estateBatchStep() {
+        log.info("[BATCH:STEP-CONFIG] 매물 수집 단계(estateBatchStep) 구성");
         return new StepBuilder("estateBatchStep", jobRepository)
             .<String, List<Estate>>chunk(1, transactionManager)
             .reader(estateItemReader)
             .processor(estateItemProcessor)
             .writer(estateItemWriter)
+            .listener(new StepExecutionLoggingListener())
             .build();
     }
 }

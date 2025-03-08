@@ -35,7 +35,7 @@ public class DataPipelineService {
         stepMap.put(scoreCalculationStep.getStepName(), scoreCalculationStep);
         stepMap.put(normalizationStep.getStepName(), normalizationStep);
         
-        log.info("Pipeline steps registered: {}", stepMap.keySet());
+        log.info("[BATCH:INIT] 파이프라인 단계 등록 완료: {}", stepMap.keySet());
     }
 
     /**
@@ -43,19 +43,19 @@ public class DataPipelineService {
      * 모든 단계를 순차적으로 실행하며, 각 단계의 실패는 후속 단계에 영향을 주지 않음
      */
     public void runFullPipeline() {
-        log.info("Starting full data pipeline execution");
+        log.info("[BATCH:JOB-START] 전체 데이터 파이프라인 실행 시작");
         
         try {
-            log.info("Running database init job first");
+            log.info("[BATCH:JOB-STEP] 데이터베이스 초기화 작업 실행");
             databaseInitJobRunner.run();
             
             runPipelineSteps(stepMap.values());
             
         } catch (Exception e) {
-            log.error("Error during database migration: {}", e.getMessage(), e);
+            log.error("[BATCH:JOB-ERR] 데이터베이스 마이그레이션 오류: {}", e.getMessage(), e);
         }
         
-        log.info("Full data pipeline execution completed");
+        log.info("[BATCH:JOB-END] 전체 데이터 파이프라인 실행 완료");
     }
 
     /**
@@ -63,7 +63,7 @@ public class DataPipelineService {
      * @param startStepName 시작할 단계 이름
      */
     public void runFromStep(String startStepName) {
-        log.info("Starting pipeline from step: {}", startStepName);
+        log.info("[BATCH:JOB-START] 파이프라인 부분 실행 - 시작 단계: {}", startStepName);
 
         boolean startFound = false;
         List<PipelineStep> stepsToRun = new ArrayList<>();
@@ -76,11 +76,16 @@ public class DataPipelineService {
         }
 
         if (!startFound) {
-            log.error("Step not found: {}", startStepName);
+            log.error("[BATCH:JOB-ERR] 지정된 단계를 찾을 수 없음: {}", startStepName);
             return;
         }
 
+        log.info("[BATCH:JOB-PARAM] 실행할 단계 목록: {}", 
+                stepsToRun.stream().map(PipelineStep::getStepName).toList());
+        
         runPipelineSteps(stepsToRun);
+        
+        log.info("[BATCH:JOB-END] 파이프라인 부분 실행 완료 - 시작 단계: {}", startStepName);
     }
     
     /**
@@ -88,14 +93,27 @@ public class DataPipelineService {
      * @param steps 실행할 단계 목록
      */
     private void runPipelineSteps(Iterable<PipelineStep> steps) {
+        log.info("[BATCH:PIPELINE-START] 파이프라인 실행 시작");
+        
         List<String> succeededSteps = new ArrayList<>();
         List<String> failedSteps = new ArrayList<>();
+        Map<String, Long> executionTimes = new LinkedHashMap<>();
+        long pipelineStartTime = System.currentTimeMillis();
 
         for (PipelineStep step : steps) {
             String stepName = step.getStepName();
-            log.info("Executing pipeline step: {}", stepName);
             
+            // 단계 시작 로깅은 각 단계 구현체에 위임
+            step.logStepStart();
+            
+            // 단계 실행 및 시간 측정
+            long startTime = System.currentTimeMillis();
             boolean success = step.execute();
+            long executionTime = System.currentTimeMillis() - startTime;
+            executionTimes.put(stepName, executionTime);
+            
+            // 단계 종료 로깅은 각 단계 구현체에 위임
+            step.logStepEnd(success, executionTime);
             
             if (success) {
                 succeededSteps.add(stepName);
@@ -104,24 +122,39 @@ public class DataPipelineService {
             }
         }
         
-        // 파이프라인 실행 결과 요약
-        log.info("Pipeline execution summary - Succeeded: {}, Failed: {}", 
-                succeededSteps, failedSteps);
+        long totalExecutionTime = System.currentTimeMillis() - pipelineStartTime;
+        
+        // 파이프라인 실행 결과 상세 요약
+        log.info("[BATCH:PIPELINE-SUMMARY] 총 실행 시간: {}ms", totalExecutionTime);
+        log.info("[BATCH:PIPELINE-SUMMARY] 성공한 단계: {}", succeededSteps);
+        log.info("[BATCH:PIPELINE-SUMMARY] 실패한 단계: {}", failedSteps);
+        log.info("[BATCH:PIPELINE-SUMMARY] 단계별 실행 시간: {}", executionTimes);
+        
+        log.info("[BATCH:PIPELINE-END] 파이프라인 실행 완료 - 상태: {}", 
+                failedSteps.isEmpty() ? "성공" : "일부 실패");
     }
     
     /**
      * 파이프라인 부분 실행 - 매물 수집부터 시작
      */
     public void runFromEstateCollection() {
-        log.info("Starting pipeline from estate collection");
+        log.info("[BATCH:JOB-START] 파이프라인 부분 실행 - 매물 수집부터 시작");
+        
+        List<String> stepsToRun = stepMap.values().stream()
+            .map(PipelineStep::getStepName)
+            .toList();
+        log.info("[BATCH:JOB-PARAM] 실행할 단계 목록: {}", stepsToRun);
+        
         runPipelineSteps(stepMap.values());
+        
+        log.info("[BATCH:JOB-END] 파이프라인 부분 실행 완료 - 매물 수집부터");
     }
     
     /**
      * 파이프라인 부분 실행 - 소스 데이터 수집부터 시작
      */
     public void runFromSourceCollection() {
-        log.info("Starting pipeline from source collection");
+        log.info("[BATCH:JOB-START] 파이프라인 부분 실행 - 소스 데이터 수집부터 시작");
         
         // 소스 수집부터 이후 모든 단계 실행
         List<PipelineStep> steps = new ArrayList<>();
@@ -129,34 +162,55 @@ public class DataPipelineService {
         steps.add(scoreCalculationStep);
         steps.add(normalizationStep);
         
+        List<String> stepsToRun = steps.stream()
+            .map(PipelineStep::getStepName)
+            .toList();
+        log.info("[BATCH:JOB-PARAM] 실행할 단계 목록: {}", stepsToRun);
+        
         runPipelineSteps(steps);
+        
+        log.info("[BATCH:JOB-END] 파이프라인 부분 실행 완료 - 소스 수집부터");
     }
     
     /**
      * 파이프라인 부분 실행 - 점수 계산부터 시작
      */
     public void runFromScoreCalculation() {
-        log.info("Starting pipeline from score calculation");
+        log.info("[BATCH:JOB-START] 파이프라인 부분 실행 - 점수 계산부터 시작");
         
         // 점수 계산부터 이후 모든 단계 실행
         List<PipelineStep> steps = new ArrayList<>();
         steps.add(scoreCalculationStep);
         steps.add(normalizationStep);
         
+        List<String> stepsToRun = steps.stream()
+            .map(PipelineStep::getStepName)
+            .toList();
+        log.info("[BATCH:JOB-PARAM] 실행할 단계 목록: {}", stepsToRun);
+        
         runPipelineSteps(steps);
+        
+        log.info("[BATCH:JOB-END] 파이프라인 부분 실행 완료 - 점수 계산부터");
     }
     
     /**
      * 파이프라인 부분 실행 - 정규화만 실행
      */
     public void runNormalizationOnly() {
-        log.info("Running normalization step only");
+        log.info("[BATCH:JOB-START] 파이프라인 부분 실행 - 정규화 단계만 실행");
         
         // 정규화 단계만 실행
         List<PipelineStep> steps = new ArrayList<>();
         steps.add(normalizationStep);
         
+        List<String> stepsToRun = steps.stream()
+            .map(PipelineStep::getStepName)
+            .toList();
+        log.info("[BATCH:JOB-PARAM] 실행할 단계: {}", stepsToRun);
+        
         runPipelineSteps(steps);
+        
+        log.info("[BATCH:JOB-END] 파이프라인 부분 실행 완료 - 정규화만 실행");
     }
     
 }
