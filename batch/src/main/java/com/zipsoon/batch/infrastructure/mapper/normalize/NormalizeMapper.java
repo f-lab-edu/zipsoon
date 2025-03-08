@@ -10,11 +10,11 @@ import java.util.Map;
 
 @Mapper
 public interface NormalizeMapper {
-    List<ScoreType> selectAllActiveScoreType();
+    List<ScoreType> selectAllActiveScoreTypes();
 
-    List<EstateScore> selectScoresById(@Param("scoreTypeId") Long scoreTypeId);
+    List<EstateScore> selectByScoreTypeId(@Param("scoreTypeId") Long scoreTypeId);
 
-    void updateScoresNormalizedByScoreTypeAndIds(
+    void updateNormalizedScoresByScoreTypeIdAndIds(
         @Param("scoreTypeId") Long scoreTypeId,
         @Param("updates") Map<Long, Double> updates
     );

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.api.interfaces.mapper.ApiEstateMapper">
+<mapper namespace="com.zipsoon.api.infrastructure.mapper.estate.ApiEstateMapper">
 
     <resultMap id="estateResultMap" type="com.zipsoon.common.domain.Estate">
         <result column="estate_type" property="estateType" typeHandler="com.zipsoon.common.config.typehandler.EstateTypeHandler"/>
@@ -8,7 +8,7 @@
         <result column="location" property="location" typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"/>
     </resultMap>
 
-    <select id="findAllInViewport" resultMap="estateResultMap">
+    <select id="selectAllInViewport" resultMap="estateResultMap">
         SELECT * FROM estate
         WHERE ST_Intersects(
             location,
@@ -23,7 +23,7 @@
         LIMIT #{limit}
     </select>
 
-    <select id="findById" resultMap="estateResultMap">
+    <select id="selectById" resultMap="estateResultMap">
         SELECT *
         FROM estate
         WHERE id = #{id}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.api.interfaces.mapper.ApiScoreMapper">
-    <select id="findScoresByEstateId" resultType="com.zipsoon.api.interfaces.api.estate.dto.ScoreDto">
+<mapper namespace="com.zipsoon.api.infrastructure.mapper.estate.ApiScoreMapper">
+    <select id="selectScoresByEstateId" resultType="com.zipsoon.api.interfaces.api.estate.dto.ScoreResponse">
         SELECT
             es.id as score_id,
             st.id as score_type_id,
@@ -19,7 +19,7 @@
             es.normalized_score DESC
     </select>
     
-    <select id="findAllScoreTypes" resultType="java.util.Map">
+    <select id="selectAllScoreTypes" resultType="java.util.Map">
         SELECT
             id,
             name,

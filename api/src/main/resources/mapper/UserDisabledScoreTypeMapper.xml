@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.zipsoon.api.infrastructure.repository.user.UserDisabledScoreTypeRepository">
+<mapper namespace="com.zipsoon.api.infrastructure.mapper.user.UserDisabledScoreTypeMapper">
     
-    <select id="findDisabledScoreTypeIdsByUserId" resultType="java.lang.Integer">
+    <select id="selectDisabledScoreTypeIdsByUserId" resultType="java.lang.Integer">
         SELECT score_type_id
         FROM user_disabled_score_type
         WHERE user_id = #{userId}

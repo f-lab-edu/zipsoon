@@ -10,15 +10,15 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class ScoreRepository {
-    private final BatchScoreMapper batchScoreMapper;
+    private final BatchScoreMapper mapper;
 
     // 최신 부동산 점수 저장
     public void saveAll(List<EstateScore> scores) {
-        batchScoreMapper.insertAll(scores);
+        mapper.insertAll(scores);
     }
     
     // 오래된 점수 스냅샷으로 이동
     public void migrateToScoreSnapshot() {
-        batchScoreMapper.migrateToScoreSnapshot();
+        mapper.migrateToScoreSnapshot();
     }
 }

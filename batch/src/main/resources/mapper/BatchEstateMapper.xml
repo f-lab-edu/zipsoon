@@ -28,7 +28,7 @@
     </resultMap>
 
     <!-- 매물 정보를 estate 테이블에 저장 -->
-    <insert id="insertEstates" parameterType="java.util.List">
+    <insert id="insertAll" parameterType="java.util.List">
         INSERT INTO estate (
             platform_type,
             platform_id,
@@ -118,7 +118,7 @@
     </update>
 
     <!-- 나중에 사용할 estate 테이블의 모든 항목 조회 -->
-    <select id="selectAllEstates" resultMap="EstateResultMap">
+    <select id="selectAll" resultMap="EstateResultMap">
         SELECT *
         FROM estate
     </select>

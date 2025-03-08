@@ -1,7 +1,7 @@
 package com.zipsoon.api.infrastructure.repository.estate;
 
 import com.zipsoon.api.interfaces.api.estate.dto.ScoreResponse;
-import com.zipsoon.api.interfaces.mapper.ApiScoreMapper;
+import com.zipsoon.api.infrastructure.mapper.estate.ApiScoreMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 @Repository
 @RequiredArgsConstructor
 public class ApiScoreRepository {
-    private final ApiScoreMapper apiScoreMapper;
+    private final ApiScoreMapper mapper;
 
     /**
      * 매물 ID로 점수 목록을 조회합니다.
@@ -20,7 +20,7 @@ public class ApiScoreRepository {
      * @return 점수 목록
      */
     public List<ScoreResponse> findScoresByEstateId(Long estateId) {
-        return apiScoreMapper.findScoresByEstateId(estateId);
+        return mapper.selectScoresByEstateId(estateId);
     }
     
     /**
@@ -29,6 +29,6 @@ public class ApiScoreRepository {
      * @return 점수 유형 목록
      */
     public List<Map<String, Object>> findAllScoreTypes() {
-        return apiScoreMapper.findAllScoreTypes();
+        return mapper.selectAllScoreTypes();
     }
 }

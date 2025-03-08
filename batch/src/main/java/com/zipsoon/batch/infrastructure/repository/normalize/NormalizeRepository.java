@@ -12,17 +12,17 @@ import java.util.Map;
 @Repository
 @RequiredArgsConstructor
 public class NormalizeRepository {
-    private final NormalizeMapper normalizeMapper;
+    private final NormalizeMapper mapper;
 
-    public List<ScoreType> findAllActiveScoreType() {
-        return normalizeMapper.selectAllActiveScoreType();
+    public List<ScoreType> findAllActiveScoreTypes() {
+        return mapper.selectAllActiveScoreTypes();
     }
 
-    public List<EstateScore> findByScoreType(Long scoreTypeId) {
-        return normalizeMapper.selectScoresById(scoreTypeId);
+    public List<EstateScore> findByScoreTypeId(Long scoreTypeId) {
+        return mapper.selectByScoreTypeId(scoreTypeId);
     }
 
     public void updateNormalizedScores(Long scoreTypeId, Map<Long, Double> updates) {
-        normalizeMapper.updateScoresNormalizedByScoreTypeAndIds(scoreTypeId, updates);
+        mapper.updateNormalizedScoresByScoreTypeIdAndIds(scoreTypeId, updates);
     }
 }

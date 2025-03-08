@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zipsoon.api.interfaces.mapper.UserMapper">
+<mapper namespace="com.zipsoon.api.infrastructure.mapper.user.UserMapper">
 
     <resultMap id="userResultMap" type="com.zipsoon.api.domain.user.User">
         <id property="id" column="id"/>
@@ -12,18 +12,23 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <select id="findById" resultMap="userResultMap">
+    <select id="selectById" resultMap="userResultMap">
         SELECT *
         FROM app_user
         WHERE id = #{id}
     </select>
 
-    <select id="findByEmail" resultMap="userResultMap">
+    <select id="selectByEmail" resultMap="userResultMap">
         SELECT *
         FROM app_user
         WHERE email = #{email}
     </select>
 
+    <select id="selectByProviderAndProviderId" resultMap="userResultMap">
+        SELECT *
+        FROM app_user
+        WHERE provider = #{provider} AND provider_id = #{providerId}
+    </select>
 
     <select id="existsByEmail" resultType="boolean">
         SELECT EXISTS(
@@ -33,7 +38,7 @@
         )
     </select>
 
-    <insert id="save" parameterType="com.zipsoon.api.domain.user.User" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.zipsoon.api.domain.user.User" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO app_user (
             email,
             name,
