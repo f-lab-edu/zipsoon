@@ -277,5 +277,20 @@ const API_ENDPOINTS = {
     responseFormatter: (data) => {
       return { success: true };
     }
+  },
+  '/api/v1/users/me/delete': {
+    url: '/api/v1/users/me',
+    method: 'DELETE',
+    description: '회원 탈퇴',
+    
+    // 요청 데이터 포맷팅
+    requestFormatter: () => {
+      return {}; // DELETE 요청이라 body가 필요 없음
+    },
+    
+    // 응답 데이터 포맷팅
+    responseFormatter: (data) => {
+      return { success: true };
+    }
   }
 };
