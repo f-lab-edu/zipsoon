@@ -22,7 +22,7 @@ public class UserDisabledScoreType {
      * @param scoreTypeId 점수 유형 ID
      * @return 생성된 비활성화 설정
      */
-    public static UserDisabledScoreType create(Long userId, Integer scoreTypeId) {
+    public static UserDisabledScoreType of(Long userId, Integer scoreTypeId) {
         return UserDisabledScoreType.builder()
             .userId(userId)
             .scoreTypeId(scoreTypeId)
