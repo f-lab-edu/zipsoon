@@ -18,8 +18,24 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
     root: INFO
-    org.springframework.batch: DEBUG
-    com.zipsoon.batch: DEBUG
+    # 시스템 컴포넌트 로그 레벨 상향 조정
+    org.springframework.batch: WARN
+    org.springframework.batch.core.job.SimpleStepHandler: INFO
+    org.springframework.batch.core.step.AbstractStep: INFO
+    org.springframework.jdbc: WARN
+    com.zaxxer.hikari: WARN
+    io.micrometer: WARN
+    # 비즈니스 로직 로그 레벨 설정
+    com.zipsoon.batch: INFO
+    com.zipsoon.batch.job: INFO
+    com.zipsoon.batch.job.listener: INFO
+    com.zipsoon.batch.application.pipeline: INFO
+    com.zipsoon.batch.application.service: INFO
+    # 세부 작업 로그는 DEBUG 레벨로 설정 (필요시 활성화)
+    com.zipsoon.batch.infrastructure.processor: DEBUG
+    com.zipsoon.batch.job.estate.processor: DEBUG
+    com.zipsoon.batch.job.score.processor: DEBUG
+    com.zipsoon.batch.job.normalize.processor: DEBUG
 
 naver:
   land:

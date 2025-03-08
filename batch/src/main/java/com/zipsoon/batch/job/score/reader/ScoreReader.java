@@ -22,7 +22,7 @@ public class ScoreReader implements ItemReader<Estate> {
         if (!initialized) {
             List<Estate> estates = batchEstateRepository.findAll();
             this.estatesIterator = estates.iterator();
-            log.info("Loaded {} estates for scoring", estates.size());
+            log.info("[BATCH:STEP-READER] 점수 계산을 위한 매물 {}개 로드됨", estates.size());
             initialized = true;
         }
     }

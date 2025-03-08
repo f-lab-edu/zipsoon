@@ -23,8 +23,8 @@ public class EstateJobRunner {
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting estate job with parameters: {}", params);
+        log.info("[BATCH:JOB-START] 매물 수집 작업 시작 - 파라미터: {}", params);
         JobExecution execution = jobLauncher.run(estateJob, params);
-        log.info("Estate collection job finished with status: {}", execution.getStatus());
+        log.info("[BATCH:JOB-END] 매물 수집 작업 완료 - 상태: {}", execution.getStatus());
     }
 }

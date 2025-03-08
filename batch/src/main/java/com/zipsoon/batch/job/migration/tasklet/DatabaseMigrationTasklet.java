@@ -26,32 +26,32 @@ public class DatabaseMigrationTasklet implements Tasklet {
     @Transactional
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         try {
-            log.info("Starting database migration tasklet");
+            log.info("[BATCH:TASKLET-START] 데이터베이스 마이그레이션 작업 시작");
             
             // 1. estate_score 테이블의 데이터를 스냅샷으로 이동
-            log.info("Migrating estate_score data to snapshot");
+            log.info("[BATCH:TASKLET-STEP] estate_score 데이터를 스냅샷으로 이동");
             jdbcTemplate.execute(
                 "INSERT INTO estate_score_snapshot " +
                 "SELECT * FROM estate_score"
             );
             
             // 2. estate 테이블의 데이터를 스냅샷으로 이동
-            log.info("Migrating estate data to snapshot");
+            log.info("[BATCH:TASKLET-STEP] estate 데이터를 스냅샷으로 이동");
             jdbcTemplate.execute(
                 "INSERT INTO estate_snapshot " +
                 "SELECT * FROM estate"
             );
             
             // 3. estate, 그리고 관련된 모든 테이블 truncate
-            log.info("Truncating estate table (parent table)");
+            log.info("[BATCH:TASKLET-STEP] estate 테이블(부모 테이블) 비우기");
             jdbcTemplate.execute("TRUNCATE TABLE estate CASCADE");
             
-            log.info("Tables truncated successfully");
+            log.info("[BATCH:TASKLET-RESULT] 테이블 비우기 완료");
             
-            log.info("Database migration completed successfully");
+            log.info("[BATCH:TASKLET-END] 데이터베이스 마이그레이션 작업 완료");
             return RepeatStatus.FINISHED;
         } catch (Exception e) {
-            log.error("Failed to perform database migration: {}", e.getMessage(), e);
+            log.error("[BATCH:TASKLET-ERR] 데이터베이스 마이그레이션 실패: {}", e.getMessage(), e);
             throw e;
         }
     }

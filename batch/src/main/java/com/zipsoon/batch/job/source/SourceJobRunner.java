@@ -23,8 +23,8 @@ public class SourceJobRunner {
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting source data collection job...");
+        log.info("[BATCH:JOB-START] 소스 데이터 수집 작업 시작 - 파라미터: {}", params);
         JobExecution execution = jobLauncher.run(sourceJob, params);
-        log.info("Source data collection job finished with status: {}", execution.getStatus());
+        log.info("[BATCH:JOB-END] 소스 데이터 수집 작업 완료 - 상태: {}", execution.getStatus());
     }
 }

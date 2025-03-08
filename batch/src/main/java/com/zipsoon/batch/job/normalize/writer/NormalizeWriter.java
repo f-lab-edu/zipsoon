@@ -44,13 +44,13 @@ public class NormalizeWriter implements ItemWriter<ScoreType> {
             for (EstateScore score : scores) {
                 double rawScore = score.getRawScore();
                 double normalizedScore = calculator.getNormalizer().normalize(rawScore, rawScores);
-                log.debug("Score ID: {}, Raw: {}, Normalized: {}",
+                log.debug("[BATCH:STEP-WRITER] 점수 ID: {}, 원시: {}, 정규화: {}",
                     score.getId(), String.format("%.10f", rawScore), String.format("%.10f", normalizedScore));
                 updates.put(score.getId(), normalizedScore);
             }
 
             normalizeRepository.updateNormalizedScores(scoreTypeId, updates);
-            log.info("Normalized {} scores for type: {}", updates.size(), scoreType.getName());
+            log.info("[BATCH:STEP-WRITER] 점수 유형 {} 정규화 완료: {}개", scoreType.getName(), updates.size());
         }
     }
 

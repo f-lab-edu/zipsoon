@@ -1,5 +1,6 @@
 package com.zipsoon.batch.job.normalize;
 
+import com.zipsoon.batch.job.listener.StepExecutionLoggingListener;
 import com.zipsoon.batch.job.normalize.processor.NormalizeProcessor;
 import com.zipsoon.batch.job.normalize.reader.NormalizeReader;
 import com.zipsoon.batch.job.normalize.writer.NormalizeWriter;
@@ -30,6 +31,7 @@ public class NormalizeJobConfig {
 
     @Bean(name = JOB_NAME)
     public Job normalizeJob() {
+        log.info("[BATCH:JOB-CONFIG] 정규화 작업(normalizeJob) 구성");
         return new JobBuilder(JOB_NAME, jobRepository)
             .start(normalizeProcessingStep())
             .build();
@@ -37,11 +39,13 @@ public class NormalizeJobConfig {
 
     @Bean
     public Step normalizeProcessingStep() {
+        log.info("[BATCH:STEP-CONFIG] 정규화 단계(normalizeProcessingStep) 구성");
         return new StepBuilder("normalizeProcessingStep", jobRepository)
             .<ScoreType, ScoreType>chunk(1, transactionManager)
             .reader(normalizeReader)
             .processor(normalizeProcessor)
             .writer(normalizeWriter)
+            .listener(new StepExecutionLoggingListener())
             .build();
     }
 }

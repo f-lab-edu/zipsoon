@@ -27,8 +27,8 @@ public class DatabaseInitJobRunner {
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting database init job with parameters: {}", params);
+        log.info("[BATCH:JOB-START] 데이터베이스 초기화 작업 시작 - 파라미터: {}", params);
         JobExecution execution = jobLauncher.run(databaseInitJob, params);
-        log.info("Database init job finished with status: {}", execution.getStatus());
+        log.info("[BATCH:JOB-END] 데이터베이스 초기화 작업 완료 - 상태: {}", execution.getStatus());
     }
 }

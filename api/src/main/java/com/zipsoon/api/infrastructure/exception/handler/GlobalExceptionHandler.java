@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        log.warn("[API:ERR] 유효하지 않은 요청 파라미터: {}", 
+                e.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", ")));
+                
         return ResponseEntity
             .status(ErrorCode.BAD_REQUEST.getHttpStatus())
             .body(ErrorResponseFactory.from(
@@ -39,6 +44,11 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
+        log.warn("[API:ERR] 제약조건 위반: {}", 
+                e.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", ")));
+                
         List<ErrorDetail> details = e.getConstraintViolations().stream()
             .map(violation -> new ErrorDetail(
                 violation.getPropertyPath().toString(),
@@ -58,6 +68,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
+        log.warn("[API:ERR] 접근 권한 없음: {}", e.getMessage());
+        
         return ResponseEntity
             .status(ErrorCode.FORBIDDEN_ACCESS.getHttpStatus())
             .body(ErrorResponseFactory.from(ErrorCode.FORBIDDEN_ACCESS));
@@ -65,6 +77,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
     protected ResponseEntity<ErrorResponse> handleServiceException(ServiceException e) {
+        // Include error code, message, and details in log
+        log.error("[API:ERR] 서비스 예외: {} - 코드: {} - 상세정보: {}", 
+                  e.getMessage(), e.getErrorCode(), e.getDetails());
+              
         List<ErrorDetail> details = e.getDetails().stream()
             .map(detail -> new ErrorDetail(
                 detail.field(),
@@ -84,10 +100,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleServerException(Exception e) {
+        // Include stack trace in non-production environments
         if (!"prod".equalsIgnoreCase(activeProfile)) {
-            log.error("Unhandled exception: {}", e.getMessage(), e);
+            log.error("[API:ERR] 처리되지 않은 예외", e);
         } else {
-            log.error("Unhandled exception: {}", e.getMessage());
+            log.error("[API:ERR] 처리되지 않은 예외: {}", e.getMessage());
         }
         return ResponseEntity
             .status(ErrorCode.INTERNAL_ERROR.getHttpStatus())

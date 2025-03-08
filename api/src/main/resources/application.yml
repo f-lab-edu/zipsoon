@@ -13,6 +13,10 @@ mybatis:
   mapper-scan-packages: com.zipsoon.api.interfaces.mapper,com.zipsoon.api.infrastructure.mapper,com.zipsoon.common.mapper
 
 logging:
+  level:
+    root: INFO
+    com.zipsoon.api.interfaces.api: INFO  # API Controllers
+    com.zipsoon.api.application: DEBUG     # Service layer
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{X-Request-Id}] %-5level %logger{36} - %msg%n"
 

@@ -37,39 +37,52 @@ public class EstateService {
      */
     @Transactional(readOnly = true)
     public List<EstateResponse> findEstatesInViewport(ViewportRequest request, Long userId) {
+        // Entry logging - DEBUG level
+        log.debug("[SVC:IN] findEstatesInViewport(viewport={}, userId={})", 
+                formatViewport(request), userId != null ? userId : "guest");
+        
         if (request.swLng() >= request.neLng() || request.swLat() >= request.neLat()) {
-            log.warn("Invalid viewport coordinates: {}", formatViewport(request));
+            log.warn("[SVC:ERR] 유효하지 않은 뷰포트 좌표: {}", formatViewport(request));
             throw new ServiceException(ErrorCode.BAD_REQUEST, "뷰포트 좌표가 유효하지 않습니다.");
         }
 
         // 조회 개수 제한 계산
         var limit = calculateResultLimit(request.zoom());
-        log.debug("Searching estates in viewport with limit: {}", limit);
+        log.debug("[SVC:PARAM] 뷰포트 내 매물 검색 제한: {}", limit);
 
         // 매물 조회
         var estates = apiEstateRepository.findAllInViewport(request, limit);
 
         // 조회 결과가 없는 경우
         if (estates.isEmpty()) {
-            log.info("No estates found in viewport: {}", formatViewport(request));
+            log.info("[SVC:RESULT] 뷰포트 내 매물 없음: {}", formatViewport(request));
+            
+            // Exit logging - DEBUG level
+            log.debug("[SVC:OUT] findEstatesInViewport() 완료 - 반환된 매물 수: 0");
             return Collections.emptyList();
         }
 
-        log.info("Found {} estates in viewport (userId: {})", estates.size(), userId != null ? userId : "guest");
+        log.info("[SVC:RESULT] 뷰포트 내 {} 개의 매물 발견 (userId: {})", 
+                estates.size(), userId != null ? userId : "guest");
 
         // 모든 매물에 점수 정보 추가하여 응답 생성
-        return estates.stream()
+        var estateResponses = estates.stream()
             .map(estate -> {
                 try {
                     ScoreSummaryResponse scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
                     return EstateResponse.from(estate, scoreSummary);
                 } catch (Exception e) {
-                    log.error("Error calculating scores for estate {}: {}", estate.getId(), e.getMessage());
+                    log.error("[SVC:ERR] 매물 {} 점수 계산 오류: {}", estate.getId(), e.getMessage());
                     return null;
                 }
             })
             .filter(Objects::nonNull)
             .toList();
+            
+        // Exit logging - DEBUG level
+        log.debug("[SVC:OUT] findEstatesInViewport() 완료 - 반환된 매물 수: {}", estateResponses.size());
+        
+        return estateResponses;
     }
 
     /**
@@ -82,79 +95,129 @@ public class EstateService {
      */
     @Transactional(readOnly = true)
     public EstateDetailResponse findEstateDetail(Long id, Long userId) {
-        log.debug("Finding estate detail for id: {} (userId: {})", id, userId != null ? userId : "guest");
+        log.debug("[SVC:IN] findEstateDetail(id={}, userId={})", id, userId != null ? userId : "guest");
 
         // 매물 조회
         Estate estate = apiEstateRepository.findById(id)
             .orElseThrow(() -> {
-                log.warn("Estate not found with id: {}", id);
+                log.warn("[SVC:ERR] ID가 {}인 매물을 찾을 수 없음", id);
                 return new ServiceException(ErrorCode.ESTATE_NOT_FOUND);
             });
+        
+        log.debug("[SVC:RESULT] 매물 발견 ID: {}, 주소: {}", id, estate.getAddress());
             
         // 찜 상태 확인
         var isFavorite = false;
         if (userId != null) {
             isFavorite = userFavoriteEstateRepository.existsByUserIdAndEstateId(userId, id);
+            log.debug("[SVC:PARAM] 사용자 {} 찜 상태: {}", userId, isFavorite);
         }
 
         // 매물 점수 정보 추가하여 응답 생성
         try {
             var scoreDetails = scoreService.getScoreDetails(estate.getId(), userId);
-            return EstateDetailResponse.from(estate, scoreDetails, isFavorite);
+            var response = EstateDetailResponse.from(estate, scoreDetails, isFavorite);
+            log.debug("[SVC:OUT] findEstateDetail() 완료 - 매물 ID: {}, 총점: {}", 
+                     id, scoreDetails.total());
+            return response;
         } catch (Exception e) {
-            log.error("Error calculating detailed scores for estate {}: {}", estate.getId(), e.getMessage());
+            log.error("[SVC:ERR] 매물 {} 상세 점수 계산 오류: {}", estate.getId(), e.getMessage());
             // 점수 정보 없이 기본 상세 정보 반환
             var emptyScoreDetails = new ScoreDetailsResponse(0.0, "점수 정보를 조회할 수 없습니다", List.of());
-            return EstateDetailResponse.from(estate, emptyScoreDetails, isFavorite);
+            var response = EstateDetailResponse.from(estate, emptyScoreDetails, isFavorite);
+            log.debug("[SVC:OUT] findEstateDetail() 완료 - 매물 ID: {} (점수 없음)", id);
+            return response;
         }
     }
 
     @Transactional
     public void addFavorite(Long estateId, Long userId) {
+        log.debug("[SVC:IN] addFavorite(estateId={}, userId={})", estateId, userId);
+        
         // 매물 존재 여부 확인
         apiEstateRepository.findById(estateId)
-            .orElseThrow(() -> new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
+            .orElseThrow(() -> {
+                log.warn("[SVC:ERR] 찜하기 실패 - ID가 {}인 매물을 찾을 수 없음", estateId);
+                return new ServiceException(ErrorCode.ESTATE_NOT_FOUND);
+            });
 
         // 이미 찜한 매물인지 확인
         if (userFavoriteEstateRepository.existsByUserIdAndEstateId(userId, estateId)) {
+            log.info("[SVC:RESULT] 이미 찜한 매물임: estateId={}, userId={}", estateId, userId);
+            log.debug("[SVC:OUT] addFavorite() 완료 - 이미 찜한 매물");
             return; // 이미 찜한 경우 아무 작업 없이 반환
         }
 
         // 찜하기 추가
         var favorite = UserFavoriteEstate.of(userId, estateId);
         userFavoriteEstateRepository.save(favorite);
+        
+        log.info("[SVC:RESULT] 매물 찜하기 추가 성공: estateId={}, userId={}", estateId, userId);
+        log.debug("[SVC:OUT] addFavorite() 완료");
     }
 
     @Transactional
     public void removeFavorite(Long estateId, Long userId) {
+        log.debug("[SVC:IN] removeFavorite(estateId={}, userId={})", estateId, userId);
+        
         // 매물 존재 여부 확인
         apiEstateRepository.findById(estateId)
-            .orElseThrow(() -> new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
+            .orElseThrow(() -> {
+                log.warn("[SVC:ERR] 찜하기 삭제 실패 - ID가 {}인 매물을 찾을 수 없음", estateId);
+                return new ServiceException(ErrorCode.ESTATE_NOT_FOUND);
+            });
 
+        // 찜하기 있는지 확인
+        boolean exists = userFavoriteEstateRepository.existsByUserIdAndEstateId(userId, estateId);
+        
         // 찜하기 삭제
         userFavoriteEstateRepository.delete(userId, estateId);
+        
+        if (exists) {
+            log.info("[SVC:RESULT] 매물 찜하기 삭제 성공: estateId={}, userId={}", estateId, userId);
+        } else {
+            log.info("[SVC:RESULT] 찜하기 삭제 대상 없음: estateId={}, userId={}", estateId, userId);
+        }
+        
+        log.debug("[SVC:OUT] removeFavorite() 완료");
     }
 
     @Transactional(readOnly = true)
     public PageResponse<EstateResponse> findFavoriteEstates(Long userId, int page, int size) {
+        log.debug("[SVC:IN] findFavoriteEstates(userId={}, page={}, size={})", userId, page, size);
+        
         // 페이지네이션 계산 (page는 1부터 시작)
         var offset = (page - 1) * size;
+        log.debug("[SVC:PARAM] 페이지네이션 계산: offset={}, size={}", offset, size);
 
         // 찜한 매물 목록 조회
         var favorites = userFavoriteEstateRepository.findFavoriteEstatesByUserId(userId, offset, size);
 
         // 총 개수 조회
         var total = userFavoriteEstateRepository.countByUserId(userId);
+        
+        log.info("[SVC:RESULT] 찜한 매물 목록 조회 결과: 페이지 항목 {}개, 총 {}개", 
+                favorites.size(), total);
 
         // 응답 데이터 변환 (점수 정보 포함)
         var responseList = favorites.stream()
             .map(estate -> {
-                var scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
-                return EstateResponse.from(estate, scoreSummary);
+                try {
+                    var scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
+                    return EstateResponse.from(estate, scoreSummary);
+                } catch (Exception e) {
+                    log.error("[SVC:ERR] 매물 {} 점수 계산 오류: {}", estate.getId(), e.getMessage());
+                    // 점수 정보 없이 기본 매물 정보 반환
+                    var emptySummary = new ScoreSummaryResponse(0.0, List.of());
+                    return EstateResponse.from(estate, emptySummary);
+                }
             })
             .toList();
-
-        return new PageResponse<>(responseList, page, size, total);
+        
+        var response = new PageResponse<>(responseList, page, size, total);
+        log.debug("[SVC:OUT] findFavoriteEstates() 완료 - 페이지 {}의 {}개 항목 반환", page, responseList.size());
+        
+        return response;
     }
 
     /**
