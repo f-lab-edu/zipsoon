@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (JwtAuthenticationException e) {
             SecurityContextHolder.clearContext();
-            throw new ServletException(e);
+            request.setAttribute("exception", e);
+            throw e; // AuthenticationEntryPoint에서 처리
         }
     }
 }
