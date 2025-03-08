@@ -20,11 +20,7 @@ public class UserRepository {
     public Optional<User> findByEmail(String email) {
         return mapper.selectByEmail(email);
     }
-    
-    public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
-        return mapper.selectByProviderAndProviderId(provider, providerId);
-    }
-    
+
     public boolean existsByEmail(String email) {
         return mapper.existsByEmail(email);
     }

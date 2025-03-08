@@ -24,12 +24,6 @@
         WHERE email = #{email}
     </select>
 
-    <select id="selectByProviderAndProviderId" resultMap="userResultMap">
-        SELECT *
-        FROM app_user
-        WHERE provider = #{provider} AND provider_id = #{providerId}
-    </select>
-
     <select id="existsByEmail" resultType="boolean">
         SELECT EXISTS(
             SELECT 1
