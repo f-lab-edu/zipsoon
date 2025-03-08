@@ -4,7 +4,7 @@ import com.zipsoon.batch.job.normalize.writer.NormalizeWriter;
 import com.zipsoon.batch.application.service.normalize.normalizer.ScoreNormalizer;
 import com.zipsoon.batch.infrastructure.repository.normalize.NormalizeRepository;
 import com.zipsoon.batch.application.service.score.calculator.ScoreCalculator;
-import com.zipsoon.batch.domain.score.ScoreType;
+import com.zipsoon.common.domain.score.ScoreType;
 import com.zipsoon.common.domain.EstateScore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

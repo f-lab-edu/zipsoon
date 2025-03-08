@@ -4,7 +4,7 @@ import com.zipsoon.batch.job.listener.StepExecutionLoggingListener;
 import com.zipsoon.batch.job.normalize.processor.NormalizeProcessor;
 import com.zipsoon.batch.job.normalize.reader.NormalizeReader;
 import com.zipsoon.batch.job.normalize.writer.NormalizeWriter;
-import com.zipsoon.batch.domain.score.ScoreType;
+import com.zipsoon.common.domain.score.ScoreType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
