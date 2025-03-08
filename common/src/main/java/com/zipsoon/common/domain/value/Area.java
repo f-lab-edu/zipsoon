@@ -2,17 +2,15 @@ package com.zipsoon.common.domain.value;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 
 /**
  * 면적을 나타내는 값 객체
  */
-public record Area(BigDecimal squareMeters) {
-    private static final BigDecimal PYEONG_CONVERSION_FACTOR = new BigDecimal("0.3025");
+public record Area(double squareMeters) {
+    private static final double PYEONG_CONVERSION_FACTOR = 0.3025;
     
     public Area {
-        Objects.requireNonNull(squareMeters, "면적은 null일 수 없습니다");
-        if (squareMeters.compareTo(BigDecimal.ZERO) <= 0) {
+        if (squareMeters <= 0) {
             throw new IllegalArgumentException("면적은 양수여야 합니다");
         }
     }
@@ -22,9 +20,8 @@ public record Area(BigDecimal squareMeters) {
      * 
      * @return 평 단위 면적
      */
-    public BigDecimal toPyeong() {
-        return squareMeters.multiply(PYEONG_CONVERSION_FACTOR)
-                         .setScale(2, RoundingMode.HALF_UP);
+    public double toPyeong() {
+        return Math.round(squareMeters * PYEONG_CONVERSION_FACTOR * 100) / 100.0;
     }
     
     /**
@@ -33,8 +30,18 @@ public record Area(BigDecimal squareMeters) {
      * @param squareMeters 제곱미터 면적
      * @return Area 객체
      */
-    public static Area ofSquareMeters(BigDecimal squareMeters) {
+    public static Area ofSquareMeters(double squareMeters) {
         return new Area(squareMeters);
+    }
+    
+    /**
+     * BigDecimal에서 면적 객체 생성
+     */
+    public static Area ofSquareMeters(BigDecimal squareMeters) {
+        if (squareMeters == null) {
+            throw new IllegalArgumentException("면적은 null일 수 없습니다");
+        }
+        return new Area(squareMeters.doubleValue());
     }
     
     /**
@@ -43,8 +50,17 @@ public record Area(BigDecimal squareMeters) {
      * @param pyeong 평 면적
      * @return Area 객체
      */
+    public static Area ofPyeong(double pyeong) {
+        return new Area(pyeong / PYEONG_CONVERSION_FACTOR);
+    }
+    
+    /**
+     * BigDecimal 평에서 면적 객체 생성
+     */
     public static Area ofPyeong(BigDecimal pyeong) {
-        BigDecimal squareMeters = pyeong.divide(PYEONG_CONVERSION_FACTOR, 2, RoundingMode.HALF_UP);
-        return new Area(squareMeters);
+        if (pyeong == null) {
+            throw new IllegalArgumentException("면적은 null일 수 없습니다");
+        }
+        return ofPyeong(pyeong.doubleValue());
     }
 }

@@ -87,13 +87,14 @@ public class Estate {
         }
         
         // 거래 유형에 따른 가격 유효성 검증
-        if (tradeType == TradeType.A1 && price == null) {
-            throw new IllegalArgumentException("매매 유형은 가격(price)이 필수입니다");
+        if ((tradeType == TradeType.A1 || tradeType == TradeType.B1) && price == null) {
+            throw new IllegalArgumentException("매매, 전세 유형은 가격(price)이 필수입니다");
         }
-        if ((tradeType == TradeType.B1 || tradeType == TradeType.B2) && rentPrice == null) {
-            throw new IllegalArgumentException("임대 유형은 임대료(rentPrice)가 필수입니다");
+        if ((tradeType == TradeType.B2 || tradeType == TradeType.B3) && rentPrice == null) {
+            throw new IllegalArgumentException("월세, 단기임대 유형은 임대료(rentPrice)가 필수입니다");
         }
-        
+
+
         return Estate.builder()
                 .platformType(platformType)
                 .platformId(platformId)
@@ -130,13 +131,13 @@ public class Estate {
      * 면적(제곱미터) 원시값 반환 (호환성)
      */
     public BigDecimal getAreaMeter() {
-        return area != null ? area.squareMeters() : null;
+        return area != null ? BigDecimal.valueOf(area.squareMeters()) : null;
     }
     
     /**
      * 면적(평) 원시값 반환 (호환성)
      */
     public BigDecimal getAreaPyeong() {
-        return area != null ? area.toPyeong() : null;
+        return area != null ? BigDecimal.valueOf(area.toPyeong()) : null;
     }
 }
