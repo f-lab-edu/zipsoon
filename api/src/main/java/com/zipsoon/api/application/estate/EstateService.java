@@ -118,7 +118,7 @@ public class EstateService {
             var scoreDetails = scoreService.getScoreDetails(estate.getId(), userId);
             var response = EstateDetailResponse.from(estate, scoreDetails, isFavorite);
             log.debug("[SVC:OUT] findEstateDetail() 완료 - 매물 ID: {}, 총점: {}", 
-                     id, scoreDetails.totalScore());
+                     id, scoreDetails.total());
             return response;
         } catch (Exception e) {
             log.error("[SVC:ERR] 매물 {} 상세 점수 계산 오류: {}", estate.getId(), e.getMessage());
@@ -208,7 +208,7 @@ public class EstateService {
                 } catch (Exception e) {
                     log.error("[SVC:ERR] 매물 {} 점수 계산 오류: {}", estate.getId(), e.getMessage());
                     // 점수 정보 없이 기본 매물 정보 반환
-                    var emptySummary = new ScoreSummaryResponse(0.0, "점수 정보 없음");
+                    var emptySummary = new ScoreSummaryResponse(0.0, List.of());
                     return EstateResponse.from(estate, emptySummary);
                 }
             })

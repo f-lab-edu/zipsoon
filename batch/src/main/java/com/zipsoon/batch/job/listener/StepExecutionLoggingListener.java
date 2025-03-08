@@ -5,6 +5,8 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
+import java.time.Duration;
+
 /**
  * Spring Batch Step 실행 시 로깅을 위한 리스너
  * Step 시작, 종료 및 통계 정보를 로깅
@@ -31,11 +33,8 @@ public class StepExecutionLoggingListener implements StepExecutionListener {
                 stepExecution.getRollbackCount());
         
         // 타이밍 정보 추가
-        long executionTime = 0;
-        if (stepExecution.getStartTime() != null && stepExecution.getEndTime() != null) {
-            executionTime = stepExecution.getEndTime().getTime() - stepExecution.getStartTime().getTime();
-        }
-        log.info("[BATCH:JOB-STEP-STATS] {} - 실행 시간: {}ms", 
+        long executionTime = Duration.between(stepExecution.getStartTime(), stepExecution.getEndTime()).toMillis();
+        log.info("[BATCH:JOB-STEP-STATS] {} - 실행 시간: {}ms",
                 stepExecution.getStepName(), executionTime);
                 
         // 스킵된 항목이 있는 경우 추가 로깅
