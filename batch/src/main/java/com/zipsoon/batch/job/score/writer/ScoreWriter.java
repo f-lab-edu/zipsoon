@@ -34,10 +34,10 @@ public class ScoreWriter implements ItemWriter<List<EstateScore>> {
             // 오래된 스코어는 스냅샷으로 이동
             scoreRepository.migrateToScoreSnapshot();
             
-            log.info("Saved scores: {}", scores.size());
+            log.info("[BATCH:STEP-WRITER] 점수 저장 완료: {}개", scores.size());
         } catch (Exception e) {
-            log.error("Error saving scores: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to save scores: " + e.getMessage(), e);
+            log.error("[BATCH:STEP-ERR] 점수 저장 중 오류 발생: {}", e.getMessage(), e);
+            throw new RuntimeException("점수 저장 실패: " + e.getMessage(), e);
         }
     }
     

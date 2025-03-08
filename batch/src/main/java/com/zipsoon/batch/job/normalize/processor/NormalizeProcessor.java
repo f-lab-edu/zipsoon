@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class NormalizeProcessor implements ItemProcessor<ScoreType, ScoreType> {
     @Override
     public ScoreType process(ScoreType scoreType) {
-        log.info("Processing normalization for score type: {}", scoreType.getName());
+        log.info("[BATCH:STEP-PROCESSOR] 점수 유형 정규화 처리 중: {}", scoreType.getName());
         return scoreType;
     }
 }

@@ -25,7 +25,7 @@ public class EstateItemReader implements ItemReader<String> {
                 .stream()
                 .map(DongCode::code)
                 .toList();
-            log.info("Estate reader initialized with {} dong codes", dongCodes.size());
+            log.info("[BATCH:STEP-READER] 매물 수집 리더 초기화 - 법정동코드 {}개 로드됨", dongCodes.size());
         }
         
         if (currentIndex < dongCodes.size()) {

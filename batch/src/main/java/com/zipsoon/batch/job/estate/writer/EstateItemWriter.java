@@ -32,22 +32,23 @@ public class EstateItemWriter implements ItemWriter<List<Estate>> {
                 .toList();
             
             // 새로운 매물 정보 저장
-            log.info("Saving new estates data: {} items", estates.size());
+            log.info("[BATCH:STEP-WRITER] 새로운 매물 데이터 저장 시작: 총 {}개", estates.size());
             
             // 빈 리스트인 경우 저장 작업 생략
             if (estates.isEmpty()) {
-                log.info("No estates to save, skipping database operation");
+                log.info("[BATCH:STEP-WRITER] 저장할 매물 없음, 데이터베이스 작업 생략");
                 return;
             }
             
             batchEstateRepository.saveAll(estates);
-            log.info("Estate data saved successfully: {} estates", estates.size());
+            log.info("[BATCH:STEP-WRITER] 매물 데이터 저장 완료: {}개", estates.size());
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("Failed to save estates due to data integrity violation: " + e.getMessage(), e);
+            log.error("[BATCH:STEP-ERR] 매물 데이터 무결성 위반 오류: {}", e.getMessage());
+            throw new IllegalArgumentException("데이터 무결성 위반으로 매물 저장 실패: " + e.getMessage(), e);
         } catch (Exception e) {
             // 예외 발생 시 트랜잭션이 롤백됨
-            log.error("Transaction will be rolled back due to error: {}", e.getMessage());
-            throw new RuntimeException("Unexpected failure during batch job execution: " + e.getMessage(), e);
+            log.error("[BATCH:STEP-ERR] 오류로 인한 트랜잭션 롤백: {}", e.getMessage());
+            throw new RuntimeException("배치 작업 실행 중 예상치 못한 오류 발생: " + e.getMessage(), e);
         }
     }
 }

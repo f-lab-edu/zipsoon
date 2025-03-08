@@ -24,25 +24,27 @@ public class JobRunner implements CommandLineRunner, ExitCodeGenerator {
     
     @Override
     public void run(String... args) {
-        log.info("Starting batch job pipeline execution");
+        log.info("[BATCH:JOB-START] 배치 작업 파이프라인 실행 시작");
         
         try {
             // 커맨드 라인 인자가 있는 경우 특정 단계부터 실행
             if (args.length > 0) {
                 String startStep = args[0].toUpperCase();
+                log.info("[BATCH:JOB-PARAM] 시작 단계 지정: {}", startStep);
                 runFrom(startStep);
             } else {
                 // 인자가 없는 경우 전체 파이프라인 실행
+                log.info("[BATCH:JOB-PARAM] 전체 파이프라인 실행");
                 pipelineService.runFullPipeline();
             }
             
-            log.info("Batch job pipeline execution completed successfully");
+            log.info("[BATCH:JOB-END] 배치 작업 파이프라인 실행 완료 - 상태: 성공");
         } catch (Exception e) {
-            log.error("Error during batch job pipeline execution", e);
+            log.error("[BATCH:JOB-ERR] 배치 작업 파이프라인 실행 중 오류 발생", e);
             exitCode = 1;
         } finally {
             // 애플리케이션 종료
-            log.info("Exiting application with exit code: {}", exitCode);
+            log.info("[BATCH:JOB-END] 애플리케이션 종료 - 종료 코드: {}", exitCode);
             SpringApplication.exit(context, () -> exitCode);
         }
     }
@@ -72,7 +74,7 @@ public class JobRunner implements CommandLineRunner, ExitCodeGenerator {
                     break;
             }
         } catch (Exception e) {
-            log.error("Error during batch job pipeline execution from {}", startPoint, e);
+            log.error("[BATCH:JOB-ERR] {} 단계부터 배치 작업 파이프라인 실행 중 오류 발생", startPoint, e);
             exitCode = 1;
         }
     }

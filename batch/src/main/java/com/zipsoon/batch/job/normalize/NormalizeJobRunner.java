@@ -23,8 +23,8 @@ public class NormalizeJobRunner {
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting score normalization job...");
+        log.info("[BATCH:JOB-START] 점수 정규화 작업 시작 - 파라미터: {}", params);
         JobExecution execution = jobLauncher.run(normalizeJob, params);
-        log.info("Score normalization job finished with status: {}", execution.getStatus());
+        log.info("[BATCH:JOB-END] 점수 정규화 작업 완료 - 상태: {}", execution.getStatus());
     }
 }

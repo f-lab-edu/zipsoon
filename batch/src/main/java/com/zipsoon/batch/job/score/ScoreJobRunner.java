@@ -23,8 +23,8 @@ public class ScoreJobRunner {
             .addString("executionTime", LocalDateTime.now().toString())
             .toJobParameters();
 
-        log.info("Starting estate score calculation job...");
+        log.info("[BATCH:JOB-START] 매물 점수 계산 작업 시작 - 파라미터: {}", params);
         JobExecution execution = jobLauncher.run(scoreJob, params);
-        log.info("Score calculation job finished with status: {}", execution.getStatus());
+        log.info("[BATCH:JOB-END] 매물 점수 계산 작업 완료 - 상태: {}", execution.getStatus());
     }
 }

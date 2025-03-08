@@ -19,12 +19,23 @@ public class ScoreProcessor implements ItemProcessor<Estate, List<EstateScore>> 
 
     @Override
     public List<EstateScore> process(Estate estate) {
-        return calculators.stream()
-            .map(calculator -> EstateScore.of(
-                estate.getId(),
-                calculator.getScoreId(),
-                calculator.calculateRawScore(estate)
-            ))
+        log.debug("[BATCH:STEP-PROCESSOR] 매물 ID {} 점수 계산 시작", estate.getId());
+        
+        List<EstateScore> scores = calculators.stream()
+            .map(calculator -> {
+                double rawScore = calculator.calculateRawScore(estate);
+                log.debug("[BATCH:STEP-PROCESSOR] 매물 ID {} - {} 점수: {}", 
+                        estate.getId(), calculator.getScoreId(), rawScore);
+                return EstateScore.of(
+                    estate.getId(),
+                    calculator.getScoreId(),
+                    rawScore
+                );
+            })
             .toList();
+            
+        log.debug("[BATCH:STEP-PROCESSOR] 매물 ID {} 점수 계산 완료 - {}개 유형 처리됨", 
+                estate.getId(), scores.size());
+        return scores;
     }
 }
