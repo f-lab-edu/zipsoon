@@ -122,7 +122,7 @@ public class EstateService {
 
         // 찜하기 추가
         var favorite = UserFavoriteEstate.of(userId, estateId);
-        userFavoriteEstateRepository.addFavorite(favorite);
+        userFavoriteEstateRepository.save(favorite);
     }
 
     @Transactional
@@ -132,7 +132,7 @@ public class EstateService {
             .orElseThrow(() -> new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
 
         // 찜하기 삭제
-        userFavoriteEstateRepository.removeFavorite(userId, estateId);
+        userFavoriteEstateRepository.delete(userId, estateId);
     }
 
     @Transactional(readOnly = true)

@@ -33,7 +33,7 @@ public class NormalizeWriter implements ItemWriter<ScoreType> {
 
             if (calculator == null || calculator.getNormalizer() == null) continue;
 
-            List<EstateScore> scores = normalizeRepository.findByScoreType(scoreTypeId);
+            List<EstateScore> scores = normalizeRepository.findByScoreTypeId(scoreTypeId);
             if (scores == null || scores.isEmpty()) continue;
 
             List<Double> rawScores = scores.stream()

@@ -48,7 +48,7 @@ class BatchExceptionHandlerTest {
         );
 
         doThrow(new DataIntegrityViolationException("Duplicate key"))
-            .when(repository).saveAllEstates(eq(snapshots));
+            .when(repository).saveAll(eq(snapshots));
 
         assertThrows(IllegalArgumentException.class, () -> writer.write(new Chunk<>(List.of(snapshots))));
     }

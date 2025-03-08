@@ -40,7 +40,7 @@ public class EstateItemWriter implements ItemWriter<List<Estate>> {
                 return;
             }
             
-            batchEstateRepository.saveAllEstates(estates);
+            batchEstateRepository.saveAll(estates);
             log.info("Estate data saved successfully: {} estates", estates.size());
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("Failed to save estates due to data integrity violation: " + e.getMessage(), e);

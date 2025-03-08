@@ -153,7 +153,7 @@ public class ScoreService {
     public void disableScoreType(Long userId, Integer scoreTypeId) {
         log.info("Disabling score type: {} for user: {}", scoreTypeId, userId);
         var disabledScoreType = UserDisabledScoreType.of(userId, scoreTypeId);
-        userDisabledScoreTypeRepository.insert(disabledScoreType);
+        userDisabledScoreTypeRepository.save(disabledScoreType);
     }
 
     /**
