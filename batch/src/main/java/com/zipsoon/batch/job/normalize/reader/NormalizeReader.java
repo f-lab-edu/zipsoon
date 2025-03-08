@@ -19,7 +19,7 @@ public class NormalizeReader implements ItemReader<ScoreType> {
     @Override
     public ScoreType read() {
         if (iterator == null) {
-            List<ScoreType> scoreTypes = normalizeRepository.findAllActiveScoreType();
+            List<ScoreType> scoreTypes = normalizeRepository.findAllActiveScoreTypes();
             iterator = scoreTypes.iterator();
         }
 

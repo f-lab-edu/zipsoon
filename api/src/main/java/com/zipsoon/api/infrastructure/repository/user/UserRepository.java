@@ -2,7 +2,7 @@ package com.zipsoon.api.infrastructure.repository.user;
 
 
 import com.zipsoon.api.domain.user.User;
-import com.zipsoon.api.interfaces.mapper.UserMapper;
+import com.zipsoon.api.infrastructure.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -11,29 +11,25 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
-    private final UserMapper userMapper;
+    private final UserMapper mapper;
     
     public Optional<User> findById(Long id) {
-        return userMapper.findById(id);
+        return mapper.selectById(id);
     }
     
     public Optional<User> findByEmail(String email) {
-        return userMapper.findByEmail(email);
+        return mapper.selectByEmail(email);
     }
-    
-    public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
-        return userMapper.findByProviderAndProviderId(provider, providerId);
-    }
-    
+
     public boolean existsByEmail(String email) {
-        return userMapper.existsByEmail(email);
+        return mapper.existsByEmail(email);
     }
     
     public void save(User user) {
-        userMapper.save(user);
+        mapper.insert(user);
     }
     
     public void delete(Long id) {
-        userMapper.delete(id);
+        mapper.delete(id);
     }
 }

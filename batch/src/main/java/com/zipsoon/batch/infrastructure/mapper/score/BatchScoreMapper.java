@@ -9,5 +9,5 @@ import java.util.List;
 @Mapper
 public interface BatchScoreMapper {
     void insertAll(@Param("list") List<EstateScore> scores);
-    void migrateToScoreSnapshot();
+    void insertIntoScoreSnapshot();
 }

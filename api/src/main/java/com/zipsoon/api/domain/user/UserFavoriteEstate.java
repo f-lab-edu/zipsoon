@@ -12,7 +12,14 @@ public class UserFavoriteEstate {
     private Long estateId;
     private LocalDateTime createdAt;
 
-    public static UserFavoriteEstate create(Long userId, Long estateId) {
+    /**
+     * 사용자가 찜한 매물 정보를 생성합니다.
+     * 
+     * @param userId 사용자 ID
+     * @param estateId 매물 ID
+     * @return 생성된 찜 정보
+     */
+    public static UserFavoriteEstate of(Long userId, Long estateId) {
         return UserFavoriteEstate.builder()
             .userId(userId)
             .estateId(estateId)

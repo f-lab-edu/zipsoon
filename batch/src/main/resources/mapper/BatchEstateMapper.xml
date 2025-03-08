@@ -28,7 +28,7 @@
     </resultMap>
 
     <!-- 매물 정보를 estate 테이블에 저장 -->
-    <insert id="insertEstates" parameterType="java.util.List">
+    <insert id="insertAll" parameterType="java.util.List">
         INSERT INTO estate (
             platform_type,
             platform_id,
@@ -68,65 +68,11 @@
             )
         </foreach>
     </insert>
-    
-    <!-- 기존 매물 정보를 estate_snapshot 테이블로 이동 (모든 데이터) -->
-    <insert id="migrateToSnapshot">
-        INSERT INTO estate_snapshot (
-            platform_type,
-            platform_id,
-            raw_data,
-            estate_name,
-            estate_type,
-            trade_type,
-            price,
-            rent_price,
-            area_meter,
-            area_pyeong,
-            location,
-            address,
-            tags,
-            image_urls,
-            dong_code,
-            created_at
-        )
-        SELECT 
-            e.platform_type,
-            e.platform_id,
-            e.raw_data,
-            e.estate_name,
-            e.estate_type,
-            e.trade_type,
-            e.price,
-            e.rent_price,
-            e.area_meter,
-            e.area_pyeong,
-            e.location,
-            e.address,
-            e.tags,
-            e.image_urls,
-            e.dong_code,
-            e.created_at
-        FROM 
-            estate e
-    </insert>
-    
-    <!-- estate 테이블 비우기 (외래키 제약조건 임시 비활성화) -->
-    <update id="truncateEstateTable">
-        SET session_replication_role = replica;
-        TRUNCATE TABLE estate;
-        SET session_replication_role = default;
-    </update>
 
     <!-- 나중에 사용할 estate 테이블의 모든 항목 조회 -->
-    <select id="selectAllEstates" resultMap="EstateResultMap">
+    <select id="selectAll" resultMap="EstateResultMap">
         SELECT *
         FROM estate
-    </select>
-
-    <!-- 날짜 기준으로 estate_snapshot 테이블의 모든 항목 조회 -->
-    <select id="selectLatestAll" resultMap="EstateResultMap">
-        SELECT *
-        FROM estate_snapshot
     </select>
 
 </mapper>

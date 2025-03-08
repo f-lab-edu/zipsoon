@@ -24,7 +24,7 @@
     </insert>
     
     <!-- 과거 점수 정보를 스냅샷 테이블로 이동 -->
-    <insert id="migrateToScoreSnapshot">
+    <insert id="insertIntoScoreSnapshot">
         INSERT INTO estate_score_snapshot (
             estate_snapshot_id,
             score_type_id,

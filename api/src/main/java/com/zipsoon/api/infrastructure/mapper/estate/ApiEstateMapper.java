@@ -1,4 +1,4 @@
-package com.zipsoon.api.interfaces.mapper;
+package com.zipsoon.api.infrastructure.mapper.estate;
 
 import com.zipsoon.api.interfaces.api.estate.dto.ViewportRequest;
 import com.zipsoon.common.domain.Estate;
@@ -10,12 +10,11 @@ import java.util.Optional;
 
 @Mapper
 public interface ApiEstateMapper {
-    List<Estate> findAllInViewport(
+    List<Estate> selectAllInViewport(
         @Param("viewport") ViewportRequest viewport,
         @Param("limit") int limit,
         @Param("srid") int srid
     );
 
-   Optional<Estate> findById(@Param("id") Long id);
+   Optional<Estate> selectById(@Param("id") Long id);
 }
-

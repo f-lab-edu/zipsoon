@@ -87,27 +87,27 @@ class EstateApiTest {
     }
 
     // 점수 데이터 생성 헬퍼 메서드
-    private ScoreDetails createScoreDetails(double totalScore, String description, int factorCount) {
-        List<ScoreDetails.ScoreFactor> factors = IntStream.range(1, factorCount + 1)
-            .mapToObj(i -> new ScoreDetails.ScoreFactor(
+    private ScoreDetailsResponse createScoreDetails(double totalScore, String description, int factorCount) {
+        List<ScoreDetailsResponse.ScoreFactorResponse> factors = IntStream.range(1, factorCount + 1)
+            .mapToObj(i -> new ScoreDetailsResponse.ScoreFactorResponse(
                 (long) i,
                 "점수 유형 " + i,
                 "설명 " + i,
                 7.0 + i))
             .toList();
 
-        return new ScoreDetails(totalScore, description, factors);
+        return new ScoreDetailsResponse(totalScore, description, factors);
     }
 
-    private ScoreSummary createScoreSummary(double totalScore, int factorCount) {
-        List<ScoreSummary.TopFactor> factors = IntStream.range(1, factorCount + 1)
-            .mapToObj(i -> new ScoreSummary.TopFactor(
+    private ScoreSummaryResponse createScoreSummary(double totalScore, int factorCount) {
+        List<ScoreSummaryResponse.TopFactorResponse> factors = IntStream.range(1, factorCount + 1)
+            .mapToObj(i -> new ScoreSummaryResponse.TopFactorResponse(
                 (long) i,
                 "점수 유형 " + i,
                 7.0 + i))
             .toList();
 
-        return new ScoreSummary(totalScore, factors);
+        return new ScoreSummaryResponse(totalScore, factors);
     }
 
     private List<ScoreTypeResponse> createScoreTypes(boolean... enabledFlags) {
@@ -133,7 +133,7 @@ class EstateApiTest {
             .build();
     }
 
-    private EstateDetailResponse createEstateDetailResponse(Long id, ScoreDetails scoreDetails, boolean isFavorite) {
+    private EstateDetailResponse createEstateDetailResponse(Long id, ScoreDetailsResponse scoreDetails, boolean isFavorite) {
         return EstateDetailResponse.from(
             createEstate(id),
             scoreDetails,
@@ -141,7 +141,7 @@ class EstateApiTest {
         );
     }
 
-    private List<EstateResponse> createEstateResponses(int count, ScoreSummary scoreSummary) {
+    private List<EstateResponse> createEstateResponses(int count, ScoreSummaryResponse scoreSummary) {
         return IntStream.range(1, count + 1)
             .mapToObj(i -> EstateResponse.from(
                 createEstate((long) i),
@@ -264,7 +264,7 @@ class EstateApiTest {
         void shouldReturnDefaultScores_When_GettingEstateDetailAsGuest() throws Exception {
             // given
             Long estateId = 1L;
-            ScoreDetails mockScoreDetails = createScoreDetails(7.5, "총 3개 요소의 평균 점수입니다", 3);
+            ScoreDetailsResponse mockScoreDetails = createScoreDetails(7.5, "총 3개 요소의 평균 점수입니다", 3);
             EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails, false);
 
             when(estateService.findEstateDetail(estateId, null)).thenReturn(mockResponse);
@@ -286,7 +286,7 @@ class EstateApiTest {
             // given
             Long estateId = 1L;
             // 사용자가 '편의시설 점수'를 비활성화했다고 가정 - 2개 요소만 포함
-            ScoreDetails mockScoreDetails = createScoreDetails(8.75, "총 2개 요소의 평균 점수입니다", 2);
+            ScoreDetailsResponse mockScoreDetails = createScoreDetails(8.75, "총 2개 요소의 평균 점수입니다", 2);
             EstateDetailResponse mockResponse = createEstateDetailResponse(estateId, mockScoreDetails, false);
 
             when(estateService.findEstateDetail(eq(estateId), eq(TEST_USER_ID))).thenReturn(mockResponse);
@@ -308,7 +308,7 @@ class EstateApiTest {
         void shouldReturnDefaultScores_When_GettingEstatesInViewportAsGuest() throws Exception {
             // given
             ViewportRequest request = createViewportRequest();
-            ScoreSummary scoreSummary = createScoreSummary(7.5, 3);
+            ScoreSummaryResponse scoreSummary = createScoreSummary(7.5, 3);
             List<EstateResponse> mockResponse = createEstateResponses(1, scoreSummary);
 
             when(estateService.findEstatesInViewport(any(ViewportRequest.class), isNull()))
@@ -336,7 +336,7 @@ class EstateApiTest {
             // given
             ViewportRequest request = createViewportRequest();
             // 사용자가 '편의시설 점수'를 비활성화했다고 가정 - 2개 요소만 포함
-            ScoreSummary scoreSummary = createScoreSummary(8.75, 2);
+            ScoreSummaryResponse scoreSummary = createScoreSummary(8.75, 2);
             List<EstateResponse> mockResponse = createEstateResponses(1, scoreSummary);
 
             when(estateService.findEstatesInViewport(any(ViewportRequest.class), eq(TEST_USER_ID)))

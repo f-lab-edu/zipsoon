@@ -26,7 +26,7 @@ public class ScoreWriter implements ItemWriter<List<EstateScore>> {
                 .toList();
             
             // 배치 스코어 모델을 새 모델로 변환
-            List<com.zipsoon.common.domain.EstateScore> scores = convertToEstateScores(batchScores);
+            List<EstateScore> scores = convertToEstateScores(batchScores);
             
             // 최신 스코어 저장
             scoreRepository.saveAll(scores);
@@ -42,11 +42,11 @@ public class ScoreWriter implements ItemWriter<List<EstateScore>> {
     }
     
     // 배치용 EstateScore 모델을 공통 모델로 변환
-    private List<com.zipsoon.common.domain.EstateScore> convertToEstateScores(List<EstateScore> batchScores) {
-        List<com.zipsoon.common.domain.EstateScore> scores = new ArrayList<>();
+    private List<EstateScore> convertToEstateScores(List<EstateScore> batchScores) {
+        List<EstateScore> scores = new ArrayList<>();
         
         for (EstateScore batchScore : batchScores) {
-            com.zipsoon.common.domain.EstateScore score = com.zipsoon.common.domain.EstateScore.builder()
+            EstateScore score = EstateScore.builder()
                 .estateId(batchScore.getEstateId())
                 .scoreTypeId(batchScore.getScoreTypeId())
                 .rawScore(batchScore.getRawScore())

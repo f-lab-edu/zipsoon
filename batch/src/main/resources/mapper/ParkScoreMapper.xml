@@ -7,7 +7,7 @@
                 typeHandler="com.zipsoon.common.config.typehandler.PointTypeHandler"/>
     </resultMap>
 
-    <select id="findParksWithin" resultMap="parkResultMap">
+    <select id="selectParksWithin" resultMap="parkResultMap">
         SELECT
             관리번호 as id,
             공원명 as name,

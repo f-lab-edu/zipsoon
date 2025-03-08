@@ -8,7 +8,7 @@ import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.infrastructure.jwt.JwtProvider;
 import com.zipsoon.api.infrastructure.repository.user.UserRepository;
-import com.zipsoon.api.interfaces.api.auth.dto.AuthToken;
+import com.zipsoon.api.interfaces.api.auth.dto.AuthTokenResponse;
 import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
 import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -64,7 +64,7 @@ class AuthServiceTest {
             when(jwtProvider.createRefreshToken(any())).thenReturn("mock-refresh-token");
 
             // when
-            AuthToken result = authService.signup(request);
+            AuthTokenResponse result = authService.signup(request);
 
             // then
             assertNotNull(result);
@@ -114,7 +114,7 @@ class AuthServiceTest {
             when(jwtProvider.createRefreshToken(any())).thenReturn("mock-refresh-token");
 
             // when
-            AuthToken result = authService.login(request);
+            AuthTokenResponse result = authService.login(request);
 
             // then
             assertNotNull(result);
@@ -184,7 +184,7 @@ class AuthServiceTest {
             when(jwtProvider.createRefreshToken(any())).thenReturn("mock-refresh-token");
 
             // when
-            AuthToken token = authService.login(request);
+            AuthTokenResponse token = authService.login(request);
 
             // then
             assertNotNull(token);

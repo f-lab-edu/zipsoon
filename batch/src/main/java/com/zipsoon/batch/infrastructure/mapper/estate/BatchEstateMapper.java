@@ -8,11 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface BatchEstateMapper {
-    default int getWgs84Srid() {
-        return 4326;        // WGS84 좌표계 SRID 값
-    }
-    void insertEstates(@Param("list") List<Estate> estates);
-    void migrateToSnapshot();
-    void truncateEstateTable();
-    List<Estate> selectAllEstates();
+    void insertAll(@Param("list") List<Estate> estates);
+    List<Estate> selectAll();
 }

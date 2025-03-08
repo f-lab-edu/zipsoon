@@ -58,24 +58,22 @@ public class NaverEstateCollector implements EstateCollector {
 
     private Estate convertToSnapshot(NaverLandResponseVO.NaverLandResponseArticle article, String dongCode) {
         try {
-            return Estate.builder()
-                    .platformType(PlatformType.네이버)
-                    .platformId(article.articleNo())
-                    .rawData(objectMapper.valueToTree(article))
-                    .estateName(article.articleName())
-                    .estateType(EstateType.valueOf(article.realEstateTypeCode()))
-                    .tradeType(TradeType.valueOf(article.tradeTypeCode()))
-                    .price(parsePrice(article.dealOrWarrantPrc()))
-                    .rentPrice(parsePrice(article.rentPrc()))
-                    .areaMeter(BigDecimal.valueOf(article.area1()))
-                    .areaPyeong(BigDecimal.valueOf(article.area2()))
-                    .location(createPoint(article.longitude(), article.latitude()))
-                    .address(article.detailAddress())
-                    .tags(Arrays.asList(article.tagList()))
-                    .imageUrls(article.representativeImgUrl() != null && !article.representativeImgUrl().equals("null") ? List.of(NAVER_PREFIX_URL + article.representativeImgUrl()) : null)
-                    .dongCode(dongCode)
-                    .createdAt(LocalDateTime.now())
-                    .build();
+            return Estate.of(
+                    PlatformType.네이버,
+                    article.articleNo(),
+                    objectMapper.valueToTree(article),
+                    article.articleName(),
+                    EstateType.valueOf(article.realEstateTypeCode()),
+                    TradeType.valueOf(article.tradeTypeCode()),
+                    parsePrice(article.dealOrWarrantPrc()),
+                    parsePrice(article.rentPrc()),
+                    BigDecimal.valueOf(article.area1()),
+                    createPoint(article.longitude(), article.latitude()),
+                    article.detailAddress(),
+                    dongCode,
+                    article.representativeImgUrl() != null && !article.representativeImgUrl().equals("null") ? 
+                        List.of(NAVER_PREFIX_URL + article.representativeImgUrl()) : null
+            );
         } catch (Exception e) {
             log.error("Failed to convert article to Estate: {}", article, e);
             throw new IllegalStateException("매물 정보 변환 실패: " + e.getMessage());

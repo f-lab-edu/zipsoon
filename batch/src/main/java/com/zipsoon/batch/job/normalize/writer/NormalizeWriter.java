@@ -33,7 +33,7 @@ public class NormalizeWriter implements ItemWriter<ScoreType> {
 
             if (calculator == null || calculator.getNormalizer() == null) continue;
 
-            List<EstateScore> scores = normalizeRepository.findByScoreType(scoreTypeId);
+            List<EstateScore> scores = normalizeRepository.findByScoreTypeId(scoreTypeId);
             if (scores == null || scores.isEmpty()) continue;
 
             List<Double> rawScores = scores.stream()
@@ -42,8 +42,8 @@ public class NormalizeWriter implements ItemWriter<ScoreType> {
 
             Map<Long, Double> updates = new HashMap<>();
             for (EstateScore score : scores) {
-            double rawScore = score.getRawScore();
-            double normalizedScore = calculator.getNormalizer().normalize(rawScore, rawScores);
+                double rawScore = score.getRawScore();
+                double normalizedScore = calculator.getNormalizer().normalize(rawScore, rawScores);
                 log.debug("Score ID: {}, Raw: {}, Normalized: {}",
                     score.getId(), String.format("%.10f", rawScore), String.format("%.10f", normalizedScore));
                 updates.put(score.getId(), normalizedScore);

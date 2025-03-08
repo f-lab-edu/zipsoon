@@ -20,7 +20,7 @@ public class ScoreReader implements ItemReader<Estate> {
 
     private void initialize() {
         if (!initialized) {
-            List<Estate> estates = batchEstateRepository.findAllEstates();
+            List<Estate> estates = batchEstateRepository.findAll();
             this.estatesIterator = estates.iterator();
             log.info("Loaded {} estates for scoring", estates.size());
             initialized = true;

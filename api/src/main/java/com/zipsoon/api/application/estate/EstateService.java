@@ -43,11 +43,11 @@ public class EstateService {
         }
 
         // 조회 개수 제한 계산
-        int limit = calculateResultLimit(request.zoom());
+        var limit = calculateResultLimit(request.zoom());
         log.debug("Searching estates in viewport with limit: {}", limit);
 
         // 매물 조회
-        List<Estate> estates = apiEstateRepository.findAllInViewport(request, limit);
+        var estates = apiEstateRepository.findAllInViewport(request, limit);
 
         // 조회 결과가 없는 경우
         if (estates.isEmpty()) {
@@ -61,7 +61,7 @@ public class EstateService {
         return estates.stream()
             .map(estate -> {
                 try {
-                    ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
+                    ScoreSummaryResponse scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
                     return EstateResponse.from(estate, scoreSummary);
                 } catch (Exception e) {
                     log.error("Error calculating scores for estate {}: {}", estate.getId(), e.getMessage());
@@ -92,19 +92,19 @@ public class EstateService {
             });
             
         // 찜 상태 확인
-        boolean isFavorite = false;
+        var isFavorite = false;
         if (userId != null) {
             isFavorite = userFavoriteEstateRepository.existsByUserIdAndEstateId(userId, id);
         }
 
         // 매물 점수 정보 추가하여 응답 생성
         try {
-            ScoreDetails scoreDetails = scoreService.getScoreDetails(estate.getId(), userId);
+            var scoreDetails = scoreService.getScoreDetails(estate.getId(), userId);
             return EstateDetailResponse.from(estate, scoreDetails, isFavorite);
         } catch (Exception e) {
             log.error("Error calculating detailed scores for estate {}: {}", estate.getId(), e.getMessage());
             // 점수 정보 없이 기본 상세 정보 반환
-            ScoreDetails emptyScoreDetails = new ScoreDetails(0.0, "점수 정보를 조회할 수 없습니다", List.of());
+            var emptyScoreDetails = new ScoreDetailsResponse(0.0, "점수 정보를 조회할 수 없습니다", List.of());
             return EstateDetailResponse.from(estate, emptyScoreDetails, isFavorite);
         }
     }
@@ -121,8 +121,8 @@ public class EstateService {
         }
 
         // 찜하기 추가
-        UserFavoriteEstate favorite = UserFavoriteEstate.create(userId, estateId);
-        userFavoriteEstateRepository.addFavorite(favorite);
+        var favorite = UserFavoriteEstate.of(userId, estateId);
+        userFavoriteEstateRepository.save(favorite);
     }
 
     @Transactional
@@ -132,24 +132,24 @@ public class EstateService {
             .orElseThrow(() -> new ServiceException(ErrorCode.ESTATE_NOT_FOUND));
 
         // 찜하기 삭제
-        userFavoriteEstateRepository.removeFavorite(userId, estateId);
+        userFavoriteEstateRepository.delete(userId, estateId);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<EstateResponse> findFavoriteEstates(Long userId, int page, int size) {
         // 페이지네이션 계산 (page는 1부터 시작)
-        int offset = (page - 1) * size;
+        var offset = (page - 1) * size;
 
         // 찜한 매물 목록 조회
-        List<Estate> favorites = userFavoriteEstateRepository.findFavoriteEstatesByUserId(userId, offset, size);
+        var favorites = userFavoriteEstateRepository.findFavoriteEstatesByUserId(userId, offset, size);
 
         // 총 개수 조회
-        int total = userFavoriteEstateRepository.countByUserId(userId);
+        var total = userFavoriteEstateRepository.countByUserId(userId);
 
         // 응답 데이터 변환 (점수 정보 포함)
-        List<EstateResponse> responseList = favorites.stream()
+        var responseList = favorites.stream()
             .map(estate -> {
-                ScoreSummary scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
+                var scoreSummary = scoreService.getScoreSummary(estate.getId(), userId);
                 return EstateResponse.from(estate, scoreSummary);
             })
             .toList();

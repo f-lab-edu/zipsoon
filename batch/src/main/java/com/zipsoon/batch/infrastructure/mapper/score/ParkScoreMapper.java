@@ -9,5 +9,5 @@ import java.util.List;
 
 @Mapper
 public interface ParkScoreMapper {
-    List<Park> findParksWithin(@Param("location") Point location, @Param("radius") double radiusMeters);
+    List<Park> selectParksWithin(@Param("location") Point location, @Param("radius") double radiusMeters);
 }

@@ -21,11 +21,11 @@ public record EstateDetailResponse(
     String address,
     List<String> tags,
     List<String> imageUrls,
-    ScoreDetails score,
+    ScoreDetailsResponse score,
     String platformId,
     boolean isFavorite
 ) {
-    public static EstateDetailResponse from(Estate estate, ScoreDetails scoreDetails, boolean isFavorite) {
+    public static EstateDetailResponse from(Estate estate, ScoreDetailsResponse scoreDetails, boolean isFavorite) {
         return new EstateDetailResponse(
             estate.getId(),
             estate.getEstateName(),

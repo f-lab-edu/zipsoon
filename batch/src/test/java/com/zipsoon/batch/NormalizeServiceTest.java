@@ -50,7 +50,7 @@ class NormalizeServiceTest {
             EstateScore.builder().id(2L).scoreTypeId(1L).rawScore(7.0).build()
         );
 
-        when(normalizeRepository.findByScoreType(1L)).thenReturn(scores);
+        when(normalizeRepository.findByScoreTypeId(1L)).thenReturn(scores);
         when(mockNormalizer.normalize(eq(3.0), anyList())).thenReturn(2.5);
         when(mockNormalizer.normalize(eq(7.0), anyList())).thenReturn(8.5);
 
@@ -84,7 +84,7 @@ class NormalizeServiceTest {
         writer.write(new Chunk<>(List.of(scoreType)));
 
         // then
-        verify(normalizeRepository, never()).findByScoreType(2L);
+        verify(normalizeRepository, never()).findByScoreTypeId(2L);
         verify(normalizeRepository, never()).updateNormalizedScores(eq(2L), anyMap());
     }
 
@@ -98,13 +98,13 @@ class NormalizeServiceTest {
             .active(true)
             .build();
 
-        when(normalizeRepository.findByScoreType(1L)).thenReturn(List.of());
+        when(normalizeRepository.findByScoreTypeId(1L)).thenReturn(List.of());
 
         // when
         normalizeWriter.write(new Chunk<>(List.of(scoreType)));
 
         // then
-        verify(normalizeRepository).findByScoreType(1L);
+        verify(normalizeRepository).findByScoreTypeId(1L);
         verify(normalizeRepository, never()).updateNormalizedScores(eq(1L), anyMap());
     }
 }

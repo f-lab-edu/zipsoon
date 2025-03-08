@@ -1,19 +1,18 @@
 package com.zipsoon.api.application.auth;
 
 import com.zipsoon.api.domain.auth.AuthenticationResult;
-import com.zipsoon.api.interfaces.api.auth.dto.AuthToken;
-import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
-import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
+import com.zipsoon.api.domain.auth.Role;
 import com.zipsoon.api.domain.auth.UserPrincipal;
+import com.zipsoon.api.domain.user.User;
 import com.zipsoon.api.infrastructure.exception.custom.JwtAuthenticationException;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.jwt.JwtProvider;
-import com.zipsoon.api.domain.auth.Role;
-import com.zipsoon.api.domain.user.User;
 import com.zipsoon.api.infrastructure.repository.user.UserRepository;
+import com.zipsoon.api.interfaces.api.auth.dto.AuthTokenResponse;
+import com.zipsoon.api.interfaces.api.auth.dto.LoginRequest;
+import com.zipsoon.api.interfaces.api.auth.dto.SignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,39 +28,37 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
-    public AuthToken signup(SignupRequest request) {
+    public AuthTokenResponse signup(SignupRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new ServiceException(USER_DUPLICATE);
         }
 
-        User newUser = User.builder()
-                        .email(request.email())
-                        .name(request.name())
-                        .role(Role.USER)
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .build();
+        var newUser = User.of(
+                        request.email(),
+                        request.name(),
+                        Role.USER
+                    );
         userRepository.save(newUser);
 
-        AuthenticationResult authResult = authenticate(newUser);
+        var authResult = authenticate(newUser);
         return createAuthToken(authResult);
     }
 
     @Transactional(readOnly = true)
-    public AuthToken login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+    public AuthTokenResponse login(LoginRequest request) {
+        var user = userRepository.findByEmail(request.email())
             .orElseThrow(() -> new JwtAuthenticationException(USER_NOT_FOUND));
 
-        AuthenticationResult authResult = authenticate(user);
+        var authResult = authenticate(user);
         return createAuthToken(authResult);
     }
 
-    private AuthToken createAuthToken(AuthenticationResult authResult) {
+    private AuthTokenResponse createAuthToken(AuthenticationResult authResult) {
         if (!authResult.isValid()) {
             throw new JwtAuthenticationException(INVALID_CREDENTIALS);
         }
 
-        return new AuthToken(
+        return new AuthTokenResponse(
             jwtProvider.createAccessToken(authResult.authentication()),
             jwtProvider.createRefreshToken(authResult.authentication()),
             authResult.authenticatedAt().plusDays(14)
@@ -69,8 +66,8 @@ public class AuthService {
     }
 
     private AuthenticationResult authenticate(User user) {
-        UserPrincipal principal = UserPrincipal.create(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
+        var principal = UserPrincipal.create(user);
+        var authentication = new UsernamePasswordAuthenticationToken(
             principal,
             null,
             principal.getAuthorities()
