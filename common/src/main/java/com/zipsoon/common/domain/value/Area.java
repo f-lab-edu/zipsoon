@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 public record Area(BigDecimal squareMeters) {
     private static final BigDecimal PYEONG_CONVERSION_FACTOR = new BigDecimal("0.3025");
     private static final int SCALE = 2;
-    private static final BigDecimal DEFAULT_VALUE = new BigDecimal("0.01");
+    private static final BigDecimal DEFAULT_VALUE = new BigDecimal("0");
     
     public Area {
         // 생성자에서 기본값 처리 (null이나 0 이하면 기본값 사용)
@@ -35,14 +35,14 @@ public record Area(BigDecimal squareMeters) {
      * @return Area 객체
      */
     public static Area ofSquareMeters(BigDecimal squareMeters) {
-        return new Area(squareMeters); // 생성자에서 null/0 체크함
+        return new Area(squareMeters);
     }
     
     /**
      * 제곱미터 단위로 면적 객체 생성 (double 값)
      */
     public static Area ofSquareMeters(double squareMeters) {
-        return new Area(BigDecimal.valueOf(squareMeters)); // 생성자에서 0 체크함
+        return new Area(BigDecimal.valueOf(squareMeters));
     }
     
     /**
@@ -53,7 +53,7 @@ public record Area(BigDecimal squareMeters) {
      */
     public static Area ofPyeong(BigDecimal pyeong) {
         if (pyeong == null || pyeong.compareTo(BigDecimal.ZERO) <= 0) {
-            return new Area(null); // 생성자에서 기본값 사용
+            return new Area(null);
         }
         
         BigDecimal sqMeters = pyeong.divide(PYEONG_CONVERSION_FACTOR, SCALE + 2, RoundingMode.HALF_UP)
@@ -66,16 +66,15 @@ public record Area(BigDecimal squareMeters) {
      */
     public static Area ofPyeong(double pyeong) {
         if (pyeong <= 0) {
-            return new Area(null); // 생성자에서 기본값 사용
+            return new Area(null);
         }
         return ofPyeong(BigDecimal.valueOf(pyeong));
     }
     
     /**
-     * 기본 면적 (0.01㎡) 반환
+     * 기본 면적 반환
      */
     public static Area defaultArea() {
-        return new Area(null); // 생성자에서 기본값 사용
+        return new Area(null);
     }
-}
 }

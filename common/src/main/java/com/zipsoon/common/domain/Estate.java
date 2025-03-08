@@ -104,7 +104,6 @@ public class Estate {
         } else if (area2 != null && area2.compareTo(BigDecimal.ZERO) > 0) {
             area = Area.ofPyeong(area2);
         } else {
-            // 면적 정보가 없을 경우 기본값 - 생성자에서 처리
             area = Area.defaultArea();
         }
 
@@ -127,28 +126,28 @@ public class Estate {
     }
     
     /**
-     * 가격 원시값 반환 (호환성)
+     * 가격 원시값 반환
      */
     public BigDecimal getPrice() {
         return price != null ? price.amount() : null;
     }
     
     /**
-     * 임대료 원시값 반환 (호환성)
+     * 임대료 원시값 반환
      */
     public BigDecimal getRentPrice() {
         return rentPrice != null ? rentPrice.amount() : null;
     }
     
     /**
-     * 면적(제곱미터) 원시값 반환 (호환성)
+     * 면적(제곱미터) 원시값 반환
      */
     public BigDecimal getAreaMeter() {
         return area != null ? area.squareMeters() : null;
     }
     
     /**
-     * 면적(평) 원시값 반환 (호환성)
+     * 면적(평) 원시값 반환
      */
     public BigDecimal getAreaPyeong() {
         return area != null ? area.toPyeong() : null;
