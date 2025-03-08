@@ -96,12 +96,15 @@ public class Estate {
             throw new IllegalArgumentException("월세, 단기임대 유형은 임대료(rentPrice)가 필수입니다");
         }
         
-        // 면적 정보 처리 - area1(제곱미터)가 0이거나 null이면 area2(평)에서 변환
-        Area area = null;
+        // 면적 정보 처리 - areaMeter(area1)이 유효하면 해당 값 사용, 
+        // 아니면 areaPyeong(area2)에서 변환, 둘 다 없으면 기본값
+        Area area;
         if (area1 != null && area1.compareTo(BigDecimal.ZERO) > 0) {
             area = Area.ofSquareMeters(area1);
         } else if (area2 != null && area2.compareTo(BigDecimal.ZERO) > 0) {
             area = Area.ofPyeong(area2);
+        } else {
+            area = Area.defaultArea();
         }
 
         return Estate.builder()

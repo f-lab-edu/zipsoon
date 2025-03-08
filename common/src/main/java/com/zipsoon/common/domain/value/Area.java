@@ -35,6 +35,9 @@ public record Area(BigDecimal squareMeters) {
      * @return Area 객체
      */
     public static Area ofSquareMeters(BigDecimal squareMeters) {
+        if (squareMeters == null || squareMeters.compareTo(BigDecimal.ZERO) <= 0) {
+            return defaultArea();
+        }
         return new Area(squareMeters);
     }
     
@@ -42,6 +45,9 @@ public record Area(BigDecimal squareMeters) {
      * 제곱미터 단위로 면적 객체 생성 (double 값)
      */
     public static Area ofSquareMeters(double squareMeters) {
+        if (squareMeters <= 0) {
+            return defaultArea();
+        }
         return new Area(BigDecimal.valueOf(squareMeters));
     }
     
@@ -52,6 +58,9 @@ public record Area(BigDecimal squareMeters) {
      * @return Area 객체
      */
     public static Area ofPyeong(BigDecimal pyeong) {
+        if (pyeong == null || pyeong.compareTo(BigDecimal.ZERO) <= 0) {
+            return defaultArea();
+        }
         return new Area(
             pyeong.divide(PYEONG_CONVERSION_FACTOR, SCALE + 2, RoundingMode.HALF_UP)
                 .setScale(SCALE, RoundingMode.HALF_UP)
@@ -62,6 +71,17 @@ public record Area(BigDecimal squareMeters) {
      * 평 단위로 면적 객체 생성 (double 값)
      */
     public static Area ofPyeong(double pyeong) {
+        if (pyeong <= 0) {
+            return defaultArea();
+        }
         return ofPyeong(BigDecimal.valueOf(pyeong));
+    }
+    
+    /**
+     * 기본 면적 (0.01㎡) 반환
+     */
+    public static Area defaultArea() {
+        // 0은 유효하지 않으므로 최소값 0.01 사용
+        return new Area(new BigDecimal("0.01"));
     }
 }
