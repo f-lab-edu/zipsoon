@@ -80,7 +80,7 @@ public class Estate {
             String address,
             String dongCode,
             List<String> imageUrls) {
-        
+
         // 필수 속성 유효성 검증
         if (platformType == null || platformId == null || location == null) {
             throw new IllegalArgumentException("필수 매물 속성(platformType, platformId, location)은 null일 수 없습니다");
@@ -94,7 +94,6 @@ public class Estate {
             throw new IllegalArgumentException("월세, 단기임대 유형은 임대료(rentPrice)가 필수입니다");
         }
 
-
         return Estate.builder()
                 .platformType(platformType)
                 .platformId(platformId)
@@ -105,6 +104,64 @@ public class Estate {
                 .price(price != null ? Price.of(price) : null)
                 .rentPrice(rentPrice != null ? Price.of(rentPrice) : null)
                 .area(areaMeter != null ? Area.ofSquareMeters(areaMeter) : null)
+                .location(location)
+                .address(address)
+                .dongCode(dongCode)
+                .imageUrls(imageUrls)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+    
+    /**
+     * 다양한 면적 단위를 처리하는 팩토리 메서드 (area1=평방미터, area2=평)
+     */
+    public static Estate of(
+            PlatformType platformType,
+            String platformId,
+            JsonNode rawData,
+            String estateName,
+            EstateType estateType,
+            TradeType tradeType,
+            BigDecimal price,
+            BigDecimal rentPrice,
+            BigDecimal area1, // 평방미터
+            BigDecimal area2, // 평
+            Geometry location,
+            String address,
+            String dongCode,
+            List<String> imageUrls) {
+
+        // 필수 속성 유효성 검증
+        if (platformType == null || platformId == null || location == null) {
+            throw new IllegalArgumentException("필수 매물 속성(platformType, platformId, location)은 null일 수 없습니다");
+        }
+        
+        // 거래 유형에 따른 가격 유효성 검증
+        if ((tradeType == TradeType.A1 || tradeType == TradeType.B1) && price == null) {
+            throw new IllegalArgumentException("매매, 전세 유형은 가격(price)이 필수입니다");
+        }
+        if ((tradeType == TradeType.B2 || tradeType == TradeType.B3) && rentPrice == null) {
+            throw new IllegalArgumentException("월세, 단기임대 유형은 임대료(rentPrice)가 필수입니다");
+        }
+        
+        // 면적 정보 처리 - area1(제곱미터)가 0이거나 null이면 area2(평)에서 변환
+        Area area = null;
+        if (area1 != null && area1.compareTo(BigDecimal.ZERO) > 0) {
+            area = Area.ofSquareMeters(area1);
+        } else if (area2 != null && area2.compareTo(BigDecimal.ZERO) > 0) {
+            area = Area.ofPyeong(area2);
+        }
+
+        return Estate.builder()
+                .platformType(platformType)
+                .platformId(platformId)
+                .rawData(rawData)
+                .estateName(estateName)
+                .estateType(estateType)
+                .tradeType(tradeType)
+                .price(price != null ? Price.of(price) : null)
+                .rentPrice(rentPrice != null ? Price.of(rentPrice) : null)
+                .area(area)
                 .location(location)
                 .address(address)
                 .dongCode(dongCode)
@@ -131,13 +188,13 @@ public class Estate {
      * 면적(제곱미터) 원시값 반환 (호환성)
      */
     public BigDecimal getAreaMeter() {
-        return area != null ? BigDecimal.valueOf(area.squareMeters()) : null;
+        return area != null ? area.squareMeters() : null;
     }
     
     /**
      * 면적(평) 원시값 반환 (호환성)
      */
     public BigDecimal getAreaPyeong() {
-        return area != null ? BigDecimal.valueOf(area.toPyeong()) : null;
+        return area != null ? area.toPyeong() : null;
     }
 }
