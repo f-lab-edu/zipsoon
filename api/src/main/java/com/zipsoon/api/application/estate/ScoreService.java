@@ -152,7 +152,7 @@ public class ScoreService {
     @Transactional
     public void disableScoreType(Long userId, Integer scoreTypeId) {
         log.info("Disabling score type: {} for user: {}", scoreTypeId, userId);
-        var disabledScoreType = UserDisabledScoreType.create(userId, scoreTypeId);
+        var disabledScoreType = UserDisabledScoreType.of(userId, scoreTypeId);
         userDisabledScoreTypeRepository.insert(disabledScoreType);
     }
 

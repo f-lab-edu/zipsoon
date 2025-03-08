@@ -33,13 +33,11 @@ public class AuthService {
             throw new ServiceException(USER_DUPLICATE);
         }
 
-        var newUser = User.builder()
-                        .email(request.email())
-                        .name(request.name())
-                        .role(Role.USER)
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
-                        .build();
+        var newUser = User.of(
+                        request.email(),
+                        request.name(),
+                        Role.USER
+                    );
         userRepository.save(newUser);
 
         var authResult = authenticate(newUser);

@@ -121,7 +121,7 @@ public class EstateService {
         }
 
         // 찜하기 추가
-        var favorite = UserFavoriteEstate.create(userId, estateId);
+        var favorite = UserFavoriteEstate.of(userId, estateId);
         userFavoriteEstateRepository.addFavorite(favorite);
     }
 

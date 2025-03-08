@@ -2,8 +2,6 @@ package com.zipsoon.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zipsoon.api.application.auth.AuthService;
-import com.zipsoon.api.domain.auth.Role;
-import com.zipsoon.api.domain.user.User;
 import com.zipsoon.api.infrastructure.exception.custom.ServiceException;
 import com.zipsoon.api.infrastructure.exception.model.ErrorCode;
 import com.zipsoon.api.interfaces.api.auth.AuthController;
@@ -52,19 +50,7 @@ class AuthApiTest {
             LocalDateTime.now().plusHours(1)
         );
     }
-
-    // 테스트용 사용자 생성
-    private User createMockUser() {
-        return User.builder()
-            .id(1L)
-            .email("test@example.com")
-            .name("Test User")
-            .role(Role.USER)
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .build();
-    }
-
+    
     @Nested
     @DisplayName("회원가입 테스트")
     class SignupTests {

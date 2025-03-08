@@ -20,12 +20,11 @@ public class ScoreProcessor implements ItemProcessor<Estate, List<EstateScore>> 
     @Override
     public List<EstateScore> process(Estate estate) {
         return calculators.stream()
-            .map(calculator -> EstateScore.builder()
-                .estateId(estate.getId())
-                .scoreTypeId(calculator.getScoreId())
-                .rawScore(calculator.calculateRawScore(estate))
-                .createdAt(LocalDateTime.now())
-                .build())
+            .map(calculator -> EstateScore.of(
+                estate.getId(),
+                calculator.getScoreId(),
+                calculator.calculateRawScore(estate)
+            ))
             .toList();
     }
 }
