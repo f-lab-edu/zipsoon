@@ -58,6 +58,10 @@ public class NaverEstateCollector implements EstateCollector {
 
     private Estate convertToSnapshot(NaverLandResponseVO.NaverLandResponseArticle article, String dongCode) {
         try {
+            // area1은 제곱미터(m²), area2는 평(py) 단위 
+            BigDecimal area1 = article.area1() != null ? BigDecimal.valueOf(article.area1()) : null;
+            BigDecimal area2 = article.area2() != null ? BigDecimal.valueOf(article.area2()) : null;
+            
             return Estate.of(
                     PlatformType.네이버,
                     article.articleNo(),
@@ -67,7 +71,8 @@ public class NaverEstateCollector implements EstateCollector {
                     TradeType.valueOf(article.tradeTypeCode()),
                     parsePrice(article.dealOrWarrantPrc()),
                     parsePrice(article.rentPrc()),
-                    BigDecimal.valueOf(article.area1()),
+                    area1, // 제곱미터
+                    area2, // 평
                     createPoint(article.longitude(), article.latitude()),
                     article.detailAddress(),
                     dongCode,
