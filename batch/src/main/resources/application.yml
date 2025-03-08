@@ -18,8 +18,11 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
     root: INFO
-    org.springframework.batch: DEBUG
-    com.zipsoon.batch: DEBUG
+    org.springframework.batch: INFO
+    com.zipsoon.batch: INFO
+    com.zipsoon.batch.job: INFO
+    com.zipsoon.batch.application.pipeline: DEBUG
+    com.zipsoon.batch.application.service: DEBUG
 
 naver:
   land:
