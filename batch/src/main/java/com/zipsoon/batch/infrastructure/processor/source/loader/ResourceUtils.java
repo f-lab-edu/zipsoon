@@ -1,18 +1,24 @@
 package com.zipsoon.batch.infrastructure.processor.source.loader;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class ResourceUtils {
-    private final static Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
+    private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
+    private static final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+
+    // 환경변수나 시스템 프로퍼티로 경로 설정 가능
+    private static final String BASE_PATH = System.getProperty("resource.path", "classpath:source/");
 
     public static Reader toReader(String path) throws IOException {
-        InputStream is = ResourceUtils.class.getClassLoader().getResourceAsStream(path);
-        if (is == null) throw new FileNotFoundException("Resource not found: " + path);
+        InputStream is = resolver.getResource(BASE_PATH + path).getInputStream();
         return new BufferedReader(new InputStreamReader(is, DEFAULT_ENCODING));
     }
 
@@ -20,9 +26,7 @@ public class ResourceUtils {
         if (encoding == null) {
             encoding = DEFAULT_ENCODING;
         }
-
-        InputStream is = ResourceUtils.class.getClassLoader().getResourceAsStream(path);
-        if (is == null) throw new FileNotFoundException("Resource not found: " + path);
+        InputStream is = resolver.getResource(BASE_PATH + path).getInputStream();
         return new BufferedReader(new InputStreamReader(is, encoding));
     }
 
@@ -37,12 +41,15 @@ public class ResourceUtils {
             return sb.toString();
         }
     }
-    
-    public static Path getResourcePath(String resourcePath) throws IOException {
-        URL url = ResourceUtils.class.getClassLoader().getResource(resourcePath);
-        if (url == null) {
-            throw new FileNotFoundException("Resource not found: " + resourcePath);
+
+    public static LocalDateTime getLastModifiedTime(String path) throws IOException {
+        Resource resource = resolver.getResource(BASE_PATH + path);
+        if (!resource.exists()) {
+            throw new FileNotFoundException("Resource not found: " + path);
         }
-        return Paths.get(url.getPath());
+        return LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(resource.lastModified()),
+            ZoneId.systemDefault()
+        );
     }
 }
