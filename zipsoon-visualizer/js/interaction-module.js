@@ -26,8 +26,11 @@ class InteractionModule {
       // API 서버는 codespace-xxxx-8080.github.dev이 됨
       const baseHostname = SERVER_ADDRESS.replace(/-\d+\.app\.github\.dev$/, '');
       this.apiBaseUrl = `${window.location.protocol}//${baseHostname}-${SERVER_PORT}.app.github.dev`;
+    } else if (isLocalDocker) {
+      // 로컬 Docker 환경 - 파일 프로토콜일 때는 localhost 사용
+      this.apiBaseUrl = `http://localhost:${SERVER_PORT}`;
     } else {
-      // 로컬 환경 (기존 방식: hostname:port)
+      // 일반 로컬 환경 (기존 방식: hostname:port)
       this.apiBaseUrl = `${window.location.protocol}//${SERVER_ADDRESS}:${SERVER_PORT}`;
     }
 

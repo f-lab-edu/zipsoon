@@ -2,6 +2,7 @@
 const SERVER_ADDRESS = window.location.hostname;
 const SERVER_PORT = '8080';
 const isCodespace = SERVER_ADDRESS.includes('.github.dev');
+const isLocalDocker = window.location.protocol === 'file:';
 
 /**
  * API 엔드포인트 정의
