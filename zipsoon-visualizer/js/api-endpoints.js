@@ -2,6 +2,11 @@
  * API 엔드포인트 정의
  * 각 엔드포인트에 대한 요청/응답 형식을 정의합니다.
  */
+
+// 서버 설정 - 개발/배포 환경에 따라 이 값들만 변경하면 됩니다
+const SERVER_ADDRESS = 'localhost';
+const SERVER_PORT = '8080';
+
 const API_ENDPOINTS = {
   '/api/v1/estates/map': {
     url: '/api/v1/estates/map',

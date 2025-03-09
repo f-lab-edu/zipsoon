@@ -204,7 +204,7 @@ class EstateDetailComponent {
                     // API 엔드포인트 직접 호출 (fallback)
                     console.log('인터랙션 모듈이 없음, 직접 API 호출');
                     const endpoint = API_ENDPOINTS['/api/v1/estates/:id'];
-                    const apiBaseUrl = 'http://localhost:8080';
+                    const apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
                     
                     // URL 템플릿 변수 처리
                     const urlPath = endpoint.url.replace('{id}', estateData.id);
@@ -754,7 +754,7 @@ class EstateDetailComponent {
                     await window.interactionModule.triggerInteraction('removeFavorite', { id: estateId });
                 } else {
                     const endpoint = API_ENDPOINTS['/api/v1/estates/:id/favorite/delete'];
-                    const apiBaseUrl = 'http://localhost:8080';
+                    const apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
                     const urlPath = endpoint.url.replace('{id}', estateId);
                     const url = `${apiBaseUrl}${urlPath}`;
                     
@@ -775,7 +775,7 @@ class EstateDetailComponent {
                     await window.interactionModule.triggerInteraction('addFavorite', { id: estateId });
                 } else {
                     const endpoint = API_ENDPOINTS['/api/v1/estates/:id/favorite'];
-                    const apiBaseUrl = 'http://localhost:8080';
+                    const apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
                     const urlPath = endpoint.url.replace('{id}', estateId);
                     const url = `${apiBaseUrl}${urlPath}`;
                     
