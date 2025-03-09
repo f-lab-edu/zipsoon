@@ -10,7 +10,7 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 - [↗️ 웹앱 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-5500.app.github.dev/)
 - [↗️ swagger 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-8080.app.github.dev/swagger-ui/index.html)
 
-❗️위 링크는 codespace에 의해 제공됩니다. 비용이나 보안 문제로 codespace가 닫힐 경우 접근할 수 없습니다.
+❗️위 링크는 codespace에 의해 임시 제공됩니다. 비용이나 보안 문제로 codespace가 닫힐 경우 접근할 수 없습니다.
 
 <br><br>
 
