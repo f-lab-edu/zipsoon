@@ -15,7 +15,7 @@ services:
     networks:
       - zipsoon-network
     volumes:
-      - ..:/workspaces/zipsoon
+      - .:/workspaces/zipsoon
 
   db:
     image: postgis/postgis:15-3.4
@@ -26,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ../zipsoon_dump.sql:/docker-entrypoint-initdb.d/01-zipsoon_dump.sql
+      - ./zipsoon_dump.sql:/docker-entrypoint-initdb.d/01-zipsoon_dump.sql
     networks:
       - zipsoon-network
     healthcheck:
