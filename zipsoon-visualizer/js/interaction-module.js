@@ -20,7 +20,7 @@ class InteractionModule {
     document.addEventListener('estateFavoriteChanged', this.handleFavoriteChanged.bind(this));
 
     // API 베이스 URL 설정
-    this.apiBaseUrl = 'http://localhost:8080';
+    this.apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
   }
 
   // 인터랙션 데이터 로드

@@ -375,7 +375,7 @@ class SettingsComponent {
         
         if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
             // API 호출
-            fetch('http://localhost:8080/api/v1/users/me', {
+            fetch(`http://${SERVER_ADDRESS}:${SERVER_PORT}/api/v1/users/me`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${window.authTokens.accessToken}`

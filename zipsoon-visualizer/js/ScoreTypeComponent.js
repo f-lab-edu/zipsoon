@@ -289,7 +289,7 @@ class ScoreTypeComponent {
                 : `/api/v1/estates/score-types/${scoreTypeId}/disable`; // 체크 해제 - 비활성화
             
             // API 기본 URL 가져오기 (interaction 모듈에서)
-            const apiBaseUrl = window.interactionModule ? window.interactionModule.apiBaseUrl : 'http://localhost:8080';
+            const apiBaseUrl = window.interactionModule ? window.interactionModule.apiBaseUrl : `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
             const fullUrl = `${apiBaseUrl}${endpoint}`;
                 
             console.log(`점수 유형 ${scoreTypeId} ${isEnabled ? '활성화' : '비활성화'} 요청: ${fullUrl}`);
@@ -396,7 +396,7 @@ class ScoreTypeComponent {
             console.log('직접 API 호출로 대체');
             
             // API 기본 URL 가져오기
-            const apiBaseUrl = window.interactionModule ? window.interactionModule.apiBaseUrl : 'http://localhost:8080';
+            const apiBaseUrl = window.interactionModule ? window.interactionModule.apiBaseUrl : `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
             const fullUrl = `${apiBaseUrl}${endpoint}`;
             
             console.log(`API 요청: ${fullUrl}`);
