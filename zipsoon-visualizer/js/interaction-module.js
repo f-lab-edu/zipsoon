@@ -20,7 +20,17 @@ class InteractionModule {
     document.addEventListener('estateFavoriteChanged', this.handleFavoriteChanged.bind(this));
 
     // API 베이스 URL 설정
-    this.apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
+    if (isCodespace) {
+      // Codespace 환경 (포트 번호는 하위 도메인 형식)
+      // 예: 현재 hostname이 codespace-xxxx-5500.github.dev이면
+      // API 서버는 codespace-xxxx-8080.github.dev이 됨
+      const baseHostname = SERVER_ADDRESS.replace(/-\d+\.app\.github\.dev$/, '');
+      this.apiBaseUrl = `${window.location.protocol}//${baseHostname}-${SERVER_PORT}.app.github.dev`;
+    } else {
+      // 로컬 환경 (기존 방식: hostname:port)
+      this.apiBaseUrl = `${window.location.protocol}//${SERVER_ADDRESS}:${SERVER_PORT}`;
+    }
+
   }
 
   // 인터랙션 데이터 로드
