@@ -19,10 +19,8 @@ up:
 	@SPRING_PROFILES_ACTIVE=local docker-compose up -d
 	@echo "개발 환경이 실행되었습니다."
 	@echo "✅  API 서버: http://localhost:8080"
-	@echo "✅  Swagger 엔드포인트: http://localhost:8080/swagger-ui/index.html"
-	@echo "✅  디버깅용 프론트 웹앱: file://$(PWD)/zipsoon-visualizer/index.html"
-	@echo "✅  psql 접속 명령어: PGPASSWORD=$(LOCAL_DB_PASSWORD) psql -h localhost -U $(LOCAL_DB_USERNAME) -d $(LOCAL_DB_NAME)"
 	@echo "⚠️ Note: 이 컨테이너는 테스트 데이터를 제공하므로, batch 모듈을 실행할 필요가 없습니다."
+	@SPRING_PROFILES_ACTIVE=local docker-compose up
 
 down:
 	@echo "개발 환경을 중지합니다..."

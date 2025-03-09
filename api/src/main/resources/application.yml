@@ -15,6 +15,7 @@ mybatis:
 logging:
   level:
     root: INFO
+    com.zipsoon.api: DEBUG
     com.zipsoon.api.interfaces.api: INFO
     com.zipsoon.api.application: DEBUG
   pattern:
