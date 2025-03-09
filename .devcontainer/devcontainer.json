@@ -12,7 +12,7 @@
       ]
     }
   },
-  "initializeCommand": "cp -f .env .devcontainer/.env",
+  "initializeCommand": "cp -f .env.example .devcontainer/.env",
   "postAttachCommand": "tail -f /var/log/zipsoon/zipsoon-api.log",
   "forwardPorts": [8080, 5432, 5500]
 }
