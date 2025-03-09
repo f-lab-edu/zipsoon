@@ -1,52 +1,52 @@
 # Zipsoon (집순)
 집 순위를 손쉽게 매겨봅시다! 집순
 
+
 ## 1. 프로젝트 소개
 
-Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주는 "집 구하기" 서비스입니다.
+Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주는, 집 구하기 서비스입니다.
 
-## 2. Features & Screens
+
+## 2. 빠르게 구경하세요!
+
+간단한 웹앱과 swagger 엔드포인트가 배포돼 있습니다.
+- [↗️ 앱 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-5500.app.github.dev/)
+- [↗️ swagger 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-8080.app.github.dev/swagger-ui/index.html)
+
+
+## 3. Features & Screens
 
 <table>
   <tr>
-    <th style="width: 50%; text-align: center;">메인 화면</th>
-    <th style="width: 50%; text-align: center;">매물 검색 결과</th>
+    <th>메인 화면</th>
+    <th>매물 검색 결과</th>
+    <th>매물 상세 정보</th>
+    <th>사용자 설정</th>
   </tr>
-  <tr>
-    <td style="text-align: center;">
-      <img src="/assets/images/guest-screen.png" alt="메인 화면(게스트)" style="display: block; margin: 0 auto;">
-      <br>
-      • <i>인기 매물</i> 순위별 노출<br>
-      • 게스트용 필터로 매물 점수 계산<br>
-      • 매물 가격 노출
+  <tr valign="top">
+    <td>
+      <img src="/assets/images/guest-screen.png" alt="메인 화면(게스트)"><br>
+      • 게스트: 매물 정보만 제공
     </td>
-    <td style="text-align: center;">
-      <img src="/assets/images/user-screen.png" alt="메인 화면(회원)" style="display: block; margin: 0 auto;">
-      <br>
-      • <i>사용자 지정 매물</i> 순위별 노출<br>
-      • 사용자가 설정한 필터로 매물 점수 계산<br>
-      • 매물 가격, 상위 3개필터 노출
+    <td>
+      <img src="/assets/images/user-screen.png" alt="메인 화면(회원)"><br>
+      • 사용자: 매물 점수 제공<br>
+      > 사용자는 여러가지 "점수 계산기"를 선택할 수 있음<br>
+      > 선택된 계산기 중 상위 3개 점수 노출
     </td>
-  </tr>
-  <tr>
-    <th style="text-align: center;">매물 상세 정보</th>
-    <th style="text-align: center;">사용자 설정</th>
-  </tr>
-  <tr>
-    <td style="text-align: center;">
-      <img src="/assets/images/detail-screen.png" alt="매물 상세보기 화면" style="display: block; margin: 0 auto;">
-      <br>
-      • 매물 종합 평점과 세부 정보 제공<br>
-      • 사용자가 선택한 필터별 점수 노출
+    <td>
+      <img src="/assets/images/detail-screen.png" alt="매물 상세보기 화면"><br>
+      • 매물 선택: 종합 평점, 상세 정보 제공<br>
+      > 계산기별 상세 점수 제공
     </td>
-    <td style="text-align: center;">
-      <img src="/assets/images/settings-screen.png" alt="유저 정보 화면" style="display: block; margin: 0 auto;">
-      <br>
-      • 사전 제공되는 필터 제공<br>
-      • 필터 추가, 제거, 순위 변경 기능 제공
+    <td>
+      <img src="/assets/images/settings-screen.png" alt="유저 정보 화면"><br>
+      • 사용자 설정: 계산기 개인화<br>
+      > 계산기별 활성화-제외 가능
     </td>
   </tr>
 </table>
+
 
 ![zipsoon_specification](https://github.com/user-attachments/assets/f576f0b6-dc21-4ace-b5f7-e3aef9801c47)
 
