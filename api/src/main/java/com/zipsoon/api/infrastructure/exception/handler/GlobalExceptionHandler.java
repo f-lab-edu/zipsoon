@@ -77,8 +77,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
     protected ResponseEntity<ErrorResponse> handleServiceException(ServiceException e) {
-        // Include error code, message, and details in log
-        log.error("[API:ERR] 서비스 예외: {} - 코드: {} - 상세정보: {}", 
+        log.error("[API:ERR] 서비스 예외: {} - 코드: {} - 상세정보: {}",
                   e.getMessage(), e.getErrorCode(), e.getDetails());
               
         List<ErrorDetail> details = e.getDetails().stream()
@@ -100,7 +99,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleServerException(Exception e) {
-        // Include stack trace in non-production environments
         if (!"prod".equalsIgnoreCase(activeProfile)) {
             log.error("[API:ERR] 처리되지 않은 예외", e);
         } else {
