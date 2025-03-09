@@ -1,26 +1,18 @@
 {
   "name": "Zipsoon Development",
-  "dockerComposeFile": [
-    "../docker-compose.yml",
-    "../docker-compose.local.yml"
-  ],
+  "dockerComposeFile": "docker-compose.yml",
   "service": "api",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "customizations": {
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",
-        "vscjava.vscode-gradle",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "ritwickdey.LiveServer"
       ]
     }
   },
-  "initializeCommand": "cp .env.example .env",
-  "features": {
-    "ghcr.io/devcontainers/features/java:1.6.0": {
-      "version": "17",
-      "installGradle": true
-    }
-  },
-  "forwardPorts": [8080, 5432]
+  "initializeCommand": "bash -c 'cp -f .env.example .env && cp -f .env .devcontainer/.env'",
+  "postAttachCommand": "tail -f /var/log/zipsoon/zipsoon-api.log",
+  "forwardPorts": [8080, 5432, 5000]
 }
