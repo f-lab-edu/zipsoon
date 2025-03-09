@@ -48,7 +48,7 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 </table>
 
 
-![zipsoon_specification](https://github.com/user-attachments/assets/f576f0b6-dc21-4ace-b5f7-e3aef9801c47)
+<img src="/assets/images/blueprint.png" alt="기획 화면"><br>
 
 ## 3. Tech Stack
 
