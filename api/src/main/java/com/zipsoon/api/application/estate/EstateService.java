@@ -37,7 +37,7 @@ public class EstateService {
      */
     @Transactional(readOnly = true)
     public List<EstateResponse> findEstatesInViewport(ViewportRequest request, Long userId) {
-        // Entry logging - DEBUG level
+        // 메서드 진입 로깅
         log.debug("[SVC:IN] findEstatesInViewport(viewport={}, userId={})", 
                 formatViewport(request), userId != null ? userId : "guest");
         
@@ -57,7 +57,7 @@ public class EstateService {
         if (estates.isEmpty()) {
             log.info("[SVC:RESULT] 뷰포트 내 매물 없음: {}", formatViewport(request));
             
-            // Exit logging - DEBUG level
+            // 메서드 종료 로깅
             log.debug("[SVC:OUT] findEstatesInViewport() 완료 - 반환된 매물 수: 0");
             return Collections.emptyList();
         }
@@ -79,7 +79,7 @@ public class EstateService {
             .filter(Objects::nonNull)
             .toList();
             
-        // Exit logging - DEBUG level
+        // 메서드 종료 로깅
         log.debug("[SVC:OUT] findEstatesInViewport() 완료 - 반환된 매물 수: {}", estateResponses.size());
         
         return estateResponses;

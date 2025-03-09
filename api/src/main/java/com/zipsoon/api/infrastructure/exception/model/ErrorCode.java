@@ -15,7 +15,6 @@ public enum ErrorCode {
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_005", "지원되지 않는 토큰입니다"),
     INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "AUTH_006", "유효하지 않은 토큰 서명입니다"),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_007", "잘못된 인증 정보입니다"),
-//    INSUFFICIENT_PERMISSIONS(HttpStatus.FORBIDDEN, "AUTH_008", "권한이 부족합니다"),
 
     // user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "사용자를 찾을 수 없습니다"),

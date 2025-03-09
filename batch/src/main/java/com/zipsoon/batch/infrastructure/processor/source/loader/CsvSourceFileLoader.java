@@ -23,7 +23,7 @@ public class CsvSourceFileLoader implements SourceFileLoader {
     @Override
     public int load(Reader reader, String tableName) throws IOException, SQLException {
         try (Reader safeReader = reader) {
-            // 현재 활성화된 트랜잭션 내의 Connection 획득 (Spring 관리)
+            // 스프링이 관리하는 트랜잭션 Connection 획득
             Connection conn = DataSourceUtils.getConnection(dataSource);
             try {
                 BaseConnection pgConn = conn.unwrap(BaseConnection.class);
@@ -34,13 +34,13 @@ public class CsvSourceFileLoader implements SourceFileLoader {
                     safeReader
                 );
 
-                log.info("Successfully copied {} rows to table {}", rowsCopied, tableName);
+                log.info("테이블 {}에 {}개 행을 성공적으로 복사했습니다", tableName, rowsCopied);
                 return rowsCopied;
             } catch (Exception e) {
-                log.error("Error copying data to table {}: {}", tableName, e.getMessage());
+                log.error("테이블 {}에 데이터 복사 중 오류 발생: {}", tableName, e.getMessage());
                 throw e;
             } finally {
-                // Spring이 관리하는 Connection을 해제 (닫지 않음)
+                // 스프링이 관리하는 Connection 반환 (실제로 닫지 않음)
                 DataSourceUtils.releaseConnection(conn, dataSource);
             }
         }

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  api:
+    image: electronyoon/zipsoon-api:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DEV_DB_JDBC_URI=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
+      - DEV_DB_USERNAME=${LOCAL_DB_USERNAME}
+      - DEV_DB_PASSWORD=${LOCAL_DB_PASSWORD}
+      - DEV_JWT_SECRET=${LOCAL_JWT_SECRET}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - zipsoon-network
+    volumes:
+      - ..:/workspaces/zipsoon
+
+  db:
+    image: postgis/postgis:15-3.4
+    environment:
+      - POSTGRES_DB=${LOCAL_DB_NAME}
+      - POSTGRES_USER=${LOCAL_DB_USERNAME}
+      - POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../zipsoon_dump.sql:/docker-entrypoint-initdb.d/01-zipsoon_dump.sql
+    networks:
+      - zipsoon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  zipsoon-network:
+    driver: bridge

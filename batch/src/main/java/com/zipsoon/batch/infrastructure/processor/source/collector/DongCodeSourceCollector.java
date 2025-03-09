@@ -7,20 +7,13 @@ import com.zipsoon.batch.infrastructure.repository.source.SourceRepository;
 import com.zipsoon.batch.infrastructure.util.BatchJobUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -70,14 +63,7 @@ public class DongCodeSourceCollector implements SourceCollector {
     @Override
     public boolean wasUpdated() {
         try {
-            Path resourcePath = ResourceUtils.getResourcePath(DATA_FILE);
-
-            LocalDateTime fileLastModified = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(Files.getLastModifiedTime(resourcePath).toMillis()),
-                ZoneId.systemDefault()
-            );
-            
-            // 유틸리티 클래스 사용
+            LocalDateTime fileLastModified = ResourceUtils.getLastModifiedTime(DATA_FILE);
             LocalDateTime lastSuccessTime = BatchJobUtils.getLastSuccessfulJobTime(jobExplorer, JOB_NAME);
 
             // 유틸리티 클래스를 사용하여 업데이트 필요 여부 확인 및 로깅

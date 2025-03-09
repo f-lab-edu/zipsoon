@@ -54,17 +54,17 @@ public class NaverLandClient {
             );
 
             if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RestClientException("Failed to retrieve data from Naver API");
+                throw new RestClientException("네이버 API에서 데이터를 가져오지 못했습니다");
             }
             
             NaverLandResponseVO responseBody = response.getBody();
             if (responseBody.articleList().length == 0) {
-                log.info("Received empty articleList from Naver API for cortarNo: {}, page: {}", cortarNo, page);
+                log.info("법정동 코드 {}, 페이지 {}에 대한 네이버 API 응답에 매물이 없습니다", cortarNo, page);
             }
 
             return responseBody;
         } catch (RestClientException e) {
-            log.error("API error for cortarNo: {}, page: {}", cortarNo, page, e);
+            log.error("법정동 코드: {}, 페이지: {}에 대한 API 오류", cortarNo, page, e);
             return new NaverLandResponseVO(false, cortarNo, new NaverLandResponseVO.NaverLandResponseArticle[0]);
         }
     }

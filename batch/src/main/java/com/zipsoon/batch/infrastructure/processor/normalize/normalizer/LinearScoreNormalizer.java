@@ -19,7 +19,7 @@ public class LinearScoreNormalizer implements ScoreNormalizer {
 
         double range = MAX_SCORE - BASE_SCORE;
 
-        // 수정된 정규화 공식: BASE_SCORE + (value-min)/(max-min) * (MAX_SCORE-BASE_SCORE)
+        // 정규화 공식: BASE_SCORE + (value-min)/(max-min) * (MAX_SCORE-BASE_SCORE)
         double normalized = BASE_SCORE + ((rawScore - min) / (max - min)) * range;
 
         // 최소값은 BASE_SCORE, 최대값은 MAX_SCORE로 제한

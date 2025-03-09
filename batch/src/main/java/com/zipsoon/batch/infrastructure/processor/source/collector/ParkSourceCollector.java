@@ -12,12 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Slf4j
 @Component
@@ -76,12 +72,7 @@ public class ParkSourceCollector implements SourceCollector {
     @Override
     public boolean wasUpdated() {
         try {
-            Path resourcePath = ResourceUtils.getResourcePath(DATA_FILE);
-
-            LocalDateTime fileLastModified = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(Files.getLastModifiedTime(resourcePath).toMillis()),
-                ZoneId.systemDefault()
-            );
+            LocalDateTime fileLastModified = ResourceUtils.getLastModifiedTime(DATA_FILE);
             LocalDateTime lastSuccessTime = BatchJobUtils.getLastSuccessfulJobTime(jobExplorer, JOB_NAME);
 
             return BatchJobUtils.checkNeedsUpdate(fileLastModified, lastSuccessTime, "공원");

@@ -1,7 +1,7 @@
 package com.zipsoon.batch.job.normalize.reader;
 
 import com.zipsoon.batch.infrastructure.repository.normalize.NormalizeRepository;
-import com.zipsoon.batch.domain.score.ScoreType;
+import com.zipsoon.common.domain.score.ScoreType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;

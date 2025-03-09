@@ -1,6 +1,8 @@
 package com.zipsoon.common.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.zipsoon.common.domain.value.Area;
+import com.zipsoon.common.domain.value.Price;
 import lombok.*;
 import org.locationtech.jts.geom.Geometry;
 
@@ -28,13 +30,11 @@ public class Estate {
 
     private TradeType tradeType;
 
-    private BigDecimal price;
+    private Price price;
 
-    private BigDecimal rentPrice;
+    private Price rentPrice;
 
-    private BigDecimal areaMeter;
-
-    private BigDecimal areaPyeong;
+    private Area area;
 
     private Geometry location;
 
@@ -59,7 +59,8 @@ public class Estate {
      * @param tradeType 거래 유형
      * @param price 가격
      * @param rentPrice 임대료
-     * @param areaMeter 면적(제곱미터)
+     * @param area1 면적(제곱미터)
+     * @param area2 면적(평)
      * @param location 위치 좌표
      * @param address 주소
      * @param dongCode 법정동 코드
@@ -75,12 +76,37 @@ public class Estate {
             TradeType tradeType,
             BigDecimal price,
             BigDecimal rentPrice,
-            BigDecimal areaMeter,
+            BigDecimal area1,
+            BigDecimal area2,
             Geometry location,
             String address,
             String dongCode,
             List<String> imageUrls) {
+
+        // 필수 속성 유효성 검증
+        if (platformType == null || platformId == null || location == null) {
+            throw new IllegalArgumentException("필수 매물 속성(platformType, platformId, location)은 null일 수 없습니다");
+        }
         
+        // 거래 유형에 따른 가격 유효성 검증
+        if ((tradeType == TradeType.A1 || tradeType == TradeType.B1) && price == null) {
+            throw new IllegalArgumentException("매매, 전세 유형은 가격(price)이 필수입니다");
+        }
+        if ((tradeType == TradeType.B2 || tradeType == TradeType.B3) && rentPrice == null) {
+            throw new IllegalArgumentException("월세, 단기임대 유형은 임대료(rentPrice)가 필수입니다");
+        }
+        
+        // 면적 정보 처리 - areaMeter(area1)이 유효하면 해당 값 사용, 
+        // 아니면 areaPyeong(area2)에서 변환, 둘 다 없으면 기본값
+        Area area;
+        if (area1 != null && area1.compareTo(BigDecimal.ZERO) > 0) {
+            area = Area.ofSquareMeters(area1);
+        } else if (area2 != null && area2.compareTo(BigDecimal.ZERO) > 0) {
+            area = Area.ofPyeong(area2);
+        } else {
+            area = Area.defaultArea();
+        }
+
         return Estate.builder()
                 .platformType(platformType)
                 .platformId(platformId)
@@ -88,15 +114,42 @@ public class Estate {
                 .estateName(estateName)
                 .estateType(estateType)
                 .tradeType(tradeType)
-                .price(price)
-                .rentPrice(rentPrice)
-                .areaMeter(areaMeter)
-                .areaPyeong(areaMeter != null ? areaMeter.multiply(BigDecimal.valueOf(0.3025)) : null)
+                .price(price != null ? Price.of(price) : null)
+                .rentPrice(rentPrice != null ? Price.of(rentPrice) : null)
+                .area(area)
                 .location(location)
                 .address(address)
                 .dongCode(dongCode)
                 .imageUrls(imageUrls)
                 .createdAt(LocalDateTime.now())
                 .build();
+    }
+    
+    /**
+     * 가격 원시값 반환
+     */
+    public BigDecimal getPrice() {
+        return price != null ? price.amount() : null;
+    }
+    
+    /**
+     * 임대료 원시값 반환
+     */
+    public BigDecimal getRentPrice() {
+        return rentPrice != null ? rentPrice.amount() : null;
+    }
+    
+    /**
+     * 면적(제곱미터) 원시값 반환
+     */
+    public BigDecimal getAreaMeter() {
+        return area != null ? area.squareMeters() : null;
+    }
+    
+    /**
+     * 면적(평) 원시값 반환
+     */
+    public BigDecimal getAreaPyeong() {
+        return area != null ? area.toPyeong() : null;
     }
 }

@@ -374,7 +374,38 @@ class SettingsComponent {
         console.log('회원 탈퇴 클릭');
         
         if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-            alert('회원 탈퇴 API는 아직 준비 중입니다.');
+            // API 호출
+            fetch('http://localhost:8080/api/v1/users/me', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${window.authTokens.accessToken}`
+                }
+            })
+            .then(response => {
+                if (response.status === 204) {
+                    // 성공 - 로그아웃 처리
+                    window.authTokens = {
+                        isLoggedIn: false
+                    };
+                    localStorage.removeItem('authTokens');
+                    
+                    // 설정 페이지 닫기
+                    this.hide();
+                    
+                    // 사용자에게 알림
+                    alert('회원 탈퇴가 완료되었습니다.');
+
+                    // 필요시 페이지 새로고침
+                    window.location.reload();
+                } else {
+                    // 오류 처리
+                    throw new Error('회원 탈퇴 처리 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('회원 탈퇴 오류:', error);
+                alert('회원 탈퇴 처리 중 오류가 발생했습니다.');
+            });
         }
     }
     

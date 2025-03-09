@@ -1,20 +1,47 @@
-.PHONY: local up down clean localdb
+.PHONY: help db emptydb clean
 
-local:
-	docker-compose -f docker-compose.yml -f docker-compose.local.yml build --no-cache
+# .env -> .env.example 순으로 로드
+ENV_FILE := $(if $(wildcard .env),.env,.env.example)
+include $(ENV_FILE)
+export $(shell sed 's/=.*//' $(ENV_FILE))
 
-up:
-	docker-compose -f docker-compose.yml -f docker-compose.local.yml up
 
-# prod:
-#     ...
+help:
+	@echo "Available commands:"
+	@echo "  make db      - batch 데이터가 준비된 데이터베이스 컨테이너를 생성합니다."
+	@echo "  make emptydb - 스키마가 존재하지만 비어있는 데이터베이스 컨테이너를 생성합니다."
+	@echo "  make clean   - 생성된 데이터베이스 컨테이너를 중지하고 삭제합니다."
 
-down:
-	docker-compose -f docker-compose.yml -f docker-compose.local.yml down -v
+db:
+	@echo "테스트 데이터가 포함된 PostGIS 데이터베이스를 시작합니다..."
+	@docker run --name zipsoon-db \
+		-e POSTGRES_DB=$(LOCAL_DB_NAME) \
+		-e POSTGRES_USER=$(LOCAL_DB_USERNAME) \
+		-e POSTGRES_PASSWORD=$(LOCAL_DB_PASSWORD) \
+		-v $(PWD)/zipsoon_dump.sql:/docker-entrypoint-initdb.d/01-dumped-data.sql \
+		-p 5432:5432 \
+		-d postgis/postgis:15-3.4
+	@echo "✅ JDBC URL: jdbc:postgresql://localhost:5432/$(LOCAL_DB_NAME)"
+	@echo "✅ 접속 명령어: PGPASSWORD=$(LOCAL_DB_PASSWORD) psql -h localhost -U $(LOCAL_DB_USERNAME) -d $(LOCAL_DB_NAME)"
+	@echo "⚠️ Note: 이 컨테이너는 테스트 데이터를 제공하므로, batch 모듈을 실행할 필요가 없습니다."
 
-clean: down
-	docker volume rm $$(docker volume ls -q | grep zipsoon) 2>/dev/null || true
-	docker system prune -f
+emptydb:
+	@echo "빈 스키마 PostGIS 데이터베이스를 시작합니다..."
+	@docker run --name zipsoon-db \
+		-e POSTGRES_DB=$(LOCAL_DB_NAME) \
+		-e POSTGRES_USER=$(LOCAL_DB_USERNAME) \
+		-e POSTGRES_PASSWORD=$(LOCAL_DB_PASSWORD) \
+		-v $(PWD)/common/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql \
+		-v $(PWD)/batch/src/main/resources/schema/schema-postgresql.sql:/docker-entrypoint-initdb.d/02-schema-postgresql.sql \
+		-p 5432:5432 \
+		-d postgis/postgis:15-3.4
+	@echo "✅ JDBC URL: jdbc:postgresql://localhost:5432/$(LOCAL_DB_NAME)"
+	@echo "✅ 접속 명령어: PGPASSWORD=$(LOCAL_DB_PASSWORD) psql -h localhost -U $(LOCAL_DB_USERNAME) -d $(LOCAL_DB_NAME)"
+	@echo "⚠️ Note: 이 컨테이너는 스키마를 초기화할 뿐, 테스트 데이터를 포함하지 않습니다. batch 모듈을 실행해야 합니다."
 
-localdb:
-	docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d db
+clean:
+	@echo "데이터베이스 컨테이너를 중지하고 삭제합니다..."
+	@docker stop zipsoon-db || true
+	@docker rm zipsoon-db || true
+	@docker volume prune -f
+	@echo "✅ 삭제 완료."

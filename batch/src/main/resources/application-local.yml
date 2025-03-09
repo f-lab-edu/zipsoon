@@ -3,3 +3,7 @@ spring:
     url: ${LOCAL_SPRING_DATASOURCE_URL}
     username: ${LOCAL_DB_USERNAME}
     password: ${LOCAL_DB_PASSWORD}
+
+# api와 동시 실행 고려
+server:
+  port: 8081
