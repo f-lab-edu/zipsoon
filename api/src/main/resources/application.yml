@@ -15,8 +15,8 @@ mybatis:
 logging:
   level:
     root: INFO
-    com.zipsoon.api.interfaces.api: INFO  # API Controllers
-    com.zipsoon.api.application: DEBUG     # Service layer
+    com.zipsoon.api.interfaces.api: INFO
+    com.zipsoon.api.application: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{X-Request-Id}] %-5level %logger{36} - %msg%n"
 
