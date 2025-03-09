@@ -14,7 +14,7 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 
 <br><br>
 
-## 1. Features & Screens
+## 1. 화면
 
 <table>
   <tr>
@@ -31,24 +31,26 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
     <td>
       <img src="/assets/images/user-screen.png" alt="메인 화면(회원)"><br>
       • 사용자: 매물 점수 제공<br>
-      > 사용자는 여러가지 "점수 계산기"를 선택할 수 있음<br>
-      > 선택된 계산기 중 상위 3개 점수 노출
+      > 매물의 종합 점수와, 상위 3개 상세 점수를 제공<br>
+      > 각 상세 점수는 고유한 점수 계산 방식을 따름
     </td>
     <td>
       <img src="/assets/images/detail-screen.png" alt="매물 상세보기 화면"><br>
       • 매물 선택: 종합 평점, 상세 정보 제공<br>
-      > 계산기별 상세 점수 제공
+      > 매물의 상세 정보와, 모든 상세 점수를 제공
+      > 마음에 드는 매물을 찜할 수 있음
     </td>
     <td>
       <img src="/assets/images/settings-screen.png" alt="유저 정보 화면"><br>
-      • 사용자 설정: 계산기 개인화<br>
-      > 계산기별 활성화-제외 가능
+      • 사용자 설정: 상세 점수 개인화<br>
+      > 사용자는 특정 점수 계산 방식을 포함/제외시킬 수 있음
     </td>
   </tr>
 </table>
 
-
 <img src="/assets/images/blueprint.png" alt="기획 화면"><br>
+
+<br><br>
 
 ## 3. Tech Stack
 
