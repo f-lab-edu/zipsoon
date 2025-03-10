@@ -48,112 +48,64 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
   </tr>
 </table>
 
-<img src="/assets/images/blueprint.png" alt="기획 화면"><br>
+<img src="/assets/images/blueprint.png" alt="기획 화면">
 
 <br><br>
 
-## 3. Tech Stack
-
-**Core**
-- Java 17
-- Spring Boot 3.4.x
-- Spring Security with JWT Authentication
-- MyBatis
-
-**Database**
-- PostgreSQL with PostGIS extension
-
-**Testing**
-- JUnit 5
-- Mockito for unit testing
-
-**Build & Development**
-- Gradle 8.x
-- Docker
-- Docker Compose
-
-**API Documentation**
-- Swagger/OpenAPI
-
-## 4. System Architecture
+## 2. 아키텍처 및 ERD
 ```mermaid
-flowchart TD
-    NaverLand[부동산 중개 사이트] -->|batch| ZipsoonBatch
-    PublicData[공공데이터] -->|batch| ZipsoonBatch
-    ZipsoonBatch -->|Insert/Update| DB[(PostgreSQL + PostGIS)]
-    DB -->|Read| ZipsoonApp
-    ZipsoonApp <-->|REST API| 유저
-    
-    subgraph " "
-        ZipsoonBatch
-    end
-    
-    subgraph " "
-        ZipsoonApp
+flowchart LR
+    subgraph TOP[" "]
+        direction LR
+
+        subgraph BATCH["SpringBatch"]
+            direction TB
+            SourceJob["1\. SourceJob<br>(필요 데이터 수집)"]
+            EstateJob["2\. EstateJob<br>(부동산 매물 정보 수집)"]
+            ScoreJob["3\. ScoreJob<br>(부동산 매물별 점수 계산)"]
+            NormalizeJob["4\. NormalizeJob<br>(0-10점으로 정규화)"]
+            
+            SourceJob --> EstateJob
+            EstateJob --> ScoreJob
+            ScoreJob --> NormalizeJob
+        end
+
+        subgraph MIDDLE[" "]
+            style MIDDLE stroke-width:0px
+            direction TB
+            subgraph SOURCE["외부 자원"]
+                direction LR
+                NaverLand["네이버 부동산<br>(웹 자원)"]
+                PublicData["외부 데이터 정보<br>*행정구역코드, 공원 정보 등<br>(csv 파일)"]
+                NaverLand ~~~ PublicData
+            end
+
+
+            subgraph DB["PostgreSQL"]
+                EstateTable[(estate)]
+                EstateScoreTable[(estate_score)]
+                AppUserTable[(app_user)]
+            end
+
+            
+            SOURCE ~~~ DB
+
+        end
+
+
+        subgraph API["SpringBoot"]
+            direction TB
+            ViewportSearch["지도 뷰포트 검색<br>.../estates/map"]
+            DetailView["매물 상세 조회<br>.../estates/{id}"]
+            ScoreFilter["점수 타입 활성화/비활성화<br>.../estates/score-types"]
+            Favorite["매물 찜하기<br>.../estates/{id}/favorite"]
+
+            ViewportSearch ~~~ DetailView
+            DetailView ~~~ ScoreFilter
+            ScoreFilter ~~~ Favorite
+        end
+
+        BATCH["SpringBatch"] <-.-> MIDDLE <-.-> API["SpringBoot"]
     end
 ```
-
-## 5. ERD
-```mermaid
-erDiagram
-    PropertySnapshot {
-        bigint id PK
-        varchar platform_type "네이버/직방/다방 등"
-        varchar platform_id "플랫폼별 매물 ID"
-        jsonb raw_data "원본 데이터 보관"
-        varchar prop_name "매물명"
-        varchar prop_type "아파트/오피스텔/빌라"
-        varchar trade_type "매매/전세/월세"
-        numeric price "매매가/보증금"
-        numeric rent_price "월세"
-        numeric area_meter "전용면적(㎡)"
-        numeric area_pyeong "전용면적(평)"
-        geometry location "위치(PostGIS Point)"
-        varchar address "주소"
-        varchar[] tags "태그 목록"
-        varchar dong_code "법정동 코드"
-        timestamp created_at
-    }
-
-    User {
-        bigint id PK
-        varchar email
-        varchar password
-        varchar name
-        varchar provider
-        timestamp created_at
-    }
-
-    UserFilters {
-        bigint id PK
-        bigint user_id FK
-        varchar name
-        varchar description
-        boolean is_active
-        timestamp created_at
-    }
-
-    Filter {
-        bigint id PK
-        bigint filter_set_id FK
-        varchar category "시설/환경/통근"
-        varchar name "필터명"
-        integer priority "우선순위"
-        decimal weight "가중치"
-        jsonb config "필터별 설정"
-    }
-
-    ScoreSnapshot {
-        bigint id PK
-        bigint property_id FK
-        bigint filter_set_id FK
-        decimal score "0-10점"
-        jsonb details "상세 점수"
-        timestamp created_at
-    }
-
-    PropertySnapshot ||--o{ Filter : has
-    User ||--o{ UserFilters : owns
-    UserFilters ||--o{ FilterOption : contains
-    UserFilters ||--o{ ScoreSnapshot : produces
-```
+<img src="/assets/images/ERD.png" alt="ERD"><br>
