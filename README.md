@@ -12,67 +12,13 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 - [↗️ zipsoon-visualizer 웹앱 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-5500.app.github.dev/)
 - [↗️ swagger 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-8080.app.github.dev/swagger-ui/index.html)
 
-❗️위 링크는 codespace에 의해 임시 제공됩니다. 비용이나 보안 문제로 codespace가 닫힐 경우 접근할 수 없습니다.
+❗️위 링크는 codespace로 제공되는 링크입니다. 비용이나 보안 문제로 접근이 불안정할 수 있습니다.
 
-<br><br>
-
-### 프로젝트 구조
-```
-.
-├── 📁 api                  : SpringBoot REST API 어플리케이션입니다. 클라이언트와 통신을 담당합니다.
-├── 📁 batch                : SpringBatch 어플리케이션입니다. 각종 정보를 수집, 계산하고 DB에 저장합니다.
-├── 📁 common               : 공통 모듈입니다.
-├── 📁 zipsoon-visualizer   : 디버깅용 Vanilla JS 프론트엔드 웹앱입니다.
-├── Makefile                : 손쉬운 로컬 실행을 돕는 Makefile입니다.
-└── zipsoon_dump.sql        : 테스트 데이터를 포함한 sql입니다.
-```
-
-<br><br>
-
-### 로컬 실행
-Windows
-```
-git clone https://github.com/f-lab-edu/zipsoon
-cd zipsoon
-move .env.example .env
-make db
-gradlew.bat :api:bootRun --args="--spring.profiles.active=local"
-```
-macOS
-```
-git clone https://github.com/f-lab-edu/zipsoon
-cd zipsoon
-mv .env.example .env
-make db
-./gradlew :api:bootRun --args="--spring.profiles.active=local"
-```
-- 도커가 사전에 설치되어 있어야 합니다.
-- 위 방법은 테스트 데이터가 포함된 db 컨테이너를 생성합니다.
-
-<br><br>
-
-### ⚠️ 로컬 실행 (테스트 데이터 없이 batch 실행하기)
-- ___batch 어플리케이션의 직접 실행은 보안상의 문제로 권장되지 않습니다.___
-- 꼭 실행이 필요하다면 다음을 따라 주세요.
-
-Windows
-```
-git clone https://github.com/f-lab-edu/zipsoon
-cd zipsoon
-move .env.example .env
-make emptydb
-```
-macOS
-```
-git clone https://github.com/f-lab-edu/zipsoon
-cd zipsoon
-mv .env.example .env
-make emptydb
-```
-이후
-1. `.env`파일의 `NAVER_LAND_AUTH_TOKEN`에 네이버 로그인 시 발급받은 JWT 토큰을 입력
-2. `local profile`로 batch->api 순서로 실행
-
+### Codespace로 실행
+- 상단의 링크가 작동하지 않거나, DB 또는 어플리케이션의 로그를 직접 확인하고 싶으신가요?
+- 준비된 가상 환경을 이용하세요. 약 1분 안팎이면 세팅 완료!
+- 리포지토리 상단의 `Code->Codespaces->"+"` 버튼을 눌러 새 코드스페이스를 만들거나, [링크](https://codespaces.new/f-lab-edu/zipsoon?quickstart=1)를 클릭하세요.
+- 직접 실행을 원하시면, 하단의 `4. 로컬 실행` 문서로 이동하세요.
 
 <br><br>
 
@@ -115,6 +61,17 @@ make emptydb
 <br><br>
 
 ## 2. 아키텍처 및 ERD
+### 프로젝트 구조
+```
+.
+├── 📁 api                  : SpringBoot REST API 어플리케이션입니다. 클라이언트와 통신을 담당합니다.
+├── 📁 batch                : SpringBatch 어플리케이션입니다. 각종 정보를 수집, 계산하고 DB에 저장합니다.
+├── 📁 common               : 공통 모듈입니다.
+├── 📁 zipsoon-visualizer   : 디버깅용 Vanilla JS 프론트엔드 웹앱입니다.
+├── Makefile                : 손쉬운 로컬 실행을 돕는 Makefile입니다.
+└── zipsoon_dump.sql        : 테스트 데이터를 포함한 sql입니다.
+```
+### 아키텍처
 ```mermaid
 flowchart LR
     subgraph TOP[" "]
@@ -143,7 +100,7 @@ flowchart LR
             end
 
 
-            subgraph DB["PostgreSQL"]
+            subgraph DB["핵심 DB(PostgreSQL)"]
                 EstateTable[(estate)]
                 EstateScoreTable[(estate_score)]
                 AppUserTable[(app_user)]
@@ -170,8 +127,57 @@ flowchart LR
         BATCH["SpringBatch"] <-.-> MIDDLE <-.-> API["SpringBoot"]
     end
 ```
+### ERD
 <img src="/assets/images/ERD.png" alt="ERD"><br>
 
 <br><br>
 
 ## 3. 챌린지
+
+<br><br>
+
+## 4. 로컬 실행
+직접 로컬에 다운로드하고 실행해 보고 싶으시다면, 다음을 따라 주세요.
+
+Windows
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+move .env.example .env
+make db
+gradlew.bat :api:bootRun --args="--spring.profiles.active=local"
+```
+macOS
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+mv .env.example .env
+make db
+./gradlew :api:bootRun --args="--spring.profiles.active=local"
+```
+- 도커가 사전에 설치되어 있어야 합니다.
+- 위 방법은 테스트 데이터가 포함된 db 컨테이너를 생성합니다.
+
+<br><br>
+
+### ⚠️ 로컬 실행 (테스트 데이터 없이 batch 실행하기)
+- ___batch 어플리케이션의 직접 실행은 보안상의 문제로 권장되지 않습니다.___
+- 꼭 실행이 필요하다면 다음을 따라 주세요.
+
+Windows
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+move .env.example .env
+make emptydb
+```
+macOS
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+mv .env.example .env
+make emptydb
+```
+이후
+1. `.env`파일의 `NAVER_LAND_AUTH_TOKEN`에 네이버 로그인 시 발급받은 JWT 토큰을 입력
+2. `local profile`로 batch->api 순서로 실행
