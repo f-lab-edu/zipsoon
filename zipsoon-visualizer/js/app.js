@@ -114,10 +114,10 @@ $(() => {
 
         estate ||--o{ estate_score : has
         score_type ||--o{ estate_score : has
-        app_user ||--o{ user_disabled_score_type : disables
-        score_type ||--o{ user_disabled_score_type : disabled_by
         app_user ||--o{ user_favorite_estate : favorites
         estate ||--o{ user_favorite_estate : favorited_by
+        app_user ||--o{ user_disabled_score_type : disables
+        score_type ||--o{ user_disabled_score_type : disabled_by
     `;
 
     // Insert the Mermaid diagram into the ERD container

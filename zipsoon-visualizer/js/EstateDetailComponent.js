@@ -753,19 +753,11 @@ class EstateDetailComponent {
                 if (window.interactionModule) {
                     await window.interactionModule.triggerInteraction('removeFavorite', { id: estateId });
                 } else {
-                    const endpoint = API_ENDPOINTS['/api/v1/estates/:id/favorite/delete'];
-                    const apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
-                    const urlPath = endpoint.url.replace('{id}', estateId);
-                    const url = `${apiBaseUrl}${urlPath}`;
-                    
-                    await fetch(url, {
-                        method: endpoint.method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${window.authTokens.accessToken}`
-                        }
-                    });
+                    // 인터랙션 모듈을 사용하여 찜하기 취소 API 호출
+                    await window.interactionModule.fetchAPI(
+                        API_ENDPOINTS['/api/v1/estates/:id/favorite/delete'],
+                        { id: estateId }
+                    );
                 }
                 
                 this.isFavorite = false;
@@ -774,19 +766,11 @@ class EstateDetailComponent {
                 if (window.interactionModule) {
                     await window.interactionModule.triggerInteraction('addFavorite', { id: estateId });
                 } else {
-                    const endpoint = API_ENDPOINTS['/api/v1/estates/:id/favorite'];
-                    const apiBaseUrl = `http://${SERVER_ADDRESS}:${SERVER_PORT}`;
-                    const urlPath = endpoint.url.replace('{id}', estateId);
-                    const url = `${apiBaseUrl}${urlPath}`;
-                    
-                    await fetch(url, {
-                        method: endpoint.method,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${window.authTokens.accessToken}`
-                        }
-                    });
+                    // 인터랙션 모듈을 사용하여 찜하기 추가 API 호출
+                    await window.interactionModule.fetchAPI(
+                        API_ENDPOINTS['/api/v1/estates/:id/favorite'],
+                        { id: estateId }
+                    );
                 }
                 
                 this.isFavorite = true;

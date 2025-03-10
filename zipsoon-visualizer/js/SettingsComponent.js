@@ -374,15 +374,12 @@ class SettingsComponent {
         console.log('회원 탈퇴 클릭');
         
         if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-            // API 호출
-            fetch(`http://${SERVER_ADDRESS}:${SERVER_PORT}/api/v1/users/me`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${window.authTokens.accessToken}`
-                }
-            })
+            window.interactionModule.fetchAPI(
+                API_ENDPOINTS['/api/v1/users/me/delete'],
+                {}
+            )
             .then(response => {
-                if (response.status === 204) {
+                if (response._httpStatus === 204) {
                     // 성공 - 로그아웃 처리
                     window.authTokens = {
                         isLoggedIn: false
