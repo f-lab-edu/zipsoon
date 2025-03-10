@@ -7,6 +7,8 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 
 ## 0. 빠르게 구경하세요!
 
+<img src="/assets/images/zipsoon-visualizer.png" alt="zipsoon-visualizer">
+
 - [↗️ 웹앱 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-5500.app.github.dev/)
 - [↗️ swagger 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-8080.app.github.dev/swagger-ui/index.html)
 
