@@ -59,7 +59,7 @@ Windows
 ```
 git clone https://github.com/f-lab-edu/zipsoon
 cd zipsoon
-mv .env.example .env
+move .env.example .env
 make emptydb
 ```
 macOS
