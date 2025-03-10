@@ -9,11 +9,12 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 
 <img src="/assets/images/zipsoon-visualizer.png" alt="zipsoon-visualizer">
 
+⚠️테스트 데이터는 `서울특별시 종로구`만을 포함합니다. 시작 위치는 서울시청입니다. 지도를 위쪽으로 움직여 주세요!<br>
+⚠️다음 링크는 codespace 가상 자원으로 제공됩니다. 비용이나 보안 문제로 접근이 불안정할 수 있습니다.
+
+
 - [↗️ zipsoon-visualizer 웹앱 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-5500.app.github.dev/)
 - [↗️ swagger 구경하기](https://shiny-goldfish-wgw9rqjqw9435x54-8080.app.github.dev/swagger-ui/index.html)
-
-⚠️테스트 데이터는 "서울특별시 종로구"만을 포함합니다. 시작 위치는 "서울시청"입니다. 지도를 위쪽으로 움직여 주세요.<br>
-⚠️위 링크는 codespace 가상 자원으로 제공됩니다. 비용이나 보안 문제로 접근이 불안정할 수 있습니다.
 
 ### Codespace로 실행
 - 상단의 링크가 작동하지 않거나, DB 또는 어플리케이션의 로그를 직접 확인하고 싶으신가요?
