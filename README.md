@@ -16,7 +16,67 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 
 <br><br>
 
-## 1. 화면
+### 프로젝트 구조
+```
+.
+├── 📁 api                  : SpringBoot REST API 어플리케이션입니다. 클라이언트와 통신을 담당합니다.
+├── 📁 batch                : SpringBatch 어플리케이션입니다. 각종 정보를 수집, 계산하고 DB에 저장합니다.
+├── 📁 common               : 공통 모듈입니다.
+├── 📁 zipsoon-visualizer   : 디버깅용 Vanilla JS 프론트엔드 웹앱입니다.
+├── Makefile                : 손쉬운 로컬 실행을 돕는 Makefile입니다.
+└── zipsoon_dump.sql        : 테스트 데이터를 포함한 sql입니다.
+```
+
+<br><br>
+
+### 로컬 실행
+Windows
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+move .env.example .env
+make db
+gradlew.bat :api:bootRun --args="--spring.profiles.active=local"
+```
+macOS
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+mv .env.example .env
+make db
+./gradlew :api:bootRun --args="--spring.profiles.active=local"
+```
+- 도커가 사전에 설치되어 있어야 합니다.
+- 위 방법은 테스트 데이터가 포함된 db 컨테이너를 생성합니다.
+
+<br><br>
+
+### ⚠️ 로컬 실행 (테스트 데이터 없이 batch 실행하기)
+- ___batch 어플리케이션의 직접 실행은 보안상의 문제로 권장되지 않습니다.___
+- 꼭 실행이 필요하다면 다음을 따라 주세요.
+
+Windows
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+mv .env.example .env
+make emptydb
+```
+macOS
+```
+git clone https://github.com/f-lab-edu/zipsoon
+cd zipsoon
+mv .env.example .env
+make emptydb
+```
+이후
+1. `.env`파일의 `NAVER_LAND_AUTH_TOKEN`에 네이버 로그인 시 발급받은 JWT 토큰을 입력
+2. `local profile`로 batch->api 순서로 실행
+
+
+<br><br>
+
+## 1. 최초 기획 화면
 
 <table>
   <tr>
@@ -111,3 +171,7 @@ flowchart LR
     end
 ```
 <img src="/assets/images/ERD.png" alt="ERD"><br>
+
+<br><br>
+
+## 3. 챌린지
