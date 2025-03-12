@@ -51,6 +51,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+          path: api/build/libs
       
       - name: QEMU 설정 (멀티 아키텍처 지원)
         uses: docker/setup-qemu-action@v3
@@ -89,6 +90,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+          path: batch/build/libs
+          
+      - name: 소스 디렉토리 복사
+        run: |
+          mkdir -p batch/src/main/resources
+          cp -r $GITHUB_WORKSPACE/batch/src/main/resources/source batch/src/main/resources/
       
       - name: QEMU 설정 (멀티 아키텍처 지원)
         uses: docker/setup-qemu-action@v3

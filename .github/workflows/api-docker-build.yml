@@ -47,6 +47,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: api-build-artifacts
+          path: api/build/libs
       
       - name: QEMU 설정 (멀티 아키텍처 지원)
         uses: docker/setup-qemu-action@v3
