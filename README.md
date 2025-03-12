@@ -9,17 +9,11 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 
 <img src="/assets/images/zipsoon-visualizer.png" alt="zipsoon-visualizer">
 
-⚠️다음 링크는 free-tier 호스트 자원에서 제공됩니다. 처음 시작하실 경우 1분 가량의 cold-start가 발생할 수 있습니다.<br>
+⚠️다음 링크는 free-tier 호스트 자원을 활용합니다. 1분 가량의 cold-start가 발생할 수 있습니다.<br>
 ⚠️테스트 데이터는 `서울특별시 종로구`만을 포함합니다. 지도를 위쪽으로 움직여 주세요!
 
 - [↗️ zipsoon-visualizer 웹앱 구경하기](https://zipsoon-visualizer.onrender.com/)
 - [↗️ swagger 구경하기](https://zipsoon-api.onrender.com/swagger-ui/index.html)
-
-### Codespace로 실행
-- 상단의 링크가 작동하지 않거나, DB 또는 어플리케이션의 로그를 직접 확인하고 싶으신가요?
-- 준비된 가상 환경을 이용하세요. 약 1분 안팎이면 세팅 완료!
-- 리포지토리 상단의 `Code->Codespaces->"+"` 버튼을 눌러 새 코드스페이스를 만들거나, [초대 링크](https://codespaces.new/f-lab-edu/zipsoon?quickstart=1)를 클릭하세요.
-- 직접 실행을 원하시면, 하단의 `4. 로컬 실행` 문서로 이동하세요.
 
 <br><br>
 
@@ -137,8 +131,16 @@ flowchart LR
 
 <br><br>
 
-## 4. 로컬 실행
-직접 로컬에 다운로드하고 실행해 보고 싶으시다면, 다음을 따라 주세요.
+## 4. 직접 실행
+
+### Codespace로 실행
+- Codespace로 프로젝트를 손쉽게 확인하세요. 다운로드, 환경 세팅의 번거로움이 없습니다. 딱 1분 소요됩니다!
+- [초대 링크](https://codespaces.new/f-lab-edu/zipsoon?quickstart=1)를 누르시고, 다음 가이드를 따라 주세요.
+<img src="/assets/images/codespace-guide.png" alt="codespace-guide"><br>
+
+<br><br>
+
+### 로컬 실행
 
 Windows
 ```
