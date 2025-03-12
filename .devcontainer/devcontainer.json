@@ -12,7 +12,7 @@
       ]
     },
     "settings": {
-      "liveServer.settings.root": "./zipsoon-visualizer",
+      "liveServer.settings.root": "/zipsoon-visualizer",
       "liveServer.settings.file": "index.html",
       "liveServer.settings.CustomBrowser": "chrome",
       "liveServer.settings.useLocalIp": true,
