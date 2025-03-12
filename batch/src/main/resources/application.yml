@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    default: local
   datasource:
     driver-class-name: org.postgresql.Driver
   batch:
