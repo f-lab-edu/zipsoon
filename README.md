@@ -1,7 +1,7 @@
 # Zipsoon (집순)
 > 집 순위를 손쉽게 매겨봅시다! 집순
 
-Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주는, 집 구하기 서비스입니다.
+Zipsoon은 사용자 설정에 따라 부동산 매물에 점수를 보여주는, 집 구하기 서비스입니다.
 
 <br><br>
 
@@ -9,7 +9,6 @@ Zipsoon은 사용자의 설정에 따라 부동산 매물에 점수를 매겨주
 
 <img src="/assets/images/zipsoon-visualizer.png" alt="zipsoon-visualizer">
 
-⚠️다음 링크는 free-tier 호스트 자원을 활용합니다. 1분 가량의 cold-start가 발생할 수 있습니다.<br>
 ⚠️테스트 데이터는 `서울특별시 종로구`만을 포함합니다. 지도를 위쪽으로 움직여 주세요!
 
 - [↗️ zipsoon-visualizer 웹앱 구경하기](https://zipsoon-visualizer.onrender.com/)
