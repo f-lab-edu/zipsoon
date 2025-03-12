@@ -49,10 +49,10 @@ jobs:
           name: batch-build-artifacts
           path: batch/build/libs
           
-      - name: 소스 디렉토리 복사
+      # 소스 디렉토리는 이미 checkout 단계에서 가져와지므로 별도 복사 필요 없음
+      - name: 소스 디렉토리 확인
         run: |
-          mkdir -p batch/src/main/resources
-          cp -r $GITHUB_WORKSPACE/batch/src/main/resources/source batch/src/main/resources/
+          ls -la batch/src/main/resources/source || echo "Source 디렉토리가 없습니다"
       
       - name: QEMU 설정 (멀티 아키텍처 지원)
         uses: docker/setup-qemu-action@v3
