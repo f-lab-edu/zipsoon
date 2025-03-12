@@ -2,15 +2,16 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'api/src/**'
-      - 'batch/src/**'
       - 'common/src/**'
+      # API나 Batch에서 변경된 경우는 각각의 워크플로우에서 처리
+      - '!api/src/**'
+      - '!batch/src/**'
   workflow_dispatch:
 
 jobs:
-  # 1. Java 애플리케이션 빌드
-  build-application:
-    name: Java 애플리케이션 빌드
+  # 1. Common 라이브러리 변경 시 모두 빌드
+  build-all-applications:
+    name: 모든 애플리케이션 빌드
     runs-on: ubuntu-latest
     
     steps:
@@ -39,7 +40,7 @@ jobs:
   # 2. 도커 이미지 빌드 및 배포 - API
   build-api-image:
     name: API 서비스 이미지 빌드
-    needs: build-application
+    needs: build-all-applications
     runs-on: ubuntu-latest
     
     steps:
@@ -77,7 +78,7 @@ jobs:
   # 3. 도커 이미지 빌드 및 배포 - Batch
   build-batch-image:
     name: Batch 서비스 이미지 빌드
-    needs: build-application
+    needs: build-all-applications
     runs-on: ubuntu-latest
     
     steps:
@@ -121,7 +122,7 @@ jobs:
     steps:
       - name: 배포 상태 요약
         run: |
-          echo "모든 이미지가 성공적으로 빌드되고 배포되었습니다."
+          echo "공통 라이브러리 변경으로 모든 이미지가 성공적으로 재빌드되었습니다."
           echo "API 이미지: electronyoon/zipsoon-api:latest"
           echo "Batch 이미지: electronyoon/zipsoon-batch:latest"
           echo "커밋 해시: ${{ github.sha }}"
