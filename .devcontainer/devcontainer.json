@@ -14,5 +14,15 @@
   },
   "initializeCommand": "cp -f .env.example .env",
   "postAttachCommand": "tail -f /var/log/zipsoon/zipsoon-api.log",
-  "forwardPorts": [8080, 5432, 5500]
+  "forwardPorts": [8080, 5432, 5500],
+  "portsAttributes": {
+    "8080": {
+      "label": "Spring Boot API",
+      "visibility": "public"
+    },
+    "5500": {
+      "label": "Live Server",
+      "visibility": "public"
+    }
+  }
 }
