@@ -10,9 +10,29 @@
         "redhat.vscode-yaml",
         "ritwickdey.LiveServer"
       ]
+    },
+    "settings": {
+      "liveServer.settings.root": "./zipsoon-visualizer",
+      "liveServer.settings.file": "index.html",
+      "liveServer.settings.CustomBrowser": "chrome",
+      "liveServer.settings.useLocalIp": true,
+      "liveServer.settings.donotShowInfoMsg": true,
+      "liveServer.settings.donotVerifyTags": true,
+      "git.ignoreMissingGitWarning": true,
+      "redhat.telemetry.enabled": false
     }
   },
   "initializeCommand": "cp -f .env.example .env",
   "postAttachCommand": "tail -f /var/log/zipsoon/zipsoon-api.log",
-  "forwardPorts": [8080, 5432, 5500]
+  "forwardPorts": [8080, 5432, 5500],
+  "portsAttributes": {
+    "8080": {
+      "label": "Spring Boot API",
+      "visibility": "public"
+    },
+    "5500": {
+      "label": "Live Server",
+      "visibility": "public"
+    }
+  }
 }
