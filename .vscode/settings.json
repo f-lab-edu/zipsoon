@@ -1,0 +1,5 @@
+{
+    "git.ignoreMissingGitWarning": true,
+    "liveServer.settings.root": "/zipsoon-visualizer",
+    "redhat.telemetry.enabled": false,
+}
