@@ -128,6 +128,8 @@ flowchart LR
 
 ## 3. 챌린지
 
+블로그에 별도로 [정리중](https://electronyoon.github.io/%EC%A7%91%EC%88%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9B%84%EA%B8%B0.html)입니다.
+
 <br><br>
 
 ## 4. 직접 실행
