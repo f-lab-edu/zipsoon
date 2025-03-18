@@ -128,7 +128,7 @@ flowchart LR
 
 ## 3. 챌린지
 
-(작성중)
+테스트를 거치며 [순차적 작성중](https://electronyoon.github.io/%EC%A7%91%EC%88%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9B%84%EA%B8%B0.html#4-%EC%B1%8C%EB%A6%B0%EC%A7%80-%EC%84%A0%ED%83%9D%EC%A0%81-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%B2%98%EB%A6%AC)에 있습니다.
 
 <br><br>
 
