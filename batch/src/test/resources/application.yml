@@ -1,22 +1,21 @@
 spring:
+  profile:
+    test
   datasource:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgis:15-3.4:///test_db
-
-  batch:
-    jdbc:
-      initialize-schema: never
+    url: ${LOCAL_SPRING_DATASOURCE_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
 
   sql:
     init:
       mode: always
       continue-on-error: true
-      schema-locations:
-        - classpath:org/springframework/batch/core/schema-postgresql.sql
 
-  test:
-    database:
-      replace: none
+  batch:
+    job:
+      enabled: true
+    jdbc:
+      initialize-schema: always
 
 logging:
   level:
@@ -26,6 +25,8 @@ logging:
     org.springframework.jdbc.datasource.init: DEBUG
     org.springframework.batch: DEBUG
     com.zipsoon.batch: DEBUG
+  file:
+    name: ./logs/zipsoon-batch-test.log
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
@@ -36,5 +37,11 @@ mybatis:
 naver:
   land:
     base-url: https://new.land.naver.com/api
-#    auth-token: ${NAVER_AUTH_TOKEN}
-    auth-token: test-token
+    auth-token: ${NAVER_LAND_AUTH_TOKEN}
+
+performance:
+  monitoring:
+    enabled: true
+
+jwt:
+  secret-key: ${LOCAL_JWT_SECRET}
