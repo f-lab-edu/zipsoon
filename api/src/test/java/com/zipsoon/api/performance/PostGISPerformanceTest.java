@@ -147,40 +147,62 @@ public class PostGISPerformanceTest {
 
         // 결과 파일 초기화
         initializeResultsFile();
-        // 응답 시간 파일 초기화
         initializeResponseTimesFile(STANDARD_TIMES_FILE);
         initializeResponseTimesFile(POSTGIS_TIMES_FILE);
 
         List<DataSizeResult> allResults = new ArrayList<>();
 
+        // 반복 실행 횟수 (통계적 안정성 향상)
+        final int ITERATIONS = 3;
+
         // 각 데이터 크기에 대해 테스트 실행
         for (int dataSize : DATA_SIZES) {
             log.info("데이터 크기 {} 테스트 준비", dataSize);
 
-            // 테스트 데이터 생성
+            // 테스트 데이터 생성 (한 번만)
             generateTestData(dataSize);
 
-            // 1. 일반 좌표 쿼리 테스트 실행
-            log.info("일반 좌표 쿼리 테스트 시작 (데이터 크기: {})", dataSize);
-            List<Double> standardTimes = runQueryTest(dataSize, "일반 좌표 쿼리", this::measureStandardQuery);
+            // 워밍업 단계 추가 (각 쿼리 유형별로 일정 수의 쿼리 실행)
+            log.info("워밍업 단계 시작 - 각 쿼리 유형별 200개 쿼리 실행");
+            runWarmupQueries(dataSize, 200);
 
-            // 2. PostGIS 공간 쿼리 테스트 실행
-            log.info("PostGIS 공간 쿼리 테스트 시작 (데이터 크기: {})", dataSize);
-            List<Double> postgisTimes = runQueryTest(dataSize, "PostGIS 공간 쿼리", this::measurePostgisQuery);
+            // 여러 번 반복 측정 - 각 반복의 결과 저장
+            List<DataSizeResult> iterationResults = new ArrayList<>();
 
-            // 결과 분석
-            DataSizeResult result = calculateStatistics(dataSize, standardTimes, postgisTimes);
-            allResults.add(result);
+            for (int iteration = 1; iteration <= ITERATIONS; iteration++) {
+                log.info("데이터 크기 {} - 반복 {}/{} 시작", dataSize, iteration, ITERATIONS);
+
+                // 1. 일반 좌표 쿼리 테스트 실행
+                log.info("일반 좌표 쿼리 테스트 시작 (데이터 크기: {}, 반복: {})", dataSize, iteration);
+                List<Double> standardTimes = runQueryTest(dataSize, "일반 좌표 쿼리", this::measureStandardQuery);
+
+                // 2. PostGIS 공간 쿼리 테스트 실행
+                log.info("PostGIS 공간 쿼리 테스트 시작 (데이터 크기: {}, 반복: {})", dataSize, iteration);
+                List<Double> postgisTimes = runQueryTest(dataSize, "PostGIS 공간 쿼리", this::measurePostgisQuery);
+
+                // 결과 분석
+                DataSizeResult result = calculateStatistics(dataSize, standardTimes, postgisTimes);
+                iterationResults.add(result);
+
+                log.info("반복 {}/{} - 데이터 크기 {}: P95 일반 쿼리={}ms, P95 PostGIS={}ms",
+                        iteration, ITERATIONS,
+                        dataSize,
+                        String.format("%.2f", result.p95StandardTime()),
+                        String.format("%.2f", result.p95PostgisTime()));
+            }
+
+            // 여러 반복 결과를 집계하여 최종 결과 계산
+            DataSizeResult aggregatedResult = aggregateResults(dataSize, iterationResults);
+            allResults.add(aggregatedResult);
 
             // 결과를 파일에 추가
-            appendResultToFile(result);
+            appendResultToFile(aggregatedResult);
 
-            log.info("데이터 크기 {}: 일반 쿼리 샘플={}, PostGIS 샘플={}, P95 일반 쿼리={}ms, P95 PostGIS={}ms",
+            log.info("데이터 크기 {} 최종 결과 ({} 반복 평균): P95 일반 쿼리={}ms, P95 PostGIS={}ms",
                     dataSize,
-                    standardTimes.size(),
-                    postgisTimes.size(),
-                    String.format("%.2f", result.p95StandardTime()),
-                    String.format("%.2f", result.p95PostgisTime()));
+                    ITERATIONS,
+                    String.format("%.2f", aggregatedResult.p95StandardTime()),
+                    String.format("%.2f", aggregatedResult.p95PostgisTime()));
         }
 
         // 차트 생성
@@ -189,6 +211,122 @@ public class PostGISPerformanceTest {
         log.info("PostGIS 공간 쿼리 성능 테스트 완료");
         log.info("결과 파일: {}, 차트: {}", RESULTS_FILE, SUMMARY_CHART_FILE);
     }
+
+    /**
+     * 워밍업 쿼리 실행
+     * @param dataSize 데이터 크기
+     * @param warmupQueryCount 워밍업 쿼리 수
+     */
+    private void runWarmupQueries(int dataSize, int warmupQueryCount) {
+        Random random = new Random();
+
+        log.info("워밍업: 일반 좌표 쿼리 {} 개 실행 중...", warmupQueryCount);
+        for (int i = 0; i < warmupQueryCount; i++) {
+            double centerLng = 126.9 + (random.nextDouble() * 0.2);
+            double centerLat = 37.5 + (random.nextDouble() * 0.2);
+            measureStandardQuery(dataSize, AREA_SIZE, centerLng, centerLat);
+        }
+
+        log.info("워밍업: PostGIS 공간 쿼리 {} 개 실행 중...", warmupQueryCount);
+        for (int i = 0; i < warmupQueryCount; i++) {
+            double centerLng = 126.9 + (random.nextDouble() * 0.2);
+            double centerLat = 37.5 + (random.nextDouble() * 0.2);
+            measurePostgisQuery(dataSize, AREA_SIZE, centerLng, centerLat);
+        }
+
+        // 인덱스 통계 갱신 (실행 계획 최적화를 위해)
+        jdbcTemplate.execute("ANALYZE estate");
+
+        log.info("워밍업 완료");
+    }
+
+    /**
+     * 여러 반복 실행의 결과를 집계하여 최종 결과 계산
+     */
+    private DataSizeResult aggregateResults(int dataSize, List<DataSizeResult> results) {
+        // 평균 계산
+        double avgStandardTime = results.stream()
+            .mapToDouble(DataSizeResult::avgStandardTime)
+            .average()
+            .orElse(0.0);
+
+        double avgPostgisTime = results.stream()
+            .mapToDouble(DataSizeResult::avgPostgisTime)
+            .average()
+            .orElse(0.0);
+
+        double avgP95StandardTime = results.stream()
+            .mapToDouble(DataSizeResult::p95StandardTime)
+            .average()
+            .orElse(0.0);
+
+        double avgP95PostgisTime = results.stream()
+            .mapToDouble(DataSizeResult::p95PostgisTime)
+            .average()
+            .orElse(0.0);
+
+        // 표준 편차 계산
+        double stdDevP95Standard = calculateStandardDeviation(
+            results.stream().mapToDouble(DataSizeResult::p95StandardTime).toArray());
+
+        double stdDevP95Postgis = calculateStandardDeviation(
+            results.stream().mapToDouble(DataSizeResult::p95PostgisTime).toArray());
+
+        // 샘플 수 (모든 반복의 샘플 수 합계)
+        int totalStandardSamples = results.stream()
+            .mapToInt(DataSizeResult::standardSampleCount)
+            .sum();
+
+        int totalPostgisSamples = results.stream()
+            .mapToInt(DataSizeResult::postgisSampleCount)
+            .sum();
+
+        // 신뢰 구간은 표준 편차에 기반한 95% 신뢰 구간으로 계산
+        // t-분포의 95% 신뢰 수준에서의 임계값 (자유도 = 반복 횟수 - 1)
+        double tCritical = 4.303; // 반복 횟수가 3일 때의 값
+
+        double standardCIRange = tCritical * (stdDevP95Standard / Math.sqrt(results.size()));
+        double postgisCIRange = tCritical * (stdDevP95Postgis / Math.sqrt(results.size()));
+
+        ConfidenceInterval standardCI = new ConfidenceInterval(
+            avgP95StandardTime - standardCIRange,
+            avgP95StandardTime + standardCIRange
+        );
+
+        ConfidenceInterval postgisCI = new ConfidenceInterval(
+            avgP95PostgisTime - postgisCIRange,
+            avgP95PostgisTime + postgisCIRange
+        );
+
+        return new DataSizeResult(
+            dataSize,
+            totalStandardSamples,
+            totalPostgisSamples,
+            avgStandardTime,
+            avgPostgisTime,
+            avgP95StandardTime,
+            avgP95PostgisTime,
+            standardCI,
+            postgisCI
+        );
+    }
+
+    /**
+     * 표준 편차 계산
+     */
+    private double calculateStandardDeviation(double[] values) {
+        if (values.length < 2) {
+            return 0.0;
+        }
+
+        double mean = Arrays.stream(values).average().orElse(0.0);
+        double sumSquaredDiff = Arrays.stream(values)
+            .map(v -> Math.pow(v - mean, 2))
+            .sum();
+
+        return Math.sqrt(sumSquaredDiff / (values.length - 1));
+    }
+
 
     /**
      * 특정 쿼리 유형에 대한 부하 테스트 실행
@@ -622,13 +760,6 @@ public class PostGISPerformanceTest {
             Map<Integer, List<Double>> standardTimesByDataSize = readResponseTimes(STANDARD_TIMES_FILE);
             Map<Integer, List<Double>> postgisTimesByDataSize = readResponseTimes(POSTGIS_TIMES_FILE);
 
-            // 최대 데이터 크기 찾기
-            int maxDataSize = Collections.max(
-                results.stream()
-                        .map(DataSizeResult::dataSize)
-                        .toList()
-            );
-
             StringBuilder html = new StringBuilder();
             html.append("<!DOCTYPE html>\n");
             html.append("<html>\n<head>\n");
@@ -637,7 +768,8 @@ public class PostGISPerformanceTest {
             html.append("  <script src=\"https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@3.10.0/build/index.umd.min.js\"></script>\n");
             html.append("  <style>\n");
             html.append("    body { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; margin: 20px; color: #333; background-color: #f9f9f9; }\n");
-            html.append("    .chart-container { width: 90%; max-width: 1000px; height: 500px; margin: 40px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }\n");
+            html.append("    .chart-container { width: 100%; max-width: 1000px; margin: 40px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }\n");
+            html.append("    .chart-container canvas { width: 100% !important; height: 400px !important; max-height: 400px !important; }\n");
             html.append("    h1 { text-align: center; margin-top: 40px; color: #2c3e50; font-size: 2.2em; }\n");
             html.append("    h2 { text-align: center; color: #3498db; margin-bottom: 30px; }\n");
             html.append("    .description { background-color: #e8f4fc; padding: 15px; border-radius: 5px; margin: 10px 0 25px 0; font-size: 0.95em; line-height: 1.5; }\n");
@@ -726,7 +858,7 @@ public class PostGISPerformanceTest {
             html.append("      <h2>4. 응답 시간 구간별 빈도 히트맵</h2>\n");
             html.append("      <div class=\"description\">\n");
             html.append("        응답 시간을 구간으로 나누어 각 구간의 <span class=\"highlight\">샘플 빈도를 색상 강도</span>로 표시합니다.\n");
-            html.append("        각 쿼리 유형별로 어떤 응답 시간대가 가장 빈번한지 비교할 수 있습니다.\n");
+            html.append("        각 쿼리 유형별로 어떤 응답 시간대가 가장 빈번한지 비교할 수 있습니다. 두 쿼리 유형은 동일한 시간 구간을 사용합니다.\n");
             html.append("      </div>\n");
             html.append("      <canvas id=\"heatmapChart\"></canvas>\n");
             html.append("    </div>\n");
@@ -735,7 +867,7 @@ public class PostGISPerformanceTest {
             html.append("    <div class=\"chart-container\">\n");
             html.append("      <h2>5. 백분위수 그래프</h2>\n");
             html.append("      <div class=\"description\">\n");
-            html.append("        각 백분위수(10%, 20%, ..., 99%)에서의 응답 시간을 보여줍니다.\n");
+            html.append("        각 백분위수(0%, 10%, 20%, ..., 99%)에서의 응답 시간을 보여줍니다.\n");
             html.append("        <span class=\"highlight\">곡선의 기울기가 급격하게 증가하는 지점</span>은 성능이 악화되는 구간을 의미합니다.\n");
             html.append("      </div>\n");
             html.append("      <canvas id=\"percentileChart\"></canvas>\n");
@@ -910,9 +1042,9 @@ public class PostGISPerformanceTest {
             html.append("    }\n");
 
             html.append("    // 히트맵 데이터 생성 함수\n");
-            html.append("    function generateHeatmapData(data, bins = 10) {\n");
-            html.append("      const min = Math.min(...data);\n");
-            html.append("      const max = Math.max(...data);\n");
+            html.append("    function generateHeatmapData(data, bins = 10, customMin = null, customMax = null) {\n");
+            html.append("      const min = customMin !== null ? customMin : Math.min(...data);\n");
+            html.append("      const max = customMax !== null ? customMax : Math.max(...data);\n");
             html.append("      const binWidth = (max - min) / bins;\n");
             html.append("      \n");
             html.append("      const counts = Array(bins).fill(0);\n");
@@ -997,7 +1129,7 @@ public class PostGISPerformanceTest {
 
             // 백분위수 그래프 데이터
             html.append("    // 백분위수 그래프 데이터\n");
-            html.append("    const percentileValues = [10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99];\n");
+            html.append("    const percentileValues = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99];\n");
             html.append("    const percentileDataStandard = percentileValues.map(p => ({\n");
             html.append("      x: p,\n");
             html.append("      y: calculatePercentile(standardTimesMax, p)\n");
@@ -1008,9 +1140,13 @@ public class PostGISPerformanceTest {
             html.append("    }));\n");
 
             // 히트맵 데이터
-            html.append("    // 히트맵 데이터\n");
-            html.append("    const heatmapStandard = generateHeatmapData(standardMaxSampled, 8);\n");
-            html.append("    const heatmapPostgis = generateHeatmapData(postgisMaxSampled, 8);\n");
+            html.append("    // 히트맵 데이터 - 동일한 구간 사용\n");
+            html.append("    const allTimesForBins = [...standardTimesMax, ...postgisTimesMax];\n");
+            html.append("    const globalMin = Math.min(...allTimesForBins);\n");
+            html.append("    const globalMax = Math.max(...allTimesForBins);\n");
+            html.append("    const heatmapBins = 10;\n");
+            html.append("    const heatmapStandard = generateHeatmapData(standardTimesMax, heatmapBins, globalMin, globalMax);\n");
+            html.append("    const heatmapPostgis = generateHeatmapData(postgisTimesMax, heatmapBins, globalMin, globalMax);\n");
 
             // 차트 생성
             // 1. 산점도 + 추세선 차트
@@ -1056,6 +1192,8 @@ public class PostGISPerformanceTest {
             html.append("        ]\n");
             html.append("      },\n");
             html.append("      options: {\n");
+            html.append("        responsive: true,\n");
+            html.append("        maintainAspectRatio: true,\n");
             html.append("        scales: {\n");
             html.append("          y: {\n");
             html.append("            title: {\n");
@@ -1130,6 +1268,13 @@ public class PostGISPerformanceTest {
             html.append("      },\n");
             html.append("      options: {\n");
             html.append("        responsive: true,\n");
+            html.append("        maintainAspectRatio: true,\n");
+            html.append("        elements: {\n");
+            html.append("          point: {\n");
+            html.append("            radius: 3,\n");
+            html.append("            hoverRadius: 5\n");
+            html.append("          }\n");
+            html.append("        },\n");
             html.append("        scales: {\n");
             html.append("          y: {\n");
             html.append("            title: {\n");
@@ -1197,6 +1342,8 @@ public class PostGISPerformanceTest {
             html.append("        ]\n");
             html.append("      },\n");
             html.append("      options: {\n");
+            html.append("        responsive: true,\n");
+            html.append("        maintainAspectRatio: false,\n");
             html.append("        scales: {\n");
             html.append("          y: {\n");
             html.append("            title: {\n");
@@ -1259,6 +1406,8 @@ public class PostGISPerformanceTest {
             html.append("        ]\n");
             html.append("      },\n");
             html.append("      options: {\n");
+            html.append("        responsive: true,\n");
+            html.append("        maintainAspectRatio: false,\n");
             html.append("        scales: {\n");
             html.append("          y: {\n");
             html.append("            title: {\n");
@@ -1322,6 +1471,8 @@ public class PostGISPerformanceTest {
             html.append("        ]\n");
             html.append("      },\n");
             html.append("      options: {\n");
+            html.append("        responsive: true,\n");
+            html.append("        maintainAspectRatio: false,\n");
             html.append("        scales: {\n");
             html.append("          y: {\n");
             html.append("            title: {\n");
