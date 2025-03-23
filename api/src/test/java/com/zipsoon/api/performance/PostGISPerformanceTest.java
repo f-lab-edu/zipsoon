@@ -768,7 +768,7 @@ public class PostGISPerformanceTest {
             html.append("  <script src=\"https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@3.10.0/build/index.umd.min.js\"></script>\n");
             html.append("  <style>\n");
             html.append("    body { font-family: 'Pretendard', 'Noto Sans KR', sans-serif; margin: 20px; color: #333; background-color: #f9f9f9; }\n");
-            html.append("    .chart-container { width: 100%; max-width: 1000px; margin: 40px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }\n");
+            html.append("    .chart-container { width: 90%; max-width: 1000px; margin: 40px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }\n");
             html.append("    .chart-container canvas { width: 100% !important; height: 400px !important; max-height: 400px !important; }\n");
             html.append("    h1 { text-align: center; margin-top: 40px; color: #2c3e50; font-size: 2.2em; }\n");
             html.append("    h2 { text-align: center; color: #3498db; margin-bottom: 30px; }\n");
