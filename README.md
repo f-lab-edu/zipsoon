@@ -5,7 +5,7 @@ Zipsoon은 사용자 설정에 따라 부동산 매물에 점수를 보여주는
 
 <br><br>
 
-## 0. 빠르게 구경하세요!
+## 빠르게 구경하세요!
 
 <img src="/assets/images/zipsoon-visualizer.png" alt="zipsoon-visualizer">
 
@@ -13,6 +13,25 @@ Zipsoon은 사용자 설정에 따라 부동산 매물에 점수를 보여주는
 
 - [↗️ zipsoon-visualizer 웹앱 구경하기](https://zipsoon-visualizer.onrender.com/)
 - [↗️ swagger 구경하기](https://zipsoon-api.onrender.com/swagger-ui/index.html)
+
+<br><br>
+
+## 해결한 과제들
+
+### 1. 공간 쿼리 도입으로, 일반 쿼리 대비 속도를 `5배` 향상시키고 `일관된 응답시간`을 확보했습니다.
+
+<img src="/assets/images/challenge1-chart.svg" alt="challenge1-chart">
+
+### 2. Request ID 도입으로, 로그의 단위 검색당 소요 시간을 `1.5초`가량 개선시키고, `요청 추적`이 용이하도록 개선했습니다.
+
+<img src="/assets/images/challenge2-chart.svg" alt="challenge2-chart">
+
+### 3. 선택적 리소스 처리 도입으로, 소요 시스템 자원을 낮췄습니다.
+
+
+[블로그](https://electronyoon.github.io/%EC%A7%91%EC%88%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9B%84%EA%B8%B0.html#5-%EC%B1%8C%EB%A6%B0%EC%A7%80-%EA%B3%B5%EA%B0%84-%EC%BF%BC%EB%A6%AC-%EB%8F%84%EC%9E%85%ED%95%98%EA%B8%B0)에 더 자세한 내용이 있습니다. (순차적 정리 및 보완중)
+
+
 
 <br><br>
 
@@ -126,13 +145,7 @@ flowchart LR
 
 <br><br>
 
-## 3. 챌린지
-
-테스트를 거치며 [순차적 작성중](https://electronyoon.github.io/%EC%A7%91%EC%88%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9B%84%EA%B8%B0.html#4-%EC%B1%8C%EB%A6%B0%EC%A7%80-%EC%84%A0%ED%83%9D%EC%A0%81-%EB%A6%AC%EC%86%8C%EC%8A%A4-%EC%B2%98%EB%A6%AC)에 있습니다.
-
-<br><br>
-
-## 4. 직접 실행
+## 3. 직접 실행
 
 ### Codespace로 실행
 - Codespace로 프로젝트를 손쉽게 확인하세요. 다운로드, 환경 세팅의 번거로움이 없습니다. 딱 1분 소요됩니다!
