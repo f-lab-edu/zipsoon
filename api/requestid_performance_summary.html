@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RequestID 로깅 성능 분석</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .chart-container { width: 90%; max-width: 1000px; margin: 20px auto; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .summary { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    table, th, td { border: 1px solid #ddd; }
+    th, td { padding: 8px; text-align: right; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>RequestID 로깅 시스템 검색 성능 분석</h1>
+    <p>로그 크기에 따른 RequestID 기반 검색과 전체 텍스트 검색의 성능 비교</p>
+  </div>
+  <div class="summary">
+    <h2>주요 발견점</h2>
+    <ul>
+      <li>30,000,000개 로그에서 절약 시간: <strong>1530.12 ms</strong></li>
+      <li>검색 알고리즘 복잡도: O(n) 선형 → O(1) 상수 시간으로 개선</li>
+    </ul>
+  </div>
+  <div class="chart-container">
+    <h2>로그 크기에 따른 검색 시간 비교</h2>
+    <canvas id="searchTimeChart"></canvas>
+  </div>
+  <div class="chart-container">
+    <h2>로그 크기에 따른 절약 시간 (ms)</h2>
+    <canvas id="timeSavedChart"></canvas>
+  </div>
+  <div>
+    <h2>상세 측정 결과</h2>
+    <table>
+      <tr>
+        <th>로그 크기</th>
+        <th>전체 텍스트 검색 (ms)</th>
+        <th>RequestID 검색 (ms)</th>
+        <th>절약 시간 (ms)</th>
+      </tr>
+      <tr>
+        <td>3,000</td>
+        <td>0.26</td>
+        <td>0.00</td>
+        <td>0.26</td>
+      </tr>
+      <tr>
+        <td>30,000</td>
+        <td>0.74</td>
+        <td>0.00</td>
+        <td>0.74</td>
+      </tr>
+      <tr>
+        <td>300,000</td>
+        <td>8.33</td>
+        <td>0.00</td>
+        <td>8.32</td>
+      </tr>
+      <tr>
+        <td>3,000,000</td>
+        <td>72.82</td>
+        <td>0.01</td>
+        <td>72.81</td>
+      </tr>
+      <tr>
+        <td>30,000,000</td>
+        <td>1530.19</td>
+        <td>0.07</td>
+        <td>1530.12</td>
+      </tr>
+    </table>
+  </div>
+  <script>
+    // 테스트 결과 데이터
+    const searchResults = [
+      {logSize: 3000, bruteForceTime: 0.26, requestIdTime: 0.00, timeSaved: 0.26},
+      {logSize: 30000, bruteForceTime: 0.74, requestIdTime: 0.00, timeSaved: 0.74},
+      {logSize: 300000, bruteForceTime: 8.33, requestIdTime: 0.00, timeSaved: 8.32},
+      {logSize: 3000000, bruteForceTime: 72.82, requestIdTime: 0.01, timeSaved: 72.81},
+      {logSize: 30000000, bruteForceTime: 1530.19, requestIdTime: 0.07, timeSaved: 1530.12},
+    ];
+
+    // 검색 시간 차트
+    const logSizes = searchResults.map(r => r.logSize);
+    const bruteForceTimeData = searchResults.map(r => r.bruteForceTime);
+    const requestIdTimeData = searchResults.map(r => r.requestIdTime);
+    
+    new Chart(document.getElementById('searchTimeChart'), {
+      type: 'line',
+      data: {
+        labels: logSizes.map(size => size.toLocaleString()),
+        datasets: [{
+          label: '전체 텍스트 검색 (O(n) 선형)',
+          data: bruteForceTimeData,
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          tension: 0.1
+        },
+        {
+          label: 'RequestID 검색 (O(1) 상수)',
+          data: requestIdTimeData,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: '검색 시간 (밀리초)'
+            },
+            beginAtZero: true
+          },
+          x: {
+            title: {
+              display: true,
+              text: '로그 크기'
+            }
+          }
+        }
+      }
+    });
+    // 절약 시간 차트
+    const timeSavedData = searchResults.map(r => r.timeSaved);
+    
+    new Chart(document.getElementById('timeSavedChart'), {
+      type: 'bar',
+      data: {
+        labels: logSizes.map(size => size.toLocaleString()),
+        datasets: [{
+          label: '절약된 시간 (ms)',
+          data: timeSavedData,
+          backgroundColor: 'rgba(75, 192, 192, 0.5)',
+          borderColor: 'rgb(75, 192, 192)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: '절약된 시간 (ms)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: '로그 크기'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const item = searchResults[context.dataIndex];
+                return [`절약 시간: ${item.timeSaved.toFixed(2)}ms`, 
+                        `전체 검색: ${item.bruteForceTime.toFixed(2)}ms → RequestID: ${item.requestIdTime.toFixed(2)}ms`];
+              }
+            }
+          }
+        }
+      }
+    });
+    // 추가 설명 및 결론
+    document.addEventListener('DOMContentLoaded', function() {
+      // 최대 절약 시간과 해당 로그 크기 찾기
+      const maxTimeSavedResult = searchResults.reduce((max, current) => 
+        current.timeSaved > max.timeSaved ? current : max, searchResults[0]);
+      
+      const conclusion = document.createElement('div');
+      conclusion.className = 'summary';
+      conclusion.innerHTML = `
+        <h2>결론</h2>
+        <p>RequestID 기반 로그 추적 시스템은 문제 진단 및 해결 시간을 단축시킵니다.</p>
+        <ul>
+          <li><strong>시간 효율성</strong>: 최대 ${maxTimeSavedResult.timeSaved.toFixed(2)}ms의 검색 시간 절약</li>
+          <li><strong>알고리즘 복잡도 개선</strong>: O(n) 선형 → O(1) 상수 시간으로 검색 효율성 향상</li>
+          <li><strong>로그 볼륨 확장성</strong>: 로그 크기가 증가할수록 절약되는 시간 증가</li>
+        </ul>
+      `;
+      document.body.appendChild(conclusion);
+    });
+  </script>
+</body>
+</html>
