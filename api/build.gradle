@@ -21,6 +21,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
+test {
+    // RequestIdPerformanceTest.testSearchPerformance()는 동적으로 로그를 생성해 테스트합니다.
+    // 힙 사이즈 4GB에서 1,000,000개의 로그를 생성 가능 가능
+    maxHeapSize = "16g"
+    jvmArgs = ['-Xmx16g', '-XX:+UseG1GC']    // Java 17 사용으로 G1GC 기본 지정되지만 명시 표현
+}
+
 bootJar {
     enabled = true
     mainClass = 'com.zipsoon.api.ApiApplication'
