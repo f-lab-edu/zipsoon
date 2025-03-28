@@ -151,7 +151,7 @@ public class PostGISPerformanceTest {
         List<DataSizeResult> allResults = new ArrayList<>();
 
         // 반복 실행 횟수 (통계적 안정성 향상)
-        final int ITERATIONS = 3;
+        final int ITERATIONS = 10;
 
         // 각 데이터 크기에 대해 테스트 실행
         for (int dataSize : DATA_SIZES) {
