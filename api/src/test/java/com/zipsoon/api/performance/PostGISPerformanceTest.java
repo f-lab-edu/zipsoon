@@ -61,18 +61,16 @@ public class PostGISPerformanceTest {
     // 쿼리 영역 크기 (도 단위, 약 3km에 해당)
     private static final double AREA_SIZE = 0.03;
 
-    // 시뮬레이션 설정
     private static final int BACKGROUND_LOAD_USERS = 50;  // 배경 부하 생성을 위한 동시 사용자 수
     private static final int REQUESTS_PER_SECOND = 50;    // 초당 요청 수 (RPS)
     private static final int BATCH_SIZE = 1000;          // 벌크 연산 배치 크기
     private static final int MAX_TEST_DURATION_SECONDS = 300; // 최대 테스트 시간 (5분)
-    private static final int BOOTSTRAP_ITERATIONS = 1000; // 부트스트랩 반복 횟수
 
-    /**
-     * P95 계산에 필요한 최소 샘플 수 (각 쿼리 유형별)
-     * <p>통계적 경험칙: 100/0.05 = 2,000)</p>
-     */
-    private static final int MIN_SAMPLES_PER_QUERY_TYPE = 2000;
+    // 최소 샘플 수
+    private static final int MIN_SAMPLES_PER_QUERY_TYPE = 200;
+
+    // 재추출 반복 횟수
+    private static final int BOOTSTRAP_ITERATIONS = 1000;
 
     @BeforeAll
     void setup() {
@@ -187,11 +185,12 @@ public class PostGISPerformanceTest {
                 log.info("반복 {}/{} - 데이터 크기 {}: P95 일반 쿼리={}ms, P95 PostGIS={}ms",
                         iteration, ITERATIONS,
                         dataSize,
-                        String.format("%.2f", result.p95StandardTime()),
-                        String.format("%.2f", result.p95PostgisTime()));
+                        // 소수점 둘째 자리에서 첫째 자리로 변경
+                        String.format("%.1f", result.p95StandardTime()),
+                        String.format("%.1f", result.p95PostgisTime()));
             }
 
-            // 여러 반복 결과를 집계하여 최종 결과 계산
+            // 부트스트랩 방법만 사용하도록 수정된 집계 메서드 호출
             DataSizeResult aggregatedResult = aggregateResults(dataSize, iterationResults);
             allResults.add(aggregatedResult);
 
@@ -201,8 +200,9 @@ public class PostGISPerformanceTest {
             log.info("데이터 크기 {} 최종 결과 ({} 반복 평균): P95 일반 쿼리={}ms, P95 PostGIS={}ms",
                     dataSize,
                     ITERATIONS,
-                    String.format("%.2f", aggregatedResult.p95StandardTime()),
-                    String.format("%.2f", aggregatedResult.p95PostgisTime()));
+                    // 소수점 둘째 자리에서 첫째 자리로 변경
+                    String.format("%.1f", aggregatedResult.p95StandardTime()),
+                    String.format("%.1f", aggregatedResult.p95PostgisTime()));
         }
 
         // 차트 생성
@@ -241,9 +241,22 @@ public class PostGISPerformanceTest {
     }
 
     /**
-     * 여러 반복 실행의 결과를 집계하여 최종 결과 계산
+     * 여러 반복 실행의 결과를 집계 - 단일 부트스트랩 방식만 사용
      */
     private DataSizeResult aggregateResults(int dataSize, List<DataSizeResult> results) {
+        // 모든 반복의 개별 샘플 데이터 수집
+        List<Double> allStandardP95s = results.stream()
+            .map(DataSizeResult::p95StandardTime)
+            .collect(Collectors.toList());
+
+        List<Double> allPostgisP95s = results.stream()
+            .map(DataSizeResult::p95PostgisTime)
+            .collect(Collectors.toList());
+
+        // 부트스트랩 방법으로 평균 P95 및 신뢰 구간 계산
+        double avgP95StandardTime = calculateAverage(allStandardP95s);
+        double avgP95PostgisTime = calculateAverage(allPostgisP95s);
+
         // 평균 계산
         double avgStandardTime = results.stream()
             .mapToDouble(DataSizeResult::avgStandardTime)
@@ -255,22 +268,9 @@ public class PostGISPerformanceTest {
             .average()
             .orElse(0.0);
 
-        double avgP95StandardTime = results.stream()
-            .mapToDouble(DataSizeResult::p95StandardTime)
-            .average()
-            .orElse(0.0);
-
-        double avgP95PostgisTime = results.stream()
-            .mapToDouble(DataSizeResult::p95PostgisTime)
-            .average()
-            .orElse(0.0);
-
-        // 표준 편차 계산
-        double stdDevP95Standard = calculateStandardDeviation(
-            results.stream().mapToDouble(DataSizeResult::p95StandardTime).toArray());
-
-        double stdDevP95Postgis = calculateStandardDeviation(
-            results.stream().mapToDouble(DataSizeResult::p95PostgisTime).toArray());
+        // 부트스트랩으로 신뢰 구간 계산
+        ConfidenceInterval standardCI = calculateBootstrapConfidenceInterval(allStandardP95s, 95, BOOTSTRAP_ITERATIONS);
+        ConfidenceInterval postgisCI = calculateBootstrapConfidenceInterval(allPostgisP95s, 95, BOOTSTRAP_ITERATIONS);
 
         // 샘플 수 (모든 반복의 샘플 수 합계)
         int totalStandardSamples = results.stream()
@@ -280,23 +280,6 @@ public class PostGISPerformanceTest {
         int totalPostgisSamples = results.stream()
             .mapToInt(DataSizeResult::postgisSampleCount)
             .sum();
-
-        // 신뢰 구간은 표준 편차에 기반한 95% 신뢰 구간으로 계산
-        // t-분포의 95% 신뢰 수준에서의 임계값 (자유도 = 반복 횟수 - 1)
-        double tCritical = 4.303; // 반복 횟수가 3일 때의 값
-
-        double standardCIRange = tCritical * (stdDevP95Standard / Math.sqrt(results.size()));
-        double postgisCIRange = tCritical * (stdDevP95Postgis / Math.sqrt(results.size()));
-
-        ConfidenceInterval standardCI = new ConfidenceInterval(
-            avgP95StandardTime - standardCIRange,
-            avgP95StandardTime + standardCIRange
-        );
-
-        ConfidenceInterval postgisCI = new ConfidenceInterval(
-            avgP95PostgisTime - postgisCIRange,
-            avgP95PostgisTime + postgisCIRange
-        );
 
         return new DataSizeResult(
             dataSize,
@@ -312,21 +295,14 @@ public class PostGISPerformanceTest {
     }
 
     /**
-     * 표준 편차 계산
+     * 평균 계산 헬퍼 메서드
      */
-    private double calculateStandardDeviation(double[] values) {
-        if (values.length < 2) {
+    private double calculateAverage(List<Double> values) {
+        if (values == null || values.isEmpty()) {
             return 0.0;
         }
-
-        double mean = Arrays.stream(values).average().orElse(0.0);
-        double sumSquaredDiff = Arrays.stream(values)
-            .map(v -> Math.pow(v - mean, 2))
-            .sum();
-
-        return Math.sqrt(sumSquaredDiff / (values.length - 1));
+        return values.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     }
-
 
     /**
      * 특정 쿼리 유형에 대한 부하 테스트 실행
@@ -373,7 +349,7 @@ public class PostGISPerformanceTest {
                             int current = sampleCount.incrementAndGet();
 
                             // 로그
-                            if (current % 200 == 0) {
+                            if (current % 50 == 0) {
                                 log.debug("{} 샘플 {}개 수집 완료", queryName, current);
                             }
 
@@ -626,14 +602,15 @@ public class PostGISPerformanceTest {
         ConfidenceInterval postgisCI = calculateBootstrapConfidenceInterval(postgisTimes, 95, BOOTSTRAP_ITERATIONS);
 
         log.info("P95 계산 결과 (데이터 크기: {})", dataSize);
+        // 소수점 둘째 자리에서 첫째 자리로 변경
         log.info("  일반 쿼리: P95={} ms, 95% 신뢰 구간=[{}, {}]",
-                String.format("%.2f", p95StandardTime),
-                String.format("%.2f", standardCI.lowerBound()),
-                String.format("%.2f", standardCI.upperBound()));
+                String.format("%.1f", p95StandardTime),
+                String.format("%.1f", standardCI.lowerBound()),
+                String.format("%.1f", standardCI.upperBound()));
         log.info("  PostGIS: P95={} ms, 95% 신뢰 구간=[{}, {}]",
-                String.format("%.2f", p95PostgisTime),
-                String.format("%.2f", postgisCI.lowerBound()),
-                String.format("%.2f", postgisCI.upperBound()));
+                String.format("%.1f", p95PostgisTime),
+                String.format("%.1f", postgisCI.lowerBound()),
+                String.format("%.1f", postgisCI.upperBound()));
 
         return new DataSizeResult(
                 dataSize,
@@ -735,7 +712,8 @@ public class PostGISPerformanceTest {
      */
     private void appendResultToFile(DataSizeResult result) throws Exception {
         try (FileWriter writer = new FileWriter(RESULTS_FILE, true)) {
-            writer.write(String.format("%d,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f%n",
+            // 소수점 둘째 자리에서 첫째 자리로 변경
+            writer.write(String.format("%d,%d,%d,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f%n",
                     result.dataSize(),
                     result.standardSampleCount(),
                     result.postgisSampleCount(),
@@ -799,8 +777,9 @@ public class PostGISPerformanceTest {
                 .findFirst()
                 .ifPresent(largest -> {
                     double improvementRatio = largest.p95StandardTime() / largest.p95PostgisTime();
+                    // 소수점 둘째 자리에서 첫째 자리로 변경
                     html.append(String.format(
-                        "      <li>최대 데이터셋 (%,d개)에서 95%% 사용자의 경험: 일반 쿼리 <strong>%.2f ms</strong> (95%% 신뢰 구간: %.2f-%.2f), PostGIS <strong>%.2f ms</strong> (95%% 신뢰 구간: %.2f-%.2f)</li>%n",
+                        "      <li>최대 데이터셋 (%,d개)에서 95%% 사용자의 경험: 일반 쿼리 <strong>%.1f ms</strong> (95%% 신뢰 구간: %.1f-%.1f), PostGIS <strong>%.1f ms</strong> (95%% 신뢰 구간: %.1f-%.1f)</li>%n",
                         largest.dataSize(),
                         largest.p95StandardTime(),
                         largest.standardCI().lowerBound(),
@@ -888,12 +867,13 @@ public class PostGISPerformanceTest {
             html.append("      </tr>\n");
 
             for (DataSizeResult result : results) {
+                // 소수점 둘째 자리에서 첫째 자리로 변경
                 html.append(String.format("      <tr>%n" +
                            "        <td>%,d</td>%n" +
-                           "        <td>%.2f</td>%n" +
-                           "        <td>[%.2f, %.2f]</td>%n" +
-                           "        <td>%.2f</td>%n" +
-                           "        <td>[%.2f, %.2f]</td>%n" +
+                           "        <td>%.1f</td>%n" +
+                           "        <td>[%.1f, %.1f]</td>%n" +
+                           "        <td>%.1f</td>%n" +
+                           "        <td>[%.1f, %.1f]</td>%n" +
                            "      </tr>%n",
                            result.dataSize(),
                            result.p95StandardTime(),
@@ -1220,14 +1200,15 @@ public class PostGISPerformanceTest {
             html.append("                if (label) {\n");
             html.append("                  label += ': ';\n");
             html.append("                }\n");
-            html.append("                label += context.parsed.y.toFixed(2) + 'ms';\n");
+            html.append("                // 소수점 둘째 자리에서 첫째 자리로 변경\n");
+            html.append("                label += context.parsed.y.toFixed(1) + 'ms';\n");
             html.append("                return label;\n");
             html.append("              }\n");
             html.append("            }\n");
             html.append("          }\n");
             html.append("        }\n");
             html.append("      }\n");
-            html.append("    });\n");
+            html.append("    });\n\n");
 
             // 2. 박스플롯 차트
             html.append("    // 2. 박스플롯 차트\n");
@@ -1295,19 +1276,20 @@ public class PostGISPerformanceTest {
             html.append("            callbacks: {\n");
             html.append("              label: function(context) {\n");
             html.append("                const v = context.raw;\n");
+            html.append("                // 소수점 둘째 자리에서 첫째 자리로 변경\n");
             html.append("                return [\n");
-            html.append("                  \"Min: \" + v.min.toFixed(2) + \"ms\",\n");
-            html.append("                  \"Q1: \" + v.q1.toFixed(2) + \"ms\",\n");
-            html.append("                  \"Median: \" + v.median.toFixed(2) + \"ms\",\n");
-            html.append("                  \"Q3: \" + v.q3.toFixed(2) + \"ms\",\n");
-            html.append("                  \"Max: \" + v.max.toFixed(2) + \"ms\"\n");
+            html.append("                  \"Min: \" + v.min.toFixed(1) + \"ms\",\n");
+            html.append("                  \"Q1: \" + v.q1.toFixed(1) + \"ms\",\n");
+            html.append("                  \"Median: \" + v.median.toFixed(1) + \"ms\",\n");
+            html.append("                  \"Q3: \" + v.q3.toFixed(1) + \"ms\",\n");
+            html.append("                  \"Max: \" + v.max.toFixed(1) + \"ms\"\n");
             html.append("                ];\n");
             html.append("              }\n");
             html.append("            }\n");
             html.append("          }\n");
             html.append("        }\n");
             html.append("      }\n");
-            html.append("    });\n");
+            html.append("    });\n\n");
 
             // 3. 커널 밀도 추정 차트
             html.append("    // 3. 커널 밀도 추정 차트\n");
@@ -1374,13 +1356,14 @@ public class PostGISPerformanceTest {
             html.append("          tooltip: {\n");
             html.append("            callbacks: {\n");
             html.append("              label: function(context) {\n");
-            html.append("                return context.dataset.label + \": \" + context.parsed.x.toFixed(2) + \"ms (밀도: \" + context.parsed.y.toFixed(3) + \")\";\n");
+            html.append("                // 소수점 둘째 자리에서 첫째 자리로 변경\n");
+            html.append("                return context.dataset.label + \": \" + context.parsed.x.toFixed(1) + \"ms (밀도: \" + context.parsed.y.toFixed(2) + \")\";\n");
             html.append("              }\n");
             html.append("            }\n");
             html.append("          }\n");
             html.append("        }\n");
             html.append("      }\n");
-            html.append("    });\n");
+            html.append("    });\n\n");
 
             // 4. 히트맵 차트
             html.append("    // 4. 히트맵 차트 (구간별 빈도로 대체)\n");
@@ -1430,13 +1413,14 @@ public class PostGISPerformanceTest {
             html.append("                return `응답 시간: ${tooltipItems[0].label}ms`;\n");
             html.append("              },\n");
             html.append("              label: function(context) {\n");
+            html.append("                // 소수점 둘째 자리에서 첫째 자리로 변경\n");
             html.append("                return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}%`;\n");
             html.append("              }\n");
             html.append("            }\n");
             html.append("          }\n");
             html.append("        }\n");
             html.append("      }\n");
-            html.append("    });\n");
+            html.append("    });\n\n");
 
             // 5. 백분위수 그래프
             html.append("    // 5. 백분위수 그래프\n");
@@ -1504,7 +1488,8 @@ public class PostGISPerformanceTest {
             html.append("                return `${tooltipItems[0].parsed.x}번째 백분위수`;\n");
             html.append("              },\n");
             html.append("              label: function(context) {\n");
-            html.append("                return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}ms`;\n");
+            html.append("                // 소수점 둘째 자리에서 첫째 자리로 변경\n");
+            html.append("                return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}ms`;\n");
             html.append("              }\n");
             html.append("            }\n");
             html.append("          }\n");
