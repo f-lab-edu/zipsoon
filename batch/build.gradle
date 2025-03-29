@@ -1,6 +1,9 @@
 dependencies {
     implementation project(':common')
     implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    // 테스트 관련
     testImplementation 'org.springframework.batch:spring-batch-test'
 }
 
