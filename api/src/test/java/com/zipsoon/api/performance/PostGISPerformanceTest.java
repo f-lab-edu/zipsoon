@@ -150,7 +150,7 @@ public class PostGISPerformanceTest {
 
         List<DataSizeResult> allResults = new ArrayList<>();
 
-        // 반복 실행 횟수 (통계적 안정성 향상)
+        // 반복 실행 횟수 (3회, 5회, 10회)
         final int ITERATIONS = 10;
 
         // 각 데이터 크기에 대해 테스트 실행
@@ -185,12 +185,11 @@ public class PostGISPerformanceTest {
                 log.info("반복 {}/{} - 데이터 크기 {}: P95 일반 쿼리={}ms, P95 PostGIS={}ms",
                         iteration, ITERATIONS,
                         dataSize,
-                        // 소수점 둘째 자리에서 첫째 자리로 변경
                         String.format("%.1f", result.p95StandardTime()),
                         String.format("%.1f", result.p95PostgisTime()));
             }
 
-            // 부트스트랩 방법만 사용하도록 수정된 집계 메서드 호출
+            // 부트스트랩으로 수정된 집계 메서드 호출
             DataSizeResult aggregatedResult = aggregateResults(dataSize, iterationResults);
             allResults.add(aggregatedResult);
 
@@ -247,11 +246,11 @@ public class PostGISPerformanceTest {
         // 모든 반복의 개별 샘플 데이터 수집
         List<Double> allStandardP95s = results.stream()
             .map(DataSizeResult::p95StandardTime)
-            .collect(Collectors.toList());
+            .toList();
 
         List<Double> allPostgisP95s = results.stream()
             .map(DataSizeResult::p95PostgisTime)
-            .collect(Collectors.toList());
+            .toList();
 
         // 부트스트랩 방법으로 평균 P95 및 신뢰 구간 계산
         double avgP95StandardTime = calculateAverage(allStandardP95s);
@@ -368,7 +367,7 @@ public class PostGISPerformanceTest {
                 });
             }
 
-            // 테스트 진행 상황 모니터링 - 개선된 로깅 알고리즘
+            // 테스트 진행 상황 모니터링
             long nextLogTime = System.currentTimeMillis() + 10000; // 10초 후 첫 로그
             while (sampleCount.get() < MIN_SAMPLES_PER_QUERY_TYPE) {
                 Thread.sleep(1000); // 1초마다 확인
@@ -396,7 +395,6 @@ public class PostGISPerformanceTest {
         } finally {
             workerPool.shutdown();
             try {
-                // 종료 대기
                 if (!workerPool.awaitTermination(30, TimeUnit.SECONDS)) {
                     workerPool.shutdownNow();
                 }
