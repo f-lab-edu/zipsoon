@@ -26,10 +26,7 @@ Zipsoon은 사용자 설정에 따라 부동산 매물에 점수를 보여주는
 
 <img src="/assets/images/challenge2-chart.svg" alt="challenge2-chart">
 
-### 3. 선택적 리소스 처리 도입으로, 소요 시스템 자원을 낮췄습니다.
-
-
-[블로그](https://electronyoon.github.io/%EC%A7%91%EC%88%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9B%84%EA%B8%B0.html#5-%EC%B1%8C%EB%A6%B0%EC%A7%80-%EA%B3%B5%EA%B0%84-%EC%BF%BC%EB%A6%AC-%EB%8F%84%EC%9E%85%ED%95%98%EA%B8%B0)에 더 자세한 내용이 있습니다. (순차적 정리 및 보완중)
+[블로그](https://electronyoon.github.io/%EC%A7%91%EC%88%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9B%84%EA%B8%B0.html#5-%EC%B1%8C%EB%A6%B0%EC%A7%80-%EA%B3%B5%EA%B0%84-%EC%BF%BC%EB%A6%AC-%EB%8F%84%EC%9E%85%ED%95%98%EA%B8%B0)에 더 자세한 내용이 있습니다.
 
 
 
