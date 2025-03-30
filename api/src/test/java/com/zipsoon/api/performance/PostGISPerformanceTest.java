@@ -1076,8 +1076,8 @@ public class PostGISPerformanceTest {
 
             // 산점도 + 추세선 데이터
             html.append("    // 산점도 + 추세선용 데이터\n");
-            html.append("    const standardMaxSampled = sampleArray(standardTimesMax, 300);\n");
-            html.append("    const postgisMaxSampled = sampleArray(postgisTimesMax, 300);\n");
+            html.append("    const standardMaxSampled = sampleArray(standardTimesMax, 200);\n");
+            html.append("    const postgisMaxSampled = sampleArray(postgisTimesMax, 200);\n");
             html.append("    \n");
             html.append("    // 이동 평균 계산\n");
             html.append("    const movingAverageWindow = 30;\n");
