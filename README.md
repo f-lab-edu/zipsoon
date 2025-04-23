@@ -9,10 +9,12 @@ Zipsoon은 사용자 설정에 따라 부동산 매물에 점수를 보여주는
 
 <img src="/assets/images/zipsoon-visualizer.png" alt="zipsoon-visualizer">
 
-⚠️테스트 데이터는 `서울특별시 종로구`만을 포함합니다. 지도를 위쪽으로 움직여 주세요!
+~~⚠️테스트 데이터는 `서울특별시 종로구`만을 포함합니다. 지도를 위쪽으로 움직여 주세요!~~
 
-- [↗️ zipsoon-visualizer 웹앱 구경하기](https://zipsoon-visualizer.onrender.com/)
-- [↗️ swagger 구경하기](https://zipsoon.duckdns.org:8443/swagger-ui/index.html)
+~~- [↗️ zipsoon-visualizer 웹앱 구경하기](https://zipsoon-visualizer.onrender.com/)~~
+~~- [↗️ swagger 구경하기](https://zipsoon.duckdns.org:8443/swagger-ui/index.html)~~
+
+수정 중(250423 ~14:00)
 
 <br><br>
 
